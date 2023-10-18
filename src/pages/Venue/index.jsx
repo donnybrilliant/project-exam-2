@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useAuthStore } from "../../stores/authStore";
-import { useVenuesStore } from "../../stores/venuesStore";
+import useAuthStore from "../../stores/authStore";
+import useVenuesStore from "../../stores/venuesStore";
 
 // Venue page component
 const Venue = () => {
