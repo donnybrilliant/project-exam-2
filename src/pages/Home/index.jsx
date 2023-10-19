@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
 import useAuthStore from "../../stores/authStore";
 import useVenuesStore from "../../stores/venuesStore";
 import VenueList from "../../components/VenueList";
@@ -21,20 +20,12 @@ const Home = () => {
 
   if (isError) return <h1>Error</h1>;
 
+  console.log(venues);
+
   return (
     <Container>
-      <VenueList venues={venues} />
+      {Array.isArray(venues) && <VenueList venues={venues} />}
     </Container>
-    /*     <ul>
-      {Array.isArray(venues) &&
-        venues.map((venue) => (
-          <li key={venue.id}>
-            <Link to={`/venues/${venue.id}`}>
-              {venue.name} {venue.rating}
-            </Link>
-          </li>
-        ))}
-    </ul> */
   );
 };
 
