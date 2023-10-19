@@ -6,7 +6,7 @@ import Logo from "../../ui/Logo";
 
 const Header = () => {
   return (
-    <AppBar position="sticky" color="white">
+    <AppBar position="sticky" color="white" sx={{ marginBottom: 4 }}>
       <Toolbar sx={{ justifyContent: "space-between" }}>
         <Logo fontSize="large" />
         <Typography sx={{ flexGrow: 1 }}>Holidaze</Typography>

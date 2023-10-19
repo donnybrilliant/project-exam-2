@@ -1,5 +1,7 @@
+import { Toolbar } from "@mui/material";
+
 const Footer = () => {
-  return <div>Footer</div>;
+  return <Toolbar sx={{ marginTop: 4 }}>Footer</Toolbar>;
 };
 
 export default Footer;
