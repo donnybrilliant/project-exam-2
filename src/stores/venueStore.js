@@ -2,11 +2,20 @@ import { create } from "zustand";
 import apiFetcher from "../utils/apiFetcher";
 
 // Venues store for storing venues and selected venue and api status
-const useVenuesStore = create((set) => ({
+const useVenueStore = create((set) => ({
   venues: [],
   selectedVenue: null,
   isLoading: false,
   isError: false,
+  openImageIndex: null,
+  setOpenImageIndex: (indexOrFunction) =>
+    set((state) => {
+      const newIndex =
+        typeof indexOrFunction === "function"
+          ? indexOrFunction(state.openImageIndex)
+          : indexOrFunction;
+      return { openImageIndex: newIndex };
+    }),
 
   // Fetch all venues
   fetchVenues: async (token) => {
@@ -33,4 +42,4 @@ const useVenuesStore = create((set) => ({
   },
 }));
 
-export default useVenuesStore;
+export default useVenueStore;
