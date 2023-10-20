@@ -69,7 +69,7 @@ const ImageGallery = ({ media }) => {
               p: 1,
               paddingBottom: 0,
               m: 2,
-              width: { md: "80vw", xl: "60vw" },
+              width: { md: "80vw", lg: "70vw", xl: "60vw" },
             }}
           >
             <IconButton
