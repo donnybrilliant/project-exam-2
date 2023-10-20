@@ -10,6 +10,7 @@ import {
   Container,
   Box,
   Avatar,
+  IconButton,
 } from "@mui/material";
 import PlaceIcon from "@mui/icons-material/Place";
 import { Link } from "react-router-dom";
@@ -17,6 +18,7 @@ import WifiIcon from "@mui/icons-material/Wifi";
 import LocalParkingIcon from "@mui/icons-material/LocalParking";
 import FreeBreakfastIcon from "@mui/icons-material/FreeBreakfast";
 import PetsIcon from "@mui/icons-material/Pets";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
 const VenueCard = ({ venue }) => {
   return (
@@ -43,6 +45,19 @@ const VenueCard = ({ venue }) => {
         )}
 
         <CardContent>
+          <IconButton
+            size="small"
+            aria-label="Close"
+            onClick={() => setOpenImageIndex(null)}
+            sx={{
+              position: "absolute",
+              top: 0,
+              right: 0,
+              zIndex: 2,
+            }}
+          >
+            <FavoriteBorderIcon />
+          </IconButton>
           <Container
             disableGutters
             sx={{ display: "flex", justifyContent: "space-between" }}
