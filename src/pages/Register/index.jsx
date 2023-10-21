@@ -1,3 +1,6 @@
+import { useState } from "react";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { useFetchStore } from "../../stores";
 import {
   Container,
   Typography,
@@ -5,19 +8,35 @@ import {
   TextField,
   Button,
   Link,
-  Grid,
   Avatar,
   Badge,
   IconButton,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
-import { Link as RouterLink } from "react-router-dom";
 
+// This component is used to display a register page
 const Register = () => {
-  const handleSubmit = (event) => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const login = useAuthStore((state) => state.login);
+  const errorMsg = useFetchStore((state) => state.errorMsg);
+
+  // This function is used to register the user and then login
+  const handleRegister = async (event) => {
     event.preventDefault();
-    console.log("register");
+    const register = await apiFetch("auth/register", "POST", {
+      name,
+      email,
+      password,
+    });
+    if (register) {
+      await login(email, password);
+      navigate("/", { replace: true });
+    }
   };
+
   return (
     <Container sx={{ textAlign: "center" }} maxWidth={"sm"}>
       <Typography>Register</Typography>
@@ -34,38 +53,18 @@ const Register = () => {
         <Avatar sx={{ width: "100px", height: "100px" }} />
       </Badge>
 
-      <Box component="form" onSubmit={handleSubmit}>
-        <Grid container spacing={2} sx={{ mt: 0 }}>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              autoComplete="given-name"
-              name="firstName"
-              required
-              fullWidth
-              id="firstName"
-              label="First Name"
-              autoFocus
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              required
-              fullWidth
-              id="lastName"
-              label="Last Name"
-              name="lastName"
-              autoComplete="family-name"
-            />
-          </Grid>
-        </Grid>
+      <Box component="form" onSubmit={handleRegister}>
         <TextField
           margin="normal"
           required
           fullWidth
-          id="username"
+          id="name"
           label="Username"
-          name="username"
+          name="name"
           autoComplete="username"
+          autoFocus
+          value={name}
+          onChange={(e) => setName(e.target.value)}
         />
         <TextField
           margin="normal"
@@ -75,6 +74,8 @@ const Register = () => {
           label="Email Address"
           name="email"
           autoComplete="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
         <TextField
           margin="normal"
@@ -85,6 +86,8 @@ const Register = () => {
           type="password"
           id="password"
           autoComplete="current-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
 
         <Button type="submit" fullWidth variant="contained" sx={{ my: 3 }}>
@@ -92,8 +95,9 @@ const Register = () => {
         </Button>
       </Box>
       <Link component={RouterLink} to={"/login"}>
-        {"Already have an account? Sign Up"}
+        {"Already have an account? Login"}
       </Link>
+      {errorMsg && <Typography>{errorMsg}</Typography>}
     </Container>
   );
 };
