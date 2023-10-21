@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import useAuthStore from "../../stores/authStore";
-import useVenueStore from "../../stores/venueStore";
+import { useVenueStore, useAuthStore } from "../../stores";
+import ImageGallery from "../../components/ImageGallery";
 import {
   Container,
   Card,
@@ -16,21 +16,22 @@ import WifiIcon from "@mui/icons-material/Wifi";
 import LocalParkingIcon from "@mui/icons-material/LocalParking";
 import FreeBreakfastIcon from "@mui/icons-material/FreeBreakfast";
 import PetsIcon from "@mui/icons-material/Pets";
-import ImageGallery from "../../components/ImageGallery";
 
 // Venue page component
 const VenuePage = () => {
   // Get id from URL
   let { id } = useParams();
-  // Get token from authStore
-  const { token } = useAuthStore();
   // Get states and actions from venuesStore
-  const { selectedVenue, isLoading, isError, fetchVenueById } = useVenueStore();
+  const selectedVenue = useVenueStore((state) => state.selectedVenue);
+  const isLoading = useVenueStore((state) => state.isLoading);
+  const isError = useVenueStore((state) => state.isError);
+  const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
+  const token = useAuthStore((state) => state.token);
 
   // Fetch venue when id, token and fetchVenueById function change
   useEffect(() => {
-    fetchVenueById(id, token);
-  }, [id, token, fetchVenueById]);
+    fetchVenueById(id);
+  }, [id]);
 
   if (isLoading) return <h1>Loading...</h1>;
   if (isError) return <h1>Error</h1>;
@@ -44,7 +45,7 @@ const VenuePage = () => {
           component="img"
           image={selectedVenue?.media[0]}
           alt={selectedVenue?.name}
-          style={{ height: "300px" }}
+          style={{ height: "450px" }}
         />
         <CardContent>
           <Container
@@ -56,7 +57,7 @@ const VenuePage = () => {
             </Typography>
             <Rating
               name="venue-rating"
-              value={selectedVenue?.rating}
+              value={selectedVenue?.rating ?? 0}
               precision={0.5}
               readOnly
               style={{ marginBottom: 2 }}
@@ -93,7 +94,7 @@ const VenuePage = () => {
           </Container>
         </CardContent>
         <Button variant="contained" color="primary" fullWidth>
-          Check Availability
+          {!token ? "Login to Book" : "Check Availability"}
         </Button>
       </Card>
       {selectedVenue?.media?.length > 1 && (

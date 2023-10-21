@@ -1,3 +1,4 @@
+import { useGalleryStore } from "../../stores";
 import {
   ImageList,
   ImageListItem,
@@ -9,33 +10,22 @@ import {
 import Close from "@mui/icons-material/Close";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import useVenueStore from "../../stores/venueStore";
 
+// This component is used to display a gallery of images that can be clicked on to view in a modal
 const ImageGallery = ({ media }) => {
-  const { openImageIndex, setOpenImageIndex } = useVenueStore();
-
-  // Handle next image
-  const handleNext = () => {
-    setOpenImageIndex((currentIndex) =>
-      currentIndex < media.length - 1 ? currentIndex + 1 : 0
-    );
-  };
-
-  // Handle previous image
-  const handlePrevious = () => {
-    setOpenImageIndex((currentIndex) =>
-      currentIndex > 0 ? currentIndex - 1 : media.length - 1
-    );
-  };
+  const openImageIndex = useGalleryStore((state) => state.openImageIndex);
+  const setOpenImageIndex = useGalleryStore((state) => state.setOpenImageIndex);
+  const goToNextImage = useGalleryStore((state) => state.goToNextImage);
+  const goToPreviousImage = useGalleryStore((state) => state.goToPreviousImage);
 
   const handleKeyDown = (event) => {
     // Check if the left arrow key was pressed
     if (event.key === "ArrowLeft") {
-      handlePrevious();
+      goToPreviousImage(media.length);
     }
     // Check if the right arrow key was pressed
     if (event.key === "ArrowRight") {
-      handleNext();
+      goToNextImage(media.length);
     }
   };
   return (
@@ -92,9 +82,9 @@ const ImageGallery = ({ media }) => {
                 left: 0,
                 top: 0,
                 bottom: 0,
-                width: "50%", // This makes the Box take up half the width
+                width: "50%",
               }}
-              onClick={handlePrevious}
+              onClick={() => goToPreviousImage(media.length)}
             >
               <IconButton
                 aria-label="Previous"
@@ -103,7 +93,7 @@ const ImageGallery = ({ media }) => {
                   left: 20,
                   top: "50%",
                   transform: "translateY(-50%)",
-                  bgcolor: "rgba(255, 255, 255, 0.5)", // Set background color here
+                  bgcolor: "rgba(255, 255, 255, 0.5)",
                 }}
               >
                 <ChevronLeftIcon />
@@ -125,9 +115,9 @@ const ImageGallery = ({ media }) => {
                 right: 0,
                 top: 0,
                 bottom: 0,
-                width: "50%", // This makes the Box take up half the width
+                width: "50%",
               }}
-              onClick={handleNext}
+              onClick={() => goToNextImage(media.length)}
             >
               <IconButton
                 aria-label="Next"
@@ -136,7 +126,7 @@ const ImageGallery = ({ media }) => {
                   right: 20,
                   top: "50%",
                   transform: "translateY(-50%)",
-                  bgcolor: "rgba(255, 255, 255, 0.5)", // Set background color here
+                  bgcolor: "rgba(255, 255, 255, 0.5)",
                 }}
               >
                 <ChevronRightIcon />

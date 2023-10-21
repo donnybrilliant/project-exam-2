@@ -1,25 +1,25 @@
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
-import Typography from "@mui/material/Typography";
+import { Link } from "react-router-dom";
 import {
   Button,
+  Card,
+  CardContent,
+  CardMedia,
   CardActionArea,
   CardActions,
   Rating,
   Container,
   Box,
-  Avatar,
   IconButton,
+  Typography,
 } from "@mui/material";
 import PlaceIcon from "@mui/icons-material/Place";
-import { Link } from "react-router-dom";
 import WifiIcon from "@mui/icons-material/Wifi";
 import LocalParkingIcon from "@mui/icons-material/LocalParking";
 import FreeBreakfastIcon from "@mui/icons-material/FreeBreakfast";
 import PetsIcon from "@mui/icons-material/Pets";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
+// This component is used to display a venue card
 const VenueCard = ({ venue }) => {
   return (
     <Card>
