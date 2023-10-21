@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useVenueStore } from "../../stores";
+import { useVenueStore, useAuthStore } from "../../stores";
 import ImageGallery from "../../components/ImageGallery";
 import {
   Container,
@@ -26,6 +26,7 @@ const VenuePage = () => {
   const isLoading = useVenueStore((state) => state.isLoading);
   const isError = useVenueStore((state) => state.isError);
   const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
+  const token = useAuthStore((state) => state.token);
 
   // Fetch venue when id, token and fetchVenueById function change
   useEffect(() => {
@@ -34,6 +35,8 @@ const VenuePage = () => {
 
   if (isLoading) return <h1>Loading...</h1>;
   if (isError) return <h1>Error</h1>;
+
+  console.log(selectedVenue);
 
   return (
     <Container>
@@ -91,7 +94,7 @@ const VenuePage = () => {
           </Container>
         </CardContent>
         <Button variant="contained" color="primary" fullWidth>
-          Check Availability
+          {!token ? "Login to Book" : "Check Availability"}
         </Button>
       </Card>
       {selectedVenue?.media?.length > 1 && (

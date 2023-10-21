@@ -21,6 +21,8 @@ const Home = () => {
 
   if (isError) return <h1>Error: {errorMsg}</h1>;
 
+  console.log(venues);
+
   return (
     <Container>
       {Array.isArray(venues) && <VenueList venues={venues} />}
