@@ -19,9 +19,13 @@ const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [avatar, setAvatar] = useState("");
   const navigate = useNavigate();
-  const login = useAuthStore((state) => state.login);
+  const apiFetch = useFetchStore((state) => state.apiFetch);
+  const isLoading = useFetchStore((state) => state.isLoading);
   const errorMsg = useFetchStore((state) => state.errorMsg);
+  const login = useAuthStore((state) => state.login);
+  const [isAvatarFieldVisible, setIsAvatarFieldVisible] = useState(false);
 
   // This function is used to register the user and then login
   const handleRegister = async (event) => {
@@ -30,11 +34,16 @@ const Register = () => {
       name,
       email,
       password,
+      avatar,
     });
     if (register) {
       await login(email, password);
-      navigate("/", { replace: true });
+      navigate("/dashboard", { replace: true });
     }
+  };
+
+  const toggleAvatarField = () => {
+    setIsAvatarFieldVisible((prev) => !prev);
   };
 
   return (
@@ -45,15 +54,27 @@ const Register = () => {
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         sx={{ m: 4 }}
         badgeContent={
-          <IconButton sx={{ bgcolor: "#d3d3d3" }}>
+          <IconButton sx={{ bgcolor: "#d3d3d3" }} onClick={toggleAvatarField}>
             <EditIcon />
           </IconButton>
         }
       >
-        <Avatar sx={{ width: "100px", height: "100px" }} />
+        <Avatar src={avatar} sx={{ width: "100px", height: "100px" }} />
       </Badge>
 
       <Box component="form" onSubmit={handleRegister}>
+        {isAvatarFieldVisible && (
+          <TextField
+            margin="normal"
+            fullWidth
+            id="avatar"
+            label="Avatar"
+            name="avatar"
+            value={avatar}
+            onChange={(e) => setAvatar(e.target.value)}
+          />
+        )}
+
         <TextField
           margin="normal"
           required
