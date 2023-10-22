@@ -125,6 +125,21 @@ export const useVenueStore = create((set) => ({
       set({ selectedVenue: data });
     }
   },
+  createVenue: async (venueData) => {
+    const data = await useFetchStore
+      .getState()
+      .apiFetch("venues", "POST", venueData);
+    console.log(data);
+
+    // I dont think i need this.. For testing!!
+    /*  if (data) {
+      // Assuming your API returns the newly created venue,
+      // you could add it to the venues array in the state.
+      set((state) => ({
+        venues: [...state.venues, data]
+      }));
+    } */
+  },
 }));
 
 export const useGalleryStore = create((set) => ({
