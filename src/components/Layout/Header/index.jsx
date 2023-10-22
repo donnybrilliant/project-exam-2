@@ -2,6 +2,7 @@ import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import Stack from "@mui/material/Stack";
 import Logo from "../../ui/Logo";
 import { NavLink } from "react-router-dom";
 import { useAuthStore } from "../../../stores/index";
@@ -19,23 +20,27 @@ const Header = () => {
   const handleLogout = (event) => {
     event.preventDefault();
     clearAuthInfo();
-    // or navigate elsewhere?
     navigate("/");
   };
 
   return (
     <AppBar position="sticky" color="white" sx={{ marginBottom: 4 }}>
       <Toolbar sx={{ justifyContent: "space-between" }}>
-        <Logo fontSize="large" />
-        <Typography sx={{ flexGrow: 1 }}>
-          <NavLink to={"/"}>Holidaze</NavLink>
+        <Typography
+          component={NavLink}
+          to={"/"}
+          sx={{ display: "flex", alignItems: "center", textDecoration: "none" }}
+        >
+          <Logo fontSize="large" />
+          Holidaze
         </Typography>
+
         {!token ? (
           <Button component={NavLink} to={"/login"} variant="contained">
             Login
           </Button>
         ) : (
-          <>
+          <Stack direction="row" sx={{ alignItems: "center" }} spacing={2}>
             <Typography>{userInfo.name}</Typography>
             <Avatar
               component={NavLink}
@@ -46,7 +51,7 @@ const Header = () => {
             <Button variant="contained" onClick={handleLogout}>
               Logout
             </Button>
-          </>
+          </Stack>
         )}
       </Toolbar>
     </AppBar>
