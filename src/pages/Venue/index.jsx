@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { useVenueStore, useAuthStore } from "../../stores";
+import { useVenueStore, useAuthStore, useFetchStore } from "../../stores";
 import ImageGallery from "../../components/ImageGallery";
 import {
   Container,
@@ -11,6 +11,9 @@ import {
   Rating,
   Button,
   Stack,
+  Avatar,
+  CardHeader,
+  Box,
 } from "@mui/material";
 import WifiIcon from "@mui/icons-material/Wifi";
 import LocalParkingIcon from "@mui/icons-material/LocalParking";
@@ -22,11 +25,11 @@ const VenuePage = () => {
   // Get id from URL
   let { id } = useParams();
   // Get states and actions from venuesStore
-  const selectedVenue = useVenueStore((state) => state.selectedVenue);
-  const isLoading = useVenueStore((state) => state.isLoading);
-  const isError = useVenueStore((state) => state.isError);
-  const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
   const token = useAuthStore((state) => state.token);
+  const selectedVenue = useVenueStore((state) => state.selectedVenue);
+  const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
+  const isLoading = useFetchStore((state) => state.isLoading);
+  const isError = useFetchStore((state) => state.isError);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -57,7 +60,11 @@ const VenuePage = () => {
         <CardContent>
           <Container
             disableGutters
-            sx={{ display: "flex", justifyContent: "space-between" }}
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+            }}
           >
             <Typography variant="h5" component="div">
               {selectedVenue?.name}
@@ -81,6 +88,7 @@ const VenuePage = () => {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
+              flexWrap: "wrap",
             }}
           >
             <Stack direction="row" spacing={2}>
@@ -112,10 +120,31 @@ const VenuePage = () => {
       {selectedVenue?.media?.length > 1 && (
         <ImageGallery media={selectedVenue?.media} />
       )}
-      <Typography>Created: {selectedVenue?.created}</Typography>
-      {selectedVenue?.created !== selectedVenue?.updated && (
-        <Typography>Updated: {selectedVenue.updated}</Typography>
-      )}
+      <Container
+        disableGutters
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+        }}
+      >
+        <CardHeader
+          avatar={
+            <Avatar
+              alt={selectedVenue?.owner?.name}
+              src={selectedVenue?.owner?.avatar}
+            />
+          }
+          title={selectedVenue?.owner?.name}
+        />
+        <Box>
+          <Typography>Created: {selectedVenue?.created}</Typography>
+          {selectedVenue?.created !== selectedVenue?.updated && (
+            <Typography>Updated: {selectedVenue.updated}</Typography>
+          )}
+        </Box>
+      </Container>
     </Container>
   );
 };
