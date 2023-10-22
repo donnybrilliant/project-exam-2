@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useVenueStore, useAuthStore } from "../../stores";
 import ImageGallery from "../../components/ImageGallery";
 import {
@@ -28,7 +28,10 @@ const VenuePage = () => {
   const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
   const token = useAuthStore((state) => state.token);
 
-  // Fetch venue when id, token and fetchVenueById function change
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Fetch venue when id changes
   useEffect(() => {
     fetchVenueById(id);
   }, [id]);
@@ -37,6 +40,10 @@ const VenuePage = () => {
   if (isError) return <h1>Error</h1>;
 
   console.log(selectedVenue);
+
+  const navigateToLogin = () => {
+    navigate("/login", { state: { from: location } });
+  };
 
   return (
     <Container>
@@ -93,7 +100,12 @@ const VenuePage = () => {
             <Typography>Price: ${selectedVenue?.price}</Typography>
           </Container>
         </CardContent>
-        <Button variant="contained" color="primary" fullWidth>
+        <Button
+          variant="contained"
+          color="primary"
+          fullWidth
+          onClick={!token ? navigateToLogin : () => {}}
+        >
           {!token ? "Login to Book" : "Check Availability"}
         </Button>
       </Card>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
-import { useFetchStore } from "../../stores";
+import { useFetchStore, useAuthStore } from "../../stores";
 import {
   Container,
   Typography,
