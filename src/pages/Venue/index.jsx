@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { useVenueStore, useAuthStore } from "../../stores";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { useVenueStore, useAuthStore, useFetchStore } from "../../stores";
 import ImageGallery from "../../components/ImageGallery";
 import {
   Container,
@@ -11,6 +11,9 @@ import {
   Rating,
   Button,
   Stack,
+  Avatar,
+  CardHeader,
+  Box,
 } from "@mui/material";
 import WifiIcon from "@mui/icons-material/Wifi";
 import LocalParkingIcon from "@mui/icons-material/LocalParking";
@@ -22,13 +25,16 @@ const VenuePage = () => {
   // Get id from URL
   let { id } = useParams();
   // Get states and actions from venuesStore
-  const selectedVenue = useVenueStore((state) => state.selectedVenue);
-  const isLoading = useVenueStore((state) => state.isLoading);
-  const isError = useVenueStore((state) => state.isError);
-  const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
   const token = useAuthStore((state) => state.token);
+  const selectedVenue = useVenueStore((state) => state.selectedVenue);
+  const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
+  const isLoading = useFetchStore((state) => state.isLoading);
+  const isError = useFetchStore((state) => state.isError);
 
-  // Fetch venue when id, token and fetchVenueById function change
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Fetch venue when id changes
   useEffect(() => {
     fetchVenueById(id);
   }, [id]);
@@ -37,6 +43,10 @@ const VenuePage = () => {
   if (isError) return <h1>Error</h1>;
 
   console.log(selectedVenue);
+
+  const navigateToLogin = () => {
+    navigate("/login", { state: { from: location } });
+  };
 
   return (
     <Container>
@@ -50,7 +60,11 @@ const VenuePage = () => {
         <CardContent>
           <Container
             disableGutters
-            sx={{ display: "flex", justifyContent: "space-between" }}
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+            }}
           >
             <Typography variant="h5" component="div">
               {selectedVenue?.name}
@@ -74,6 +88,7 @@ const VenuePage = () => {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
+              flexWrap: "wrap",
             }}
           >
             <Stack direction="row" spacing={2}>
@@ -93,17 +108,43 @@ const VenuePage = () => {
             <Typography>Price: ${selectedVenue?.price}</Typography>
           </Container>
         </CardContent>
-        <Button variant="contained" color="primary" fullWidth>
+        <Button
+          variant="contained"
+          color="primary"
+          fullWidth
+          onClick={!token ? navigateToLogin : () => {}}
+        >
           {!token ? "Login to Book" : "Check Availability"}
         </Button>
       </Card>
       {selectedVenue?.media?.length > 1 && (
         <ImageGallery media={selectedVenue?.media} />
       )}
-      <Typography>Created: {selectedVenue?.created}</Typography>
-      {selectedVenue?.created !== selectedVenue?.updated && (
-        <Typography>Updated: {selectedVenue.updated}</Typography>
-      )}
+      <Container
+        disableGutters
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+        }}
+      >
+        <CardHeader
+          avatar={
+            <Avatar
+              alt={selectedVenue?.owner?.name}
+              src={selectedVenue?.owner?.avatar}
+            />
+          }
+          title={selectedVenue?.owner?.name}
+        />
+        <Box>
+          <Typography>Created: {selectedVenue?.created}</Typography>
+          {selectedVenue?.created !== selectedVenue?.updated && (
+            <Typography>Updated: {selectedVenue.updated}</Typography>
+          )}
+        </Box>
+      </Container>
     </Container>
   );
 };

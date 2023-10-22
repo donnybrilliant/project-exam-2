@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
 import { useFetchStore, useAuthStore } from "../../stores";
 import {
   Container,
@@ -18,12 +18,14 @@ const Login = () => {
   const login = useAuthStore((state) => state.login);
   const errorMsg = useFetchStore((state) => state.errorMsg);
   const navigate = useNavigate();
+  const location = useLocation();
 
   // This function is used to login the user
   const handleLogin = async (event) => {
     event.preventDefault();
     await login(email, password);
-    navigate("/", { replace: true });
+    const { from } = location.state || { from: { pathname: "/" } };
+    navigate(from.pathname, { replace: true });
   };
 
   return (

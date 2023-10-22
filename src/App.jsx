@@ -4,7 +4,8 @@ import Home from "./pages/Home";
 import VenuePage from "./pages/Venue";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import PublicOnlyRoute from "./components/PublicOnlyRoute"; // Add PublicRoute
+import { PublicOnlyRoute, PrivateRoute } from "./components/AccessControl";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   return (
@@ -26,6 +27,14 @@ function App() {
             <PublicOnlyRoute>
               <Register />
             </PublicOnlyRoute>
+          }
+        />
+        <Route
+          path="dashboard"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
           }
         />
 
