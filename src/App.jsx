@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import { PublicOnlyRoute, PrivateRoute } from "./components/AccessControl";
 import Dashboard from "./pages/Dashboard";
+import CreateVenue from "./pages/Create";
 
 function App() {
   return (
@@ -29,11 +30,20 @@ function App() {
             </PublicOnlyRoute>
           }
         />
+
         <Route
           path="dashboard"
           element={
             <PrivateRoute>
               <Dashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="create"
+          element={
+            <PrivateRoute>
+              <CreateVenue />
             </PrivateRoute>
           }
         />

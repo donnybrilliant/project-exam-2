@@ -33,7 +33,7 @@ const ImageGallery = ({ media }) => {
       <ImageList cols={Math.min(media.length, 3)}>
         {media?.map((item, index) => (
           <ImageListItem
-            key={item}
+            key={`${item}-${index}`}
             onClick={() => setOpenImageIndex(index)}
             sx={{ cursor: "pointer" }}
           >

@@ -96,13 +96,13 @@ const VenuePage = () => {
                 color={selectedVenue?.meta.wifi ? "info" : "disabled"}
               />
               <LocalParkingIcon
-                color={selectedVenue?.meta.wifi ? "info" : "disabled"}
+                color={selectedVenue?.meta.parking ? "info" : "disabled"}
               />
               <FreeBreakfastIcon
-                color={selectedVenue?.meta.wifi ? "info" : "disabled"}
+                color={selectedVenue?.meta.breakfast ? "info" : "disabled"}
               />
               <PetsIcon
-                color={selectedVenue?.meta.wifi ? "info" : "disabled"}
+                color={selectedVenue?.meta.pets ? "info" : "disabled"}
               />
             </Stack>
             <Typography>Price: ${selectedVenue?.price}</Typography>
