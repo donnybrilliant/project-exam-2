@@ -52,9 +52,14 @@ export const useAuthStore = create(
     (set) => ({
       token: null,
       userInfo: null,
-      /*  setAuthInfo: (token, userInfo) => {
-        set({ token, userInfo });
-      }, */
+      updateUserInfo: (updatedInfo) => {
+        set((state) => ({
+          userInfo: {
+            ...state.userInfo,
+            ...updatedInfo,
+          },
+        }));
+      },
       clearAuthInfo: () => {
         set({ token: null, userInfo: null });
       },
@@ -162,5 +167,27 @@ export const useProfileStore = create((set) => ({
     if (data) {
       set({ selectedProfile: data });
     }
+  },
+  // maybe not neccessary with name here..
+  updateAvatar: async (newAvatarUrl) => {
+    // Utilize apiFetch from useFetchStore for the PUT request
+    const name = useAuthStore.getState().userInfo.name;
+    const updatedProfile = await useFetchStore
+      .getState()
+      .apiFetch(`profiles/${name}/media`, "PUT", { avatar: newAvatarUrl });
+
+    // Is this neccessary?
+    // If successful, update selectedProfile and userInfo with the new avatar URL
+    /*     set((state) => ({
+      selectedProfile: {
+        ...state.selectedProfile,
+        avatar: updatedProfile.avatar,
+      },
+    }));
+*/
+    // Update avatar URL in useAuthStore
+    useAuthStore.getState().updateUserInfo({
+      avatar: updatedProfile.avatar,
+    });
   },
 }));
