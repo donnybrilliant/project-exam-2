@@ -113,7 +113,9 @@ export const useVenueStore = create((set) => ({
 
   // Action for fetching a single venue
   fetchVenueById: async (id) => {
-    const data = await useFetchStore.getState().apiFetch(`venues/${id}`);
+    const data = await useFetchStore
+      .getState()
+      .apiFetch(`venues/${id}?_owner=true&_bookings=true`);
     if (data) {
       set({ selectedVenue: data });
     }
@@ -135,4 +137,30 @@ export const useGalleryStore = create((set) => ({
         state.openImageIndex > 0 ? state.openImageIndex - 1 : mediaLength - 1;
       return { openImageIndex: newIndex };
     }),
+}));
+
+// Profiles store for fetching profiles and selected profile
+export const useProfileStore = create((set) => ({
+  profiles: [],
+  selectedProfile: null,
+
+  // Action for fetching all profiles
+  fetchProfiles: async () => {
+    const data = await useFetchStore
+      .getState()
+      .apiFetch("profiles?_venues=true&_bookings=true");
+    if (data) {
+      set({ venues: data });
+    }
+  },
+
+  // Action for fetching a single profile
+  fetchProfileByName: async (name) => {
+    const data = await useFetchStore
+      .getState()
+      .apiFetch(`profiles/${name}?_venues=true&_bookings=true`);
+    if (data) {
+      set({ selectedProfile: data });
+    }
+  },
 }));
