@@ -111,6 +111,19 @@ const Dashboard = () => {
           </ListItem>
         ))}
       </List>
+      {/*  <List>
+        {selectedProfile?.venues.map((venue) => (
+          <ListItem key={venue.id} secondaryAction={<Button>View</Button>}>
+            <ListItemAvatar>
+              <Avatar alt={venue?.venue.name} src={venue?.venue.media[0]} />
+            </ListItemAvatar>
+            <ListItemText
+              primary={venue?.venue.name}
+              secondary={venue?.dateFrom + " - " + venue.dateTo}
+            />
+          </ListItem>
+        ))}
+      </List> */}
     </Container>
   );
 };
