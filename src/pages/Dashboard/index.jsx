@@ -15,6 +15,7 @@ import {
   InputAdornment,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
+import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   const [isAvatarFieldVisible, setIsAvatarFieldVisible] = useState(false);
@@ -111,19 +112,26 @@ const Dashboard = () => {
           </ListItem>
         ))}
       </List>
-      {/*  <List>
+      <List>
         {selectedProfile?.venues.map((venue) => (
-          <ListItem key={venue.id} secondaryAction={<Button>View</Button>}>
+          <ListItem
+            key={venue.id}
+            secondaryAction={
+              <Button component={Link} to={`/venues/${venue.id}`}>
+                View
+              </Button>
+            }
+          >
             <ListItemAvatar>
-              <Avatar alt={venue?.venue.name} src={venue?.venue.media[0]} />
+              <Avatar alt={venue?.name} src={venue?.media[0]} />
             </ListItemAvatar>
             <ListItemText
-              primary={venue?.venue.name}
-              secondary={venue?.dateFrom + " - " + venue.dateTo}
+              primary={venue?.name || "No venue name - please update"}
+              secondary={"Rating: " + venue?.rating + " Price: " + venue?.price}
             />
           </ListItem>
         ))}
-      </List> */}
+      </List>
     </Container>
   );
 };
