@@ -134,6 +134,7 @@ export const useVenueStore = create((set) => ({
       .apiFetch(`venues/${id}?_owner=true&_bookings=true`);
     if (data) {
       set({ selectedVenue: data });
+      return data;
     }
   },
   createVenue: async (venueData) => {
@@ -151,6 +152,13 @@ export const useVenueStore = create((set) => ({
       }));
     } */
   },
+  updateVenue: async (id, venueData) => {
+    const data = await useFetchStore
+      .getState()
+      .apiFetch(`venues/${id}`, "PUT", venueData);
+    console.log(data);
+  },
+
   deleteVenue: async (id) => {
     await useFetchStore.getState().apiFetch(`venues/${id}`, "DELETE");
     // After deletion, remove the venue from the local state to reflect the change
