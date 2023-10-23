@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { useFetchStore, useVenueStore } from "../../stores";
 import ImageGallery from "../../components/ImageGallery";
 import {
@@ -22,8 +23,10 @@ import PetsIcon from "@mui/icons-material/Pets";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const CreateVenue = () => {
-  const createVenue = useVenueStore((state) => state.createVenue);
+const EditVenue = () => {
+  const { id } = useParams();
+  const updateVenue = useVenueStore((state) => state.updateVenue);
+  const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
   const isError = useFetchStore((state) => state.isError);
   const errorMsg = useFetchStore((state) => state.errorMsg);
   const [name, setName] = useState("");
@@ -75,9 +78,25 @@ const CreateVenue = () => {
       rating,
       meta,
     };
-    createVenue(venueData);
+    updateVenue(id, venueData);
     console.log(venueData);
   };
+
+  useEffect(() => {
+    // Fetch venue data when component mounts
+    const fetchVenueData = async () => {
+      const venueData = await fetchVenueById(id);
+      // Populate state variables with fetched data
+      setName(venueData.name);
+      setDescription(venueData.description);
+      setMedia(venueData.media);
+      setPrice(venueData.price);
+      setMaxGuests(venueData.maxGuests);
+      setRating(venueData.rating);
+      setMeta(venueData.meta);
+    };
+    fetchVenueData();
+  }, [id, fetchVenueById]);
 
   return (
     <Container maxWidth="md">
@@ -238,7 +257,7 @@ const CreateVenue = () => {
           </Container>
         </CardContent>
         <Button variant="contained" color="primary" fullWidth type="submit">
-          Create Venue
+          Update Venue
         </Button>
         {isError && <Typography>{errorMsg}</Typography>}
       </Card>
@@ -247,4 +266,4 @@ const CreateVenue = () => {
   );
 };
 
-export default CreateVenue;
+export default EditVenue;
