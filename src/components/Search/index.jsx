@@ -39,6 +39,8 @@ const Search = () => {
         <DatePicker
           label="Start Date"
           value={startDate}
+          format="DD-MM-YYYY"
+          disablePast
           onChange={(date) => {
             setStartDate(date.toISOString());
             handleFilter();
@@ -47,6 +49,8 @@ const Search = () => {
         <DatePicker
           label="End Date"
           value={endDate}
+          format="DD-MM-YYYY"
+          disablePast
           onChange={(date) => {
             setEndDate(date.toISOString());
             handleFilter();
