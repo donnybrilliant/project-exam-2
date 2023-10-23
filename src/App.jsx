@@ -7,6 +7,7 @@ import Register from "./pages/Register";
 import { PublicOnlyRoute, PrivateRoute } from "./components/AccessControl";
 import Dashboard from "./pages/Dashboard";
 import CreateVenue from "./pages/Create";
+import EditVenue from "./pages/EditVenue";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="venues/:id" element={<VenuePage />} />
+        <Route path="venues/:id/edit" element={<EditVenue />} />
         <Route
           path="login"
           element={
