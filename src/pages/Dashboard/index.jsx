@@ -145,6 +145,13 @@ const Dashboard = () => {
         <Typography>
           VenueManager: {selectedProfile?.venueManager ? "Yes" : "No"}
         </Typography>
+        <Button
+          variant="contained"
+          component={Link}
+          to={"/dashboard/venues/create"}
+        >
+          Create Venue
+        </Button>
 
         <List>
           {selectedProfile?.bookings.map((booking) => (
