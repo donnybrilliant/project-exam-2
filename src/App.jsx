@@ -40,7 +40,7 @@ function App() {
           }
         />
         <Route
-          path="create"
+          path="/dashboard/venues/create"
           element={
             <PrivateRoute>
               <CreateVenue />
