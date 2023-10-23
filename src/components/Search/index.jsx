@@ -22,7 +22,6 @@ const Search = () => {
         display: "flex",
         alignItems: "center",
         marginBottom: 3,
-        justifyContent: "stretch",
       }}
       disableGutters
     >
@@ -42,7 +41,7 @@ const Search = () => {
           format="DD-MM-YYYY"
           disablePast
           onChange={(date) => {
-            setStartDate(date.toISOString());
+            setStartDate(date);
             handleFilter();
           }}
         />
@@ -52,7 +51,7 @@ const Search = () => {
           format="DD-MM-YYYY"
           disablePast
           onChange={(date) => {
-            setEndDate(date.toISOString());
+            setEndDate(date);
             handleFilter();
           }}
         />
