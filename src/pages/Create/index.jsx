@@ -64,7 +64,8 @@ const CreateVenue = () => {
     setMedia(media.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (event) => {
+    event.preventDefault();
     const venueData = {
       name,
       description,
@@ -79,8 +80,8 @@ const CreateVenue = () => {
   };
 
   return (
-    <Container>
-      <Card>
+    <Container maxWidth="md">
+      <Card component="form" onSubmit={handleSubmit}>
         {media.length > 0 && (
           <CardMedia
             component="img"
@@ -140,6 +141,7 @@ const CreateVenue = () => {
             inputProps={{ min: "1", max: "100" }}
             value={maxGuests}
             onChange={(e) => setMaxGuests(e.target.value)}
+            fullWidth
           />
 
           <Container
@@ -235,12 +237,7 @@ const CreateVenue = () => {
             ))}
           </Container>
         </CardContent>
-        <Button
-          variant="contained"
-          color="primary"
-          fullWidth
-          onClick={handleSubmit}
-        >
+        <Button variant="contained" color="primary" fullWidth type="submit">
           Create Venue
         </Button>
         {isError && <Typography>{errorMsg}</Typography>}
