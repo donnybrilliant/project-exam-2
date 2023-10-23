@@ -117,7 +117,21 @@ export const useThemeStore = create(
 
 export const useVenueStore = create((set) => ({
   venues: [],
+  filteredVenues: [],
   selectedVenue: null,
+
+  fetchAllVenues: async () => {
+    const limit = 100;
+    const offset = 0;
+    const firstBatch = await useFetchStore
+      .getState()
+      .apiFetch(`venues?_bookings=true&limit=${limit}&offset=${offset}`);
+    const secondBatch = await useFetchStore
+      .getState()
+      .apiFetch(`venues?_bookings=true&limit=${limit}&offset=${limit}`);
+    const allVenues = [...firstBatch, ...secondBatch];
+    set({ venues: allVenues, filteredVenues: allVenues }); // Initialize filteredVenues here
+  },
 
   // Action for fetching all venues
   fetchVenues: async () => {
@@ -167,6 +181,40 @@ export const useVenueStore = create((set) => ({
       selectedVenue:
         state.selectedVenue?.id === id ? null : state.selectedVenue,
     }));
+  },
+
+  filterVenues: (searchTerm, startDate, endDate) => {
+    set((state) => {
+      const lowerCaseTerm = searchTerm.toLowerCase();
+
+      const filtered = state.venues.filter((venue) => {
+        // Text Search
+        const textMatch = [
+          venue.name,
+          venue.location.city,
+          venue.location.address,
+          venue.location.continent,
+          venue.location.country,
+          venue.location.zip,
+        ].some((field) => field && field.toLowerCase().includes(lowerCaseTerm));
+
+        // Date Range Search
+        const dateMatch = !venue.bookings.some((booking) => {
+          return (
+            (startDate &&
+              booking.dateFrom <= startDate &&
+              booking.dateTo >= startDate) ||
+            (endDate &&
+              booking.dateFrom <= endDate &&
+              booking.dateTo >= endDate)
+          );
+        });
+
+        return textMatch && dateMatch;
+      });
+
+      return { filteredVenues: filtered }; // return the new state value
+    });
   },
 }));
 

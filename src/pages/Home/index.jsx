@@ -7,25 +7,27 @@ import Container from "@mui/material/Container";
 const Home = () => {
   // Get states and actions from venuesStore
   const fetchVenues = useVenueStore((state) => state.fetchVenues);
+  const fetchAllVenues = useVenueStore((state) => state.fetchAllVenues);
   const isLoading = useFetchStore((state) => state.isLoading);
   const isError = useFetchStore((state) => state.isError);
   const errorMsg = useFetchStore((state) => state.errorMsg);
   const venues = useVenueStore((state) => state.venues);
+  const filteredVenues = useVenueStore((state) => state.filteredVenues);
 
   // Fetch venues when token and fetchVenues function change
   useEffect(() => {
-    fetchVenues();
+    fetchAllVenues();
   }, []);
 
   if (isLoading) return <h1>Loading...</h1>;
 
   if (isError) return <h1>Error: {errorMsg}</h1>;
 
-  console.log(venues);
+  console.log(filteredVenues);
 
   return (
     <Container>
-      {Array.isArray(venues) && <VenueList venues={venues} />}
+      {Array.isArray(venues) && <VenueList venues={filteredVenues} />}
     </Container>
   );
 };
