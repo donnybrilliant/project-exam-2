@@ -19,6 +19,12 @@ import WifiIcon from "@mui/icons-material/Wifi";
 import LocalParkingIcon from "@mui/icons-material/LocalParking";
 import FreeBreakfastIcon from "@mui/icons-material/FreeBreakfast";
 import PetsIcon from "@mui/icons-material/Pets";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 
 // Venue page component
 const VenuePage = () => {
@@ -108,6 +114,23 @@ const VenuePage = () => {
             <Typography>Price: ${selectedVenue?.price}</Typography>
           </Container>
         </CardContent>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DateCalendar
+            disablePast
+            shouldDisableDate={(day) => {
+              return selectedVenue?.bookings.some(
+                (booking) =>
+                  day.isAfter(
+                    dayjs
+                      .utc(booking.dateFrom)
+                      .subtract(1, "day")
+                      .startOf("day")
+                  ) && day.isBefore(dayjs.utc(booking.dateTo).startOf("day"))
+              );
+            }}
+          />
+        </LocalizationProvider>
+
         <Button
           variant="contained"
           color="primary"
