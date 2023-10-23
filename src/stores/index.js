@@ -24,18 +24,29 @@ export const useFetchStore = create((set) => ({
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const text = await response.text(); // Try to read text even if it's not JSON
+        let errorData;
+        try {
+          errorData = JSON.parse(text); // Try to parse text as JSON
+        } catch {
+          errorData = { message: text }; // If parsing fails, wrap text in an object
+        }
         const errorMessage =
           (errorData.errors && errorData.errors[0].message) ||
           `${response.status}: ${response.statusText}`;
         throw new Error(errorMessage);
       }
 
-      const data = await response.json();
+      const text = await response.text();
+      if (text) {
+        // Only parse as JSON if there's a response body
+        const data = JSON.parse(text);
+        set({ isLoading: false, isError: false });
+        return data;
+      }
       set({ isLoading: false, isError: false });
-      return data;
+      return null; // Return null if there's no response body
     } catch (error) {
-      // This block will now catch both expected HTTP errors and unexpected errors
       console.error(error);
       set({
         isLoading: false,
@@ -139,6 +150,15 @@ export const useVenueStore = create((set) => ({
         venues: [...state.venues, data]
       }));
     } */
+  },
+  deleteVenue: async (id) => {
+    await useFetchStore.getState().apiFetch(`venues/${id}`, "DELETE");
+    // After deletion, remove the venue from the local state to reflect the change
+    set((state) => ({
+      venues: state.venues.filter((venue) => venue.id !== id),
+      selectedVenue:
+        state.selectedVenue?.id === id ? null : state.selectedVenue,
+    }));
   },
 }));
 
