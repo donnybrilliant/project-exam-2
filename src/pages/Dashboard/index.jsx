@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { useAuthStore, useProfileStore, useFetchStore } from "../../stores";
+import { Link } from "react-router-dom";
+import {
+  useAuthStore,
+  useProfileStore,
+  useFetchStore,
+  useVenueStore,
+} from "../../stores";
 import {
   Avatar,
   Container,
@@ -13,10 +19,16 @@ import {
   Button,
   TextField,
   InputAdornment,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
-import { Link } from "react-router-dom";
-
+import DeleteIcon from "@mui/icons-material/Delete";
 const Dashboard = () => {
   const [isAvatarFieldVisible, setIsAvatarFieldVisible] = useState(false);
   const [avatar, setAvatar] = useState("");
@@ -30,6 +42,40 @@ const Dashboard = () => {
   const isError = useFetchStore((state) => state.isError);
   const selectedProfile = useProfileStore((state) => state.selectedProfile);
   const updateAvatar = useProfileStore((state) => state.updateAvatar);
+  const deleteVenue = useVenueStore((state) => state.deleteVenue);
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [venueToDelete, setVenueToDelete] = useState(null);
+  const [venueToDeleteName, setVenueToDeleteName] = useState("");
+
+  const handleDeleteClick = (venueId) => {
+    const venue = selectedProfile?.venues.find((venue) => venue.id === venueId);
+    setVenueToDelete(venueId);
+    setVenueToDeleteName(venue?.name); // Save venue name
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    await deleteVenue(venueToDelete); // await to ensure completion before fetching
+    await fetchProfileByName(userName); // Re-fetch profile data
+    setDeleteDialogOpen(false);
+    setSnackbarMessage(`Successfully deleted ${venueToDeleteName}.`);
+    setSnackbarOpen(true);
+  };
+
+  // Check docs for opening and closing snackbars and modals
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+  };
 
   const toggleAvatarField = () => {
     setIsAvatarFieldVisible((prev) => !prev);
@@ -56,83 +102,127 @@ const Dashboard = () => {
   console.log(selectedProfile);
 
   return (
-    <Container sx={{ textAlign: "center" }}>
-      <Typography>Dashboard</Typography>
-      <Badge
-        overlap="circular"
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        sx={{ m: 4 }}
-        badgeContent={
-          <IconButton sx={{ bgcolor: "#d3d3d3" }} onClick={toggleAvatarField}>
-            <EditIcon />
-          </IconButton>
-        }
-      >
-        <Avatar
-          alt={selectedProfile?.name}
-          src={avatar}
-          sx={{ width: "100px", height: "100px" }}
-        />
-      </Badge>
-      {isAvatarFieldVisible && (
-        <TextField
-          margin="normal"
-          fullWidth
-          id="avatar"
-          label="Avatar"
-          name="avatar"
-          value={avatar}
-          onChange={(e) => setAvatar(e.target.value)}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <Button onClick={handleAvatarUpdate}>Save</Button>
-              </InputAdornment>
-            ),
-          }}
-        />
-      )}
+    <>
+      <Container sx={{ textAlign: "center" }}>
+        <Typography>Dashboard</Typography>
+        <Badge
+          overlap="circular"
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+          sx={{ m: 4 }}
+          badgeContent={
+            <IconButton sx={{ bgcolor: "#d3d3d3" }} onClick={toggleAvatarField}>
+              <EditIcon />
+            </IconButton>
+          }
+        >
+          <Avatar
+            alt={selectedProfile?.name}
+            src={avatar}
+            sx={{ width: "100px", height: "100px" }}
+          />
+        </Badge>
+        {isAvatarFieldVisible && (
+          <TextField
+            margin="normal"
+            fullWidth
+            id="avatar"
+            label="Avatar"
+            name="avatar"
+            value={avatar}
+            onChange={(e) => setAvatar(e.target.value)}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Button onClick={handleAvatarUpdate}>Save</Button>
+                </InputAdornment>
+              ),
+            }}
+          />
+        )}
 
-      <Typography>Username: {selectedProfile?.name}</Typography>
-      <Typography>Email: {selectedProfile?.email}</Typography>
-      <Typography>
-        VenueManager: {selectedProfile?.venueManager ? "Yes" : "No"}
-      </Typography>
+        <Typography>Username: {selectedProfile?.name}</Typography>
+        <Typography>Email: {selectedProfile?.email}</Typography>
+        <Typography>
+          VenueManager: {selectedProfile?.venueManager ? "Yes" : "No"}
+        </Typography>
 
-      <List>
-        {selectedProfile?.bookings.map((booking) => (
-          <ListItem key={booking.id} secondaryAction={<Button>View</Button>}>
-            <ListItemAvatar>
-              <Avatar alt={booking?.venue.name} src={booking?.venue.media[0]} />
-            </ListItemAvatar>
-            <ListItemText
-              primary={booking?.venue.name}
-              secondary={booking?.dateFrom + " - " + booking.dateTo}
-            />
-          </ListItem>
-        ))}
-      </List>
-      <List>
-        {selectedProfile?.venues.map((venue) => (
-          <ListItem
-            key={venue.id}
-            secondaryAction={
+        <List>
+          {selectedProfile?.bookings.map((booking) => (
+            <ListItem key={booking.id} secondaryAction={<Button>View</Button>}>
+              <ListItemAvatar>
+                <Avatar
+                  alt={booking?.venue.name}
+                  src={booking?.venue.media[0]}
+                />
+              </ListItemAvatar>
+              <ListItemText
+                primary={booking?.venue.name}
+                secondary={booking?.dateFrom + " - " + booking.dateTo}
+              />
+            </ListItem>
+          ))}
+        </List>
+        <List>
+          {selectedProfile?.venues.map((venue) => (
+            <ListItem key={venue.id}>
+              <ListItemAvatar>
+                <Avatar alt={venue?.name} src={venue?.media[0]} />
+              </ListItemAvatar>
+              <ListItemText
+                primary={venue?.name || "No venue name - please update"}
+                secondary={
+                  "Rating: " + venue?.rating + " Price: " + venue?.price
+                }
+              />
+              <IconButton onClick={() => handleDeleteClick(venue.id)}>
+                <DeleteIcon />
+              </IconButton>
+              <IconButton component={Link} to={`/venues/${venue.id}/edit`}>
+                <EditIcon />
+              </IconButton>
               <Button component={Link} to={`/venues/${venue.id}`}>
                 View
               </Button>
-            }
-          >
-            <ListItemAvatar>
-              <Avatar alt={venue?.name} src={venue?.media[0]} />
-            </ListItemAvatar>
-            <ListItemText
-              primary={venue?.name || "No venue name - please update"}
-              secondary={"Rating: " + venue?.rating + " Price: " + venue?.price}
-            />
-          </ListItem>
-        ))}
-      </List>
-    </Container>
+            </ListItem>
+          ))}
+        </List>
+      </Container>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleDeleteCancel}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Delete Venue"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete this venue? This action cannot be
+            undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteCancel} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDeleteConfirm} color="primary" autoFocus>
+            Yes, Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
+    </>
   );
 };
 
