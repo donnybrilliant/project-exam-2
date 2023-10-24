@@ -5,6 +5,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
+import dayjs from "dayjs";
 
 const Search = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -43,6 +44,9 @@ const Search = () => {
           onChange={(date) => {
             setStartDate(date);
             handleFilter();
+            if (date) {
+              setEndDate(dayjs(date).add(1, "day"));
+            }
           }}
         />
         <DatePicker
@@ -50,6 +54,8 @@ const Search = () => {
           value={endDate}
           format="DD-MM-YYYY"
           disablePast
+          minDate={startDate ? dayjs(startDate).add(1, "day") : undefined}
+          open={startDate !== null}
           onChange={(date) => {
             setEndDate(date);
             handleFilter();
