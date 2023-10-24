@@ -26,7 +26,6 @@ import {
   DialogActions,
   Snackbar,
   Alert,
-  Box,
   Chip,
   ListItemSecondaryAction,
 } from "@mui/material";
@@ -177,9 +176,16 @@ const Dashboard = () => {
               <ListItemText
                 primary={booking?.venue.name}
                 secondary={
-                  dayjs(booking?.dateFrom).format("DD/MM/YY") +
+                  dayjs
+                    .utc(booking?.dateFrom)
+                    .startOf("day")
+                    .format("DD/MM/YY") +
                   " - " +
-                  dayjs(booking?.dateTo).format("DD/MM/YY")
+                  dayjs
+                    .utc(booking?.dateTo)
+
+                    .endOf("day")
+                    .format("DD/MM/YY")
                 }
               />
 
