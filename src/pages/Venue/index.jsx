@@ -39,6 +39,7 @@ const VenuePage = () => {
   const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
   const isLoading = useFetchStore((state) => state.isLoading);
   const isError = useFetchStore((state) => state.isError);
+  const bookVenue = useVenueStore((state) => state.bookVenue);
   const [dateRange, setDateRange] = useState([null, null]);
 
   const checkDisabledDatesInRange = (startDate, endDate) => {
@@ -111,8 +112,6 @@ const VenuePage = () => {
     return <PickersDay {...props} sx={{ ...matchedStyles }} />;
   };
 
-  //console.log(dateRange);
-
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -124,10 +123,21 @@ const VenuePage = () => {
   if (isLoading) return <h1>Loading...</h1>;
   if (isError) return <h1>Error</h1>;
 
+  //console.log(dateRange[0]);
   //console.log(selectedVenue);
 
   const navigateToLogin = () => {
     navigate("/login", { state: { from: location } });
+  };
+
+  const handleBooking = () => {
+    const bookingData = {
+      venueId: id,
+      dateFrom: dayjs(dateRange[0]).add(1, "day").format(),
+      dateTo: dayjs(dateRange[1]).add(1, "day").format(),
+      guests: 1,
+    };
+    bookVenue(bookingData);
   };
 
   return (
@@ -214,9 +224,9 @@ const VenuePage = () => {
           variant="contained"
           color="primary"
           fullWidth
-          onClick={!token ? navigateToLogin : () => {}}
+          onClick={!token ? navigateToLogin : handleBooking}
         >
-          {!token ? "Login to Book" : "Check Availability"}
+          {!token ? "Login to Book" : "Book"}
         </Button>
       </Card>
       {selectedVenue?.media?.length > 1 && (
