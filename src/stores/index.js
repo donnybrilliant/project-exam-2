@@ -216,6 +216,12 @@ export const useVenueStore = create((set) => ({
       return { filteredVenues: filtered }; // return the new state value
     });
   },
+  bookVenue: async (bookingData) => {
+    console.log(bookingData);
+    const data = await useFetchStore
+      .getState()
+      .apiFetch("bookings", "POST", bookingData);
+  },
 }));
 
 export const useGalleryStore = create((set) => ({
