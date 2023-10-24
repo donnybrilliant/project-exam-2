@@ -26,9 +26,14 @@ import {
   DialogActions,
   Snackbar,
   Alert,
+  Chip,
+  ListItemSecondaryAction,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { People, Person } from "@mui/icons-material";
+import dayjs from "dayjs";
+
 const Dashboard = () => {
   const [isAvatarFieldVisible, setIsAvatarFieldVisible] = useState(false);
   const [avatar, setAvatar] = useState("");
@@ -40,6 +45,7 @@ const Dashboard = () => {
   );
   const isLoading = useFetchStore((state) => state.isLoading);
   const isError = useFetchStore((state) => state.isError);
+  const errorMsg = useFetchStore((state) => state.errorMsg);
   const selectedProfile = useProfileStore((state) => state.selectedProfile);
   const updateAvatar = useProfileStore((state) => state.updateAvatar);
   const deleteVenue = useVenueStore((state) => state.deleteVenue);
@@ -49,7 +55,11 @@ const Dashboard = () => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [venueToDelete, setVenueToDelete] = useState(null);
   const [venueToDeleteName, setVenueToDeleteName] = useState("");
+  const deleteBooking = useVenueStore((state) => state.deleteBooking);
 
+  const handleDeleteClickBooking = async (bookingId) => {
+    await deleteBooking(bookingId);
+  };
   const handleDeleteClick = (venueId) => {
     const venue = selectedProfile?.venues.find((venue) => venue.id === venueId);
     setVenueToDelete(venueId);
@@ -83,6 +93,7 @@ const Dashboard = () => {
 
   const handleAvatarUpdate = async () => {
     await updateAvatar(avatar);
+    setIsAvatarFieldVisible(false);
   };
 
   // Fetch venue when userName changes
@@ -97,7 +108,7 @@ const Dashboard = () => {
   }, [selectedProfile]);
 
   if (isLoading) return <h1>Loading...</h1>;
-  if (isError) return <h1>Error</h1>;
+  if (isError) return <h1>{errorMsg}</h1>;
 
   console.log(selectedProfile);
 
@@ -126,9 +137,9 @@ const Dashboard = () => {
             margin="normal"
             fullWidth
             id="avatar"
-            label="Avatar"
+            label="Avatar URL"
             name="avatar"
-            value={avatar}
+            value={avatar || ""}
             onChange={(e) => setAvatar(e.target.value)}
             InputProps={{
               endAdornment: (
@@ -155,7 +166,7 @@ const Dashboard = () => {
 
         <List>
           {selectedProfile?.bookings.map((booking) => (
-            <ListItem key={booking.id} secondaryAction={<Button>View</Button>}>
+            <ListItem key={booking.id}>
               <ListItemAvatar>
                 <Avatar
                   alt={booking?.venue.name}
@@ -164,8 +175,38 @@ const Dashboard = () => {
               </ListItemAvatar>
               <ListItemText
                 primary={booking?.venue.name}
-                secondary={booking?.dateFrom + " - " + booking.dateTo}
+                secondary={
+                  dayjs
+                    .utc(booking?.dateFrom)
+                    .startOf("day")
+                    .format("DD/MM/YY") +
+                  " - " +
+                  dayjs
+                    .utc(booking?.dateTo)
+
+                    .endOf("day")
+                    .format("DD/MM/YY")
+                }
               />
+
+              <ListItemSecondaryAction>
+                <Chip
+                  sx={{ mr: 2 }}
+                  icon={booking?.guests === 1 ? <Person /> : <People />}
+                  label={booking?.guests}
+                />
+                <IconButton
+                  onClick={() => handleDeleteClickBooking(booking.id)}
+                >
+                  <DeleteIcon />
+                </IconButton>
+                <IconButton>
+                  <EditIcon />
+                </IconButton>
+                <Button component={Link} to={`/venues/${booking.venue.id}`}>
+                  View
+                </Button>
+              </ListItemSecondaryAction>
             </ListItem>
           ))}
         </List>

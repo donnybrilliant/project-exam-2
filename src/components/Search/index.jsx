@@ -5,28 +5,32 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
+import InputAdornment from "@mui/material/InputAdornment";
+import Person from "@mui/icons-material/Person";
 import dayjs from "dayjs";
+import { Button } from "@mui/material";
+import Grid from "@mui/material/Grid";
 
 const Search = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [guests, setGuests] = useState(1);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const filterVenues = useVenueStore((state) => state.filterVenues);
 
   const handleFilter = () => {
-    filterVenues(searchTerm, startDate, endDate);
+    filterVenues(searchTerm, startDate, endDate, guests);
   };
 
   return (
-    <Container
+    <Grid
+      container
+      rowSpacing={2}
       sx={{
-        display: "flex",
-        alignItems: "center",
         marginBottom: 3,
       }}
-      disableGutters
     >
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <Grid item>
         <TextField
           label="Search"
           variant="outlined"
@@ -36,33 +40,67 @@ const Search = () => {
             handleFilter();
           }}
         />
+      </Grid>
+      <Grid item>
         <DatePicker
           label="Start Date"
           value={startDate}
-          format="DD-MM-YYYY"
+          format="DD/MM/YY"
           disablePast
           onChange={(date) => {
             setStartDate(date);
             handleFilter();
-            if (date) {
-              setEndDate(dayjs(date).add(1, "day"));
-            }
+          }}
+          sx={{
+            width: "145px",
           }}
         />
+      </Grid>
+      <Grid item>
         <DatePicker
           label="End Date"
           value={endDate}
-          format="DD-MM-YYYY"
+          format="DD/MM/YY"
           disablePast
           minDate={startDate ? dayjs(startDate).add(1, "day") : undefined}
-          open={startDate !== null}
           onChange={(date) => {
             setEndDate(date);
             handleFilter();
           }}
+          sx={{
+            width: "145px",
+          }}
         />
-      </LocalizationProvider>
-    </Container>
+      </Grid>
+      <Grid item>
+        <TextField
+          sx={{
+            width: "90px",
+          }}
+          label="Guests"
+          variant="outlined"
+          type="number"
+          inputProps={{ min: "1", max: "100" }}
+          value={guests}
+          onChange={(e) => {
+            setGuests(e.target.value);
+            handleFilter();
+          }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Person />
+              </InputAdornment>
+            ),
+          }}
+        />
+      </Grid>
+      <Grid item>
+        <Button sx={{ height: "100%", width: "100%" }} variant="contained">
+          Search
+        </Button>
+      </Grid>
+    </Grid>
   );
 };
 

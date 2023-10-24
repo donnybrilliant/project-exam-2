@@ -217,10 +217,15 @@ export const useVenueStore = create((set) => ({
     });
   },
   bookVenue: async (bookingData) => {
-    console.log(bookingData);
     const data = await useFetchStore
       .getState()
       .apiFetch("bookings", "POST", bookingData);
+  },
+  deleteBooking: async (id) => {
+    const data = await useFetchStore
+      .getState()
+      .apiFetch(`bookings/${id}`, "DELETE");
+    // Update some state??
   },
 }));
 
