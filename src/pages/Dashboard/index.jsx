@@ -28,6 +28,7 @@ import {
   Alert,
   Chip,
   ListItemSecondaryAction,
+  Divider,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -163,75 +164,82 @@ const Dashboard = () => {
         >
           Create Venue
         </Button>
-
+        <h2>Your Bookings</h2>
         <List>
           {selectedProfile?.bookings.map((booking) => (
-            <ListItem key={booking.id}>
-              <ListItemAvatar>
-                <Avatar
-                  alt={booking?.venue.name}
-                  src={booking?.venue.media[0]}
-                />
-              </ListItemAvatar>
-              <ListItemText
-                primary={booking?.venue.name}
-                secondary={
-                  dayjs
-                    .utc(booking?.dateFrom)
-                    .startOf("day")
-                    .format("DD/MM/YY") +
-                  " - " +
-                  dayjs
-                    .utc(booking?.dateTo)
+            <>
+              <ListItem key={booking.id}>
+                <ListItemAvatar>
+                  <Avatar
+                    alt={booking?.venue.name}
+                    src={booking?.venue.media[0]}
+                  />
+                </ListItemAvatar>
+                <ListItemText
+                  primary={booking?.venue.name}
+                  secondary={
+                    dayjs
+                      .utc(booking?.dateFrom)
+                      .startOf("day")
+                      .format("DD/MM/YY") +
+                    " - " +
+                    dayjs
+                      .utc(booking?.dateTo)
 
-                    .endOf("day")
-                    .format("DD/MM/YY")
-                }
-              />
-
-              <ListItemSecondaryAction>
-                <Chip
-                  sx={{ mr: 2 }}
-                  icon={booking?.guests === 1 ? <Person /> : <People />}
-                  label={booking?.guests}
+                      .endOf("day")
+                      .format("DD/MM/YY")
+                  }
                 />
-                <IconButton
-                  onClick={() => handleDeleteClickBooking(booking.id)}
-                >
-                  <DeleteIcon />
-                </IconButton>
-                <IconButton>
-                  <EditIcon />
-                </IconButton>
-                <Button component={Link} to={`/venues/${booking.venue.id}`}>
-                  View
-                </Button>
-              </ListItemSecondaryAction>
-            </ListItem>
+
+                <ListItemSecondaryAction>
+                  <Chip
+                    sx={{ mr: 2 }}
+                    icon={booking?.guests === 1 ? <Person /> : <People />}
+                    label={booking?.guests}
+                  />
+                  <IconButton
+                    onClick={() => handleDeleteClickBooking(booking.id)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                  <IconButton>
+                    <EditIcon />
+                  </IconButton>
+                  <Button component={Link} to={`/venues/${booking.venue.id}`}>
+                    View
+                  </Button>
+                </ListItemSecondaryAction>
+              </ListItem>
+              <Divider />
+            </>
           ))}
         </List>
+        <h2>Your Venues</h2>
         <List>
           {selectedProfile?.venues.map((venue) => (
-            <ListItem key={venue.id}>
-              <ListItemAvatar>
-                <Avatar alt={venue?.name} src={venue?.media[0]} />
-              </ListItemAvatar>
-              <ListItemText
-                primary={venue?.name || "No venue name - please update"}
-                secondary={
-                  "Rating: " + venue?.rating + " Price: " + venue?.price
-                }
-              />
-              <IconButton onClick={() => handleDeleteClick(venue.id)}>
-                <DeleteIcon />
-              </IconButton>
-              <IconButton component={Link} to={`/venues/${venue.id}/edit`}>
-                <EditIcon />
-              </IconButton>
-              <Button component={Link} to={`/venues/${venue.id}`}>
-                View
-              </Button>
-            </ListItem>
+            <>
+              <ListItem key={venue.id}>
+                <ListItemAvatar>
+                  <Avatar alt={venue?.name} src={venue?.media[0]} />
+                </ListItemAvatar>
+                <ListItemText
+                  primary={venue?.name || "No venue name - please update"}
+                  secondary={
+                    "Rating: " + venue?.rating + " Price: " + venue?.price
+                  }
+                />
+                <IconButton onClick={() => handleDeleteClick(venue.id)}>
+                  <DeleteIcon />
+                </IconButton>
+                <IconButton component={Link} to={`/venues/${venue.id}/edit`}>
+                  <EditIcon />
+                </IconButton>
+                <Button component={Link} to={`/venues/${venue.id}`}>
+                  View
+                </Button>
+              </ListItem>
+              <Divider />
+            </>
           ))}
         </List>
       </Container>

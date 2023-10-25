@@ -19,11 +19,14 @@ import {
   CardHeader,
   Box,
   TextField,
+  Tooltip,
+  Link,
 } from "@mui/material";
 import WifiIcon from "@mui/icons-material/Wifi";
 import LocalParkingIcon from "@mui/icons-material/LocalParking";
 import FreeBreakfastIcon from "@mui/icons-material/FreeBreakfast";
 import PetsIcon from "@mui/icons-material/Pets";
+import PlaceIcon from "@mui/icons-material/Place";
 
 dayjs.extend(utc);
 
@@ -87,9 +90,12 @@ const VenuePage = () => {
               display: "flex",
               justifyContent: "space-between",
               flexWrap: "wrap",
+              alignItems: "center",
+              marginBottom: 1,
+              gap: 1,
             }}
           >
-            <Typography variant="h5" component="div">
+            <Typography variant="h1" component="div">
               {selectedVenue?.name}
             </Typography>
             <Rating
@@ -97,13 +103,36 @@ const VenuePage = () => {
               value={selectedVenue?.rating ?? 0}
               precision={0.5}
               readOnly
-              style={{ marginBottom: 2 }}
+              style={{ marginLeft: -2 }}
             />
           </Container>
-          <Typography>Description:</Typography>
-          <Typography variant="body2">{selectedVenue?.description}</Typography>
+          <Link
+            href="#map"
+            color="text.secondary"
+            sx={{
+              textTransform: "capitalize",
+              display: "flex",
+              alignItems: "center",
+              marginLeft: -0.5,
+              marginBlock: 2,
+            }}
+          >
+            <PlaceIcon fontSize="small" />
+            {selectedVenue?.location.city === ""
+              ? "Unknown"
+              : selectedVenue?.location.city}
+            {selectedVenue?.location.country === ""
+              ? ""
+              : ", " + selectedVenue?.location.country}
+          </Link>
+          <Typography variant="h2">Description:</Typography>
+          <Typography sx={{ marginBlock: 1 }}>
+            {selectedVenue?.description}
+          </Typography>
 
-          <Typography>Max Guests: {selectedVenue?.maxGuests}</Typography>
+          <Typography color="text.secondary" align="right" sx={{ py: 2 }}>
+            Max Guests: {selectedVenue?.maxGuests}
+          </Typography>
 
           <Container
             disableGutters
@@ -112,23 +141,67 @@ const VenuePage = () => {
               justifyContent: "space-between",
               alignItems: "center",
               flexWrap: "wrap",
+              gap: 2,
+              marginBottom: 5,
             }}
           >
             <Stack direction="row" spacing={2}>
-              <WifiIcon
-                color={selectedVenue?.meta.wifi ? "info" : "disabled"}
-              />
-              <LocalParkingIcon
-                color={selectedVenue?.meta.parking ? "info" : "disabled"}
-              />
-              <FreeBreakfastIcon
-                color={selectedVenue?.meta.breakfast ? "info" : "disabled"}
-              />
-              <PetsIcon
-                color={selectedVenue?.meta.pets ? "info" : "disabled"}
-              />
+              <Tooltip
+                title={selectedVenue?.meta.wifi ? "Has Wifi" : "No Wifi"}
+                arrow
+              >
+                <WifiIcon
+                  fontSize="large"
+                  color={selectedVenue?.meta.wifi ? "" : "disabled"}
+                />
+              </Tooltip>
+              <Tooltip
+                title={
+                  selectedVenue?.meta.parking ? "Has Parking" : "No Parking"
+                }
+                arrow
+              >
+                <LocalParkingIcon
+                  fontSize="large"
+                  color={selectedVenue?.meta.parking ? "" : "disabled"}
+                />
+              </Tooltip>
+              <Tooltip
+                title={
+                  selectedVenue?.meta.breakfast
+                    ? "Breakfast included"
+                    : "No Breakfast"
+                }
+                arrow
+              >
+                <FreeBreakfastIcon
+                  fontSize="large"
+                  color={selectedVenue?.meta.breakfast ? "" : "disabled"}
+                />
+              </Tooltip>
+              <Tooltip
+                title={selectedVenue?.meta.pets ? "Pets allowed" : "No Pets"}
+                arrow
+              >
+                <PetsIcon
+                  fontSize="large"
+                  color={selectedVenue?.meta.pets ? "" : "disabled"}
+                />
+              </Tooltip>
             </Stack>
-            <Typography>Price: ${selectedVenue?.price}</Typography>
+            <Typography
+              sx={{
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <span style={{ textDecoration: "underline" }}>
+                Price per night:
+              </span>
+              <Typography variant="price" sx={{ marginLeft: 0.5 }}>
+                ${selectedVenue?.price}
+              </Typography>
+            </Typography>
           </Container>
         </CardContent>
         <Calendar
@@ -186,9 +259,18 @@ const VenuePage = () => {
           title={selectedVenue?.owner?.name}
         />
         <Box>
-          <Typography>Created: {selectedVenue?.created}</Typography>
+          <Typography>
+            Created:{" "}
+            {dayjs.utc(selectedVenue?.created).endOf("day").format("DD/MM/YY")}
+          </Typography>
           {selectedVenue?.created !== selectedVenue?.updated && (
-            <Typography>Updated: {selectedVenue.updated}</Typography>
+            <Typography>
+              Updated:{" "}
+              {dayjs
+                .utc(selectedVenue?.updated)
+                .endOf("day")
+                .format("DD/MM/YY")}
+            </Typography>
           )}
         </Box>
       </Container>
