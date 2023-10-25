@@ -17,12 +17,18 @@ const Search = () => {
   const [endDate, setEndDate] = useState(null);
   const filterVenues = useVenueStore((state) => state.filterVenues);
 
-  const handleFilter = () => {
+  const handleFilter = (e) => {
+    e.preventDefault();
     filterVenues(searchTerm, startDate, endDate, guests);
   };
 
   return (
-    <Container disableGutters sx={{ marginBottom: 4 }}>
+    <Container
+      component="form"
+      onSubmit={handleFilter}
+      disableGutters
+      sx={{ marginBottom: 4 }}
+    >
       <Grid container rowSpacing={2} sx={{ alignItems: "center" }}>
         <Grid item xs={12} sm={3} md={4}>
           <TextField
@@ -32,7 +38,7 @@ const Search = () => {
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
-              handleFilter();
+              //handleFilter();
             }}
           />
         </Grid>
@@ -46,7 +52,7 @@ const Search = () => {
             disablePast
             onChange={(date) => {
               setStartDate(date);
-              handleFilter();
+              //handleFilter();
             }}
           />
         </Grid>
@@ -61,7 +67,7 @@ const Search = () => {
             minDate={startDate ? dayjs(startDate).add(1, "day") : undefined}
             onChange={(date) => {
               setEndDate(date);
-              handleFilter();
+              //handleFilter();
             }}
           />
         </Grid>
@@ -75,7 +81,7 @@ const Search = () => {
             value={guests}
             onChange={(e) => {
               setGuests(e.target.value);
-              handleFilter();
+              //handleFilter();
             }}
             InputProps={{
               startAdornment: (
@@ -87,7 +93,12 @@ const Search = () => {
           />
         </Grid>
         <Grid item xs={9} sm={1} md={2}>
-          <Button fullWidth variant="contained" sx={{ height: "54px" }}>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ height: "54px" }}
+          >
             <SearchIcon />
           </Button>
         </Grid>
