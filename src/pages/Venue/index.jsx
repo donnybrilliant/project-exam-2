@@ -77,12 +77,26 @@ const VenuePage = () => {
   return (
     <Container>
       <Card>
-        <CardMedia
-          component="img"
-          image={selectedVenue?.media[0]}
-          alt={selectedVenue?.name}
-          style={{ height: "450px" }}
-        />
+        {" "}
+        {selectedVenue?.media.length > 0 ? (
+          <CardMedia
+            component="img"
+            height="350"
+            image={selectedVenue?.media[0]}
+            alt={selectedVenue?.name}
+          />
+        ) : (
+          <Box
+            sx={{
+              height: 350,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            No photo
+          </Box>
+        )}
         <CardContent>
           <Container
             disableGutters
