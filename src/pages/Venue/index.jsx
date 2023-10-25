@@ -142,6 +142,7 @@ const VenuePage = () => {
               alignItems: "center",
               flexWrap: "wrap",
               gap: 2,
+              marginBottom: 5,
             }}
           >
             <Stack direction="row" spacing={2}>
