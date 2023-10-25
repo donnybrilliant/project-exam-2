@@ -107,7 +107,7 @@ const VenuePage = () => {
             />
           </Container>
           <Link
-            href="#footer"
+            href="#map"
             color="text.secondary"
             sx={{
               textTransform: "capitalize",
