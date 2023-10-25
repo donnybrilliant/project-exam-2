@@ -10,7 +10,7 @@ import Typography from "@mui/material/Typography";
 // This component is used to display a header with a logo and menu button
 const Header = () => {
   return (
-    <AppBar position="sticky" color="white" sx={{ marginBottom: 4 }}>
+    <AppBar position="sticky" color="background" sx={{ marginBottom: 4 }}>
       <Toolbar sx={{ justifyContent: "space-between" }}>
         <Tooltip title="Go Home" arrow>
           <Box
@@ -25,6 +25,7 @@ const Header = () => {
           >
             <Logo />
             <Typography
+              variant="logo"
               sx={{
                 marginLeft: 1,
               }}

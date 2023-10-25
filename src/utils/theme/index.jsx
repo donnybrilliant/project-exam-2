@@ -1,3 +1,6 @@
+import "@fontsource/poppins"; // Import Poppins font
+import "@fontsource/outfit"; // Import Outfit font
+
 import { createTheme, ThemeProvider } from "@mui/material";
 import { useMemo } from "react";
 import { useThemeStore } from "../../stores";
@@ -13,6 +16,40 @@ export const useMyTheme = () => {
         mode,
         white: {
           main: "#fff",
+        },
+        primary: {
+          main: "#ea6659",
+        },
+      },
+      typography: {
+        fontFamily: "Outfit, sans-serif",
+        h1: {
+          fontFamily: "Poppins, sans-serif",
+        },
+        h2: {
+          fontFamily: "Poppins, sans-serif",
+        },
+        h3: {
+          fontFamily: "Poppins, sans-serif",
+        },
+        h4: {
+          fontFamily: "Poppins, sans-serif",
+        },
+        h5: {
+          fontFamily: "Poppins, sans-serif",
+        },
+        h6: {
+          fontFamily: "Poppins, sans-serif",
+        },
+      },
+      components: {
+        MuiTypography: {
+          styleOverrides: {
+            logo: {
+              fontFamily: "Poppins, sans-serif",
+              fontSize: 18,
+            },
+          },
         },
       },
     });
