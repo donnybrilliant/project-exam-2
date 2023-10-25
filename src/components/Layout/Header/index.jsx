@@ -20,8 +20,7 @@ const Header = () => {
               display: "flex",
               alignItems: "center",
               textDecoration: "none",
-              // change this
-              color: "black",
+              color: "inherit",
             }}
           >
             <Logo />
