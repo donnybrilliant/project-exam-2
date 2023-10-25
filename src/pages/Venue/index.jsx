@@ -186,9 +186,18 @@ const VenuePage = () => {
           title={selectedVenue?.owner?.name}
         />
         <Box>
-          <Typography>Created: {selectedVenue?.created}</Typography>
+          <Typography>
+            Created:{" "}
+            {dayjs.utc(selectedVenue?.created).endOf("day").format("DD/MM/YY")}
+          </Typography>
           {selectedVenue?.created !== selectedVenue?.updated && (
-            <Typography>Updated: {selectedVenue.updated}</Typography>
+            <Typography>
+              Updated:{" "}
+              {dayjs
+                .utc(selectedVenue?.updated)
+                .endOf("day")
+                .format("DD/MM/YY")}
+            </Typography>
           )}
         </Box>
       </Container>
