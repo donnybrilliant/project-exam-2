@@ -25,12 +25,15 @@ export const useMyTheme = () => {
         fontFamily: "Outfit, sans-serif",
         h1: {
           fontFamily: "Poppins, sans-serif",
+          fontSize: 36,
         },
         h2: {
           fontFamily: "Poppins, sans-serif",
+          fontSize: 18,
         },
         h3: {
           fontFamily: "Poppins, sans-serif",
+          fontSize: 16,
         },
         h4: {
           fontFamily: "Poppins, sans-serif",
@@ -48,6 +51,9 @@ export const useMyTheme = () => {
             logo: {
               fontFamily: "Poppins, sans-serif",
               fontSize: 18,
+            },
+            price: {
+              fontSize: 22,
             },
           },
         },
