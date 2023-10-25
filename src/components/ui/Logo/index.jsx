@@ -1,6 +1,9 @@
 import { createSvgIcon } from "@mui/material";
+import { styled, keyframes } from "@mui/system";
+import IconButton from "@mui/material/IconButton";
 
-const Logo = createSvgIcon(
+// Create a logo svg component
+const LogoIcon = createSvgIcon(
   <svg
     id="Logo"
     data-name="Logo"
@@ -14,5 +17,48 @@ const Logo = createSvgIcon(
   </svg>,
   "Logo"
 );
+
+// This component is used to display a logo with hover animation
+const Logo = () => {
+  // Make it smoother
+  const rotateGradient = keyframes`
+   0% {
+     background: linear-gradient(-135deg, #f2afa8 0%, #f1a49c 11%, #ed8278 49%, #eb6e61 80%, #ea6659 100%) no-repeat;
+   }
+   25% {
+     background: linear-gradient(-180deg, #f2afa8 0%, #f1a49c 11%, #ed8278 49%, #eb6e61 80%, #ea6659 100%) no-repeat;
+   }
+   50% {
+     background: linear-gradient(-225deg, #f2afa8 0%, #f1a49c 11%, #ed8278 49%, #eb6e61 80%, #ea6659 100%) no-repeat;
+   }
+   75% {
+     background: linear-gradient(-270deg, #f2afa8 0%, #f1a49c 11%, #ed8278 49%, #eb6e61 80%, #ea6659 100%) no-repeat;
+   }
+   100% {
+     background: linear-gradient(135deg, #f2afa8 0%, #f1a49c 11%, #ed8278 49%, #eb6e61 80%, #ea6659 100%) no-repeat;
+   }
+ `;
+
+  const RotatingIconButton = styled(IconButton)`
+    padding: 3px;
+    background: linear-gradient(
+        -135deg,
+        #f2afa8 0%,
+        #f1a49c 11%,
+        #ed8278 49%,
+        #eb6e61 80%,
+        #ea6659 100%
+      )
+      no-repeat;
+    &:hover {
+      animation: ${rotateGradient} 0.5s forwards;
+    }
+  `;
+  return (
+    <RotatingIconButton>
+      <LogoIcon fontSize="large" color="white" />
+    </RotatingIconButton>
+  );
+};
 
 export default Logo;
