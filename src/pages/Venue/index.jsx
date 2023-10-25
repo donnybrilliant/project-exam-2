@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useVenueStore, useAuthStore, useFetchStore } from "../../stores";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import Calendar from "../../components/Calendar";
+import Map from "../../components/Map";
 import ImageGallery from "../../components/ImageGallery";
 import {
   Container,
@@ -20,14 +24,6 @@ import WifiIcon from "@mui/icons-material/Wifi";
 import LocalParkingIcon from "@mui/icons-material/LocalParking";
 import FreeBreakfastIcon from "@mui/icons-material/FreeBreakfast";
 import PetsIcon from "@mui/icons-material/Pets";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
-import { PickersDay } from "@mui/x-date-pickers/PickersDay";
-import Calendar from "../../components/Calendar";
-
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
 
 dayjs.extend(utc);
 
@@ -57,7 +53,7 @@ const VenuePage = () => {
   if (isError) return <h1>Error</h1>;
 
   //console.log(dateRange[0]);
-  //console.log(selectedVenue?.bookings);
+  console.log(selectedVenue);
 
   const navigateToLogin = () => {
     navigate("/login", { state: { from: location } });
@@ -196,6 +192,7 @@ const VenuePage = () => {
           )}
         </Box>
       </Container>
+      {selectedVenue?.location && <Map location={selectedVenue.location} />}
     </Container>
   );
 };
