@@ -2,10 +2,14 @@ import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { GoogleMap, MarkerF } from "@react-google-maps/api";
 import GoogleMapsLoader from "../../utils/GoogleMapsLoader";
+import { apiKey } from "../../utils/config";
 
 // This component is used to display a map with multiple markers
 const MultiMarkerMap = ({ venues }) => {
   const navigate = useNavigate();
+
+  // If the API key is not set, return a message
+  if (!apiKey) return <h1>No api key</h1>;
 
   // Convert the venues object to an array
   const venuesArray = Object.values(venues);

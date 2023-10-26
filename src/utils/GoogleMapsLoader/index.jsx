@@ -1,17 +1,13 @@
+import React from "react";
 import { LoadScript } from "@react-google-maps/api";
+import { apiKey } from "../config";
 
-const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-
-const GoogleMapsLoader = (MapComponent) => {
-  return (props) => {
-    if (!apiKey) return null;
-
-    return (
-      <LoadScript googleMapsApiKey={apiKey}>
-        <MapComponent {...props} />
-      </LoadScript>
-    );
-  };
+const GoogleMapsLoader = ({ children }) => {
+  return apiKey ? (
+    <LoadScript googleMapsApiKey={apiKey}>{children}</LoadScript>
+  ) : (
+    <>{children}</>
+  );
 };
 
 export default GoogleMapsLoader;
