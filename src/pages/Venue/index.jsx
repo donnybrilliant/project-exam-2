@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { useVenueStore, useAuthStore, useFetchStore } from "../../stores";
+import {
+  useVenueStore,
+  useAuthStore,
+  useFetchStore,
+  useDialogStore,
+} from "../../stores";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import Calendar from "../../components/Calendar";
@@ -39,10 +44,13 @@ const VenuePage = () => {
   const selectedVenue = useVenueStore((state) => state.selectedVenue);
   const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
   const isLoading = useFetchStore((state) => state.isLoading);
-  const isError = useFetchStore((state) => state.isError);
   const bookVenue = useVenueStore((state) => state.bookVenue);
   const [dateRange, setDateRange] = useState([null, null]);
   const [guests, setGuests] = useState(1);
+  const [bookingMade, setBookingMade] = useState(false);
+  const [bookingCount, setBookingCount] = useState(0);
+
+  const { openDialog } = useDialogStore();
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -52,11 +60,10 @@ const VenuePage = () => {
     fetchVenueById(id);
   }, [id]);
 
-  if (isLoading) return <h1>Loading...</h1>;
-  if (isError) return <h1>Error</h1>;
+  //if (isLoading) return <h1>Loading...</h1>;
 
   //console.log(dateRange[0]);
-  console.log(selectedVenue);
+  //console.log(selectedVenue);
 
   const navigateToLogin = () => {
     navigate("/login", { state: { from: location } });
@@ -65,19 +72,32 @@ const VenuePage = () => {
   const handleBooking = () => {
     if (id && dateRange[0] && dateRange[1] && guests) {
       const bookingData = {
+        name: selectedVenue?.name,
         venueId: id,
         dateFrom: dayjs(dateRange[0]).add(1, "day"),
         dateTo: dayjs(dateRange[1]).add(1, "day"),
         guests: Number(guests),
       };
-      bookVenue(bookingData);
+      openDialog(
+        // Add number of nights?
+        `Book Venue: ${selectedVenue?.name}`,
+        "Confirmation your booking details below:",
+        `Dates: ${dayjs(bookingData?.dateFrom).format("DD/MM/YY")} - ${dayjs(
+          bookingData?.dateTo
+        ).format("DD/MM/YY")}. Guests: ${bookingData?.guests}`,
+        async () => {
+          await bookVenue(bookingData);
+          setDateRange([null, null]);
+          setGuests(1);
+          setBookingCount((prevCount) => prevCount + 1);
+        }
+      );
     }
   };
 
   return (
     <Container>
       <Card>
-        {" "}
         {selectedVenue?.media.length > 0 ? (
           <CardMedia
             component="img"
@@ -219,9 +239,11 @@ const VenuePage = () => {
           </Container>
         </CardContent>
         <Calendar
+          key={bookingCount}
           selectedVenue={selectedVenue}
           dateRange={dateRange}
           setDateRange={setDateRange}
+          bookingMade={bookingMade}
         />
         <Container
           sx={{

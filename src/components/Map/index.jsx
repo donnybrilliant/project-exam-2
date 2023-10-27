@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { GoogleMap, Marker } from "@react-google-maps/api";
-import GoogleMapsLoader from "../../utils/GoogleMapsLoader";
+import { apiKey } from "../../utils/config";
 
 // This component is used to display a map with a single marker
 const Map = ({ location }) => {
   const [mapLocation, setMapLocation] = useState(null);
+
+  // If the API key is not set, return null
+  if (!apiKey) return null;
 
   // When the location changes, geocode the location string
   useEffect(() => {
@@ -62,4 +65,4 @@ const Map = ({ location }) => {
   );
 };
 
-export default GoogleMapsLoader(Map);
+export default Map;
