@@ -24,6 +24,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { People, Person } from "@mui/icons-material";
 import dayjs from "dayjs";
 
+// Should show total number of bookings for each venue in list and total for user.
+// Remember to filter upcoming and past bookings
 const Dashboard = () => {
   const [isAvatarFieldVisible, setIsAvatarFieldVisible] = useState(false);
   const [avatar, setAvatar] = useState("");
@@ -166,6 +168,7 @@ const Dashboard = () => {
           Create Venue
         </Button>
         <h2>Your Bookings</h2>
+
         <List>
           {bookings.map((booking) => (
             <Fragment key={booking.id}>
@@ -182,6 +185,7 @@ const Dashboard = () => {
                   }}
                   primary={booking?.venue.name}
                   secondary={
+                    // add number of nights?
                     dayjs
                       .utc(booking?.dateFrom)
                       .startOf("day")

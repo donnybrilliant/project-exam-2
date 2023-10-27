@@ -79,8 +79,9 @@ const VenuePage = () => {
         guests: Number(guests),
       };
       openDialog(
+        // Add number of nights?
         `Book Venue: ${selectedVenue?.name}`,
-        "Confirmation details:",
+        "Confirmation your booking details below:",
         `Dates: ${dayjs(bookingData?.dateFrom).format("DD/MM/YY")} - ${dayjs(
           bookingData?.dateTo
         ).format("DD/MM/YY")}. Guests: ${bookingData?.guests}`,
@@ -97,7 +98,6 @@ const VenuePage = () => {
   return (
     <Container>
       <Card>
-        {" "}
         {selectedVenue?.media.length > 0 ? (
           <CardMedia
             component="img"
