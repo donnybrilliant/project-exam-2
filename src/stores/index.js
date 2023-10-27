@@ -157,20 +157,20 @@ export const useVenueStore = create((set) => ({
     }
   },
   createVenue: async (venueData) => {
-    const data = await useFetchStore
-      .getState()
-      .apiFetch("venues", "POST", venueData);
-    console.log(data);
-
-    // I dont think i need this.. For testing!!
-    /*  if (data) {
-      // Assuming your API returns the newly created venue,
-      // you could add it to the venues array in the state.
-      set((state) => ({
-        venues: [...state.venues, data]
-      }));
-    } */
+    try {
+      const response = await useFetchStore
+        .getState()
+        .apiFetch("venues", "POST", venueData);
+      // After creation, add the new venue to the local state to reflect the change??
+      useFetchStore
+        .getState()
+        .setSuccessMsg(`Successfully created ${response.name}`);
+      return response;
+    } catch (error) {
+      useFetchStore.getState().setErrorMsg(error.message);
+    }
   },
+
   updateVenue: async (id, venueData) => {
     const data = await useFetchStore
       .getState()
