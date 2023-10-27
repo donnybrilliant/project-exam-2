@@ -71,16 +71,16 @@ const MenuButton = () => {
             open={open}
             onClose={handleClose}
             onClick={handleClose}
+            sx={{
+              "& .MuiPaper-root": {
+                minWidth: "200px",
+              },
+            }}
             slotProps={{
               paper: {
-                elevation: 0,
                 sx: {
                   overflow: "visible",
-                  filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-                  mt: 1.5,
-                  ".MuiMenuItem-root": {
-                    px: 3,
-                  },
+                  mt: 2,
                   "&:before": {
                     content: '""',
                     display: "block",
