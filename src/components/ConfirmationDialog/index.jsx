@@ -50,7 +50,7 @@ const ConfirmationDialog = () => {
           color="primary"
           autoFocus
         >
-          Yes, Delete
+          Confirm
         </Button>
       </DialogActions>
     </Dialog>
