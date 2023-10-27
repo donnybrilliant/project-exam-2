@@ -244,9 +244,14 @@ export const useVenueStore = create((set) => ({
     });
   },
   bookVenue: async (bookingData) => {
-    const data = await useFetchStore
-      .getState()
-      .apiFetch("bookings", "POST", bookingData);
+    try {
+      await useFetchStore.getState().apiFetch("bookings", "POST", bookingData);
+      useFetchStore
+        .getState()
+        .setSuccessMsg(`Booking at ${bookingData.name} was successful!`);
+    } catch (error) {
+      useFetchStore.getState().setErrorMsg(error.message);
+    }
   },
   deleteBooking: async (id, name) => {
     try {
