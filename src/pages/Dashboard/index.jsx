@@ -1,11 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, Fragment } from "react";
 import { Link } from "react-router-dom";
-import {
-  useAuthStore,
-  useProfileStore,
-  useFetchStore,
-  useVenueStore,
-} from "../../stores";
+import { useAuthStore, useProfileStore, useVenueStore } from "../../stores";
+import { useDialogStore } from "../../stores"; // Adjust path as necessary
 import {
   Avatar,
   Container,
@@ -19,13 +15,6 @@ import {
   Button,
   TextField,
   InputAdornment,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Snackbar,
-  Alert,
   Chip,
   ListItemSecondaryAction,
   Divider,
@@ -44,49 +33,11 @@ const Dashboard = () => {
   const fetchProfileByName = useProfileStore(
     (state) => state.fetchProfileByName
   );
-  const isLoading = useFetchStore((state) => state.isLoading);
-  const isError = useFetchStore((state) => state.isError);
-  const errorMsg = useFetchStore((state) => state.errorMsg);
   const selectedProfile = useProfileStore((state) => state.selectedProfile);
   const updateAvatar = useProfileStore((state) => state.updateAvatar);
   const deleteVenue = useVenueStore((state) => state.deleteVenue);
-
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [venueToDelete, setVenueToDelete] = useState(null);
-  const [venueToDeleteName, setVenueToDeleteName] = useState("");
   const deleteBooking = useVenueStore((state) => state.deleteBooking);
-
-  const handleDeleteClickBooking = async (bookingId) => {
-    await deleteBooking(bookingId);
-  };
-  const handleDeleteClick = (venueId) => {
-    const venue = selectedProfile?.venues.find((venue) => venue.id === venueId);
-    setVenueToDelete(venueId);
-    setVenueToDeleteName(venue?.name); // Save venue name
-    setDeleteDialogOpen(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    await deleteVenue(venueToDelete); // await to ensure completion before fetching
-    await fetchProfileByName(userName); // Re-fetch profile data
-    setDeleteDialogOpen(false);
-    setSnackbarMessage(`Successfully deleted ${venueToDeleteName}.`);
-    setSnackbarOpen(true);
-  };
-
-  // Check docs for opening and closing snackbars and modals
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setSnackbarOpen(false);
-  };
-
-  const handleDeleteCancel = () => {
-    setDeleteDialogOpen(false);
-  };
+  const { openDialog } = useDialogStore();
 
   const toggleAvatarField = () => {
     setIsAvatarFieldVisible((prev) => !prev);
@@ -97,7 +48,37 @@ const Dashboard = () => {
     setIsAvatarFieldVisible(false);
   };
 
-  // Fetch venue when userName changes
+  const handleDeleteClickBooking = async (bookingId) => {
+    const booking = selectedProfile?.bookings.find(
+      (booking) => booking.id === bookingId
+    );
+    openDialog(
+      `Cancel Booking at ${booking?.venue.name}`,
+      "Are you sure you want to cancel this booking? This action cannot be undone.",
+      `Dates: ${dayjs(booking?.dateFrom).format("DD/MM/YY")} - ${dayjs(
+        booking?.dateTo
+      ).format("DD/MM/YY")}. Guests: ${booking?.guests}`,
+      async () => {
+        await deleteBooking(bookingId, booking?.venue.name);
+      }
+    );
+  };
+
+  const handleDeleteClickVenue = (venueId) => {
+    const venue = selectedProfile?.venues.find((venue) => venue.id === venueId);
+    // TODO: I need to fetch venue to get bookings..
+    openDialog(
+      `Delete Venue: ${venueToDeleteName}`,
+      "Are you sure you want to delete this venue? This action cannot be undone.",
+      `You have ${
+        venue?.bookings?.length ? venue.bookings.length : "0"
+      } upcoming bookings for this venue.`,
+      async () => {
+        await deleteVenue(venueId, venue?.name);
+      }
+    );
+  };
+
   useEffect(() => {
     fetchProfileByName(userName);
   }, [userName]);
@@ -108,11 +89,7 @@ const Dashboard = () => {
     }
   }, [selectedProfile]);
 
-  if (isLoading) return <h1>Loading...</h1>;
-  if (isError) return <h1>{errorMsg}</h1>;
-
-  console.log(selectedProfile);
-
+  //console.log(selectedProfile);
   return (
     <>
       <Container sx={{ textAlign: "center" }}>
@@ -167,8 +144,8 @@ const Dashboard = () => {
         <h2>Your Bookings</h2>
         <List>
           {selectedProfile?.bookings.map((booking) => (
-            <>
-              <ListItem key={booking.id}>
+            <Fragment key={booking.id}>
+              <ListItem>
                 <ListItemAvatar>
                   <Avatar
                     alt={booking?.venue.name}
@@ -176,6 +153,9 @@ const Dashboard = () => {
                   />
                 </ListItemAvatar>
                 <ListItemText
+                  sx={{
+                    textTransform: "capitalize",
+                  }}
                   primary={booking?.venue.name}
                   secondary={
                     dayjs
@@ -211,24 +191,27 @@ const Dashboard = () => {
                 </ListItemSecondaryAction>
               </ListItem>
               <Divider />
-            </>
+            </Fragment>
           ))}
         </List>
         <h2>Your Venues</h2>
         <List>
           {selectedProfile?.venues.map((venue) => (
-            <>
-              <ListItem key={venue.id}>
+            <Fragment key={venue.id}>
+              <ListItem>
                 <ListItemAvatar>
                   <Avatar alt={venue?.name} src={venue?.media[0]} />
                 </ListItemAvatar>
                 <ListItemText
+                  sx={{
+                    textTransform: "capitalize",
+                  }}
                   primary={venue?.name || "No venue name - please update"}
                   secondary={
                     "Rating: " + venue?.rating + " Price: " + venue?.price
                   }
                 />
-                <IconButton onClick={() => handleDeleteClick(venue.id)}>
+                <IconButton onClick={() => handleDeleteClickVenue(venue.id)}>
                   <DeleteIcon />
                 </IconButton>
                 <IconButton component={Link} to={`/venues/${venue.id}/edit`}>
@@ -239,45 +222,10 @@ const Dashboard = () => {
                 </Button>
               </ListItem>
               <Divider />
-            </>
+            </Fragment>
           ))}
         </List>
       </Container>
-      <Dialog
-        open={deleteDialogOpen}
-        onClose={handleDeleteCancel}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">{"Delete Venue"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete this venue? This action cannot be
-            undone.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDeleteCancel} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleDeleteConfirm} color="primary" autoFocus>
-            Yes, Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-      >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity="success"
-          sx={{ width: "100%" }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
     </>
   );
 };
