@@ -8,51 +8,57 @@ import { PublicOnlyRoute, PrivateRoute } from "./components/AccessControl";
 import Dashboard from "./pages/Dashboard";
 import CreateVenue from "./pages/Create";
 import EditVenue from "./pages/EditVenue";
+import Feedback from "./components/Feedback";
+import ConfirmationDialog from "./components/ConfirmationDialog";
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Home />} />
-        <Route path="venues/:id" element={<VenuePage />} />
-        <Route path="venues/:id/edit" element={<EditVenue />} />
-        <Route
-          path="login"
-          element={
-            <PublicOnlyRoute>
-              <Login />
-            </PublicOnlyRoute>
-          }
-        />
-        <Route
-          path="register"
-          element={
-            <PublicOnlyRoute>
-              <Register />
-            </PublicOnlyRoute>
-          }
-        />
+    <>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="venues/:id" element={<VenuePage />} />
+          <Route path="venues/:id/edit" element={<EditVenue />} />
+          <Route
+            path="login"
+            element={
+              <PublicOnlyRoute>
+                <Login />
+              </PublicOnlyRoute>
+            }
+          />
+          <Route
+            path="register"
+            element={
+              <PublicOnlyRoute>
+                <Register />
+              </PublicOnlyRoute>
+            }
+          />
 
-        <Route
-          path="dashboard"
-          element={
-            <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/dashboard/venues/create"
-          element={
-            <PrivateRoute>
-              <CreateVenue />
-            </PrivateRoute>
-          }
-        />
+          <Route
+            path="dashboard"
+            element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/dashboard/venues/create"
+            element={
+              <PrivateRoute>
+                <CreateVenue />
+              </PrivateRoute>
+            }
+          />
 
-        <Route path="*" element={<h1>Not Found</h1>} />
-      </Route>
-    </Routes>
+          <Route path="*" element={<h1>Not Found</h1>} />
+        </Route>
+      </Routes>
+      <Feedback />
+      <ConfirmationDialog />
+    </>
   );
 }
 
