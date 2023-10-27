@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useFetchStore, useVenueStore } from "../../stores";
 import ImageGallery from "../../components/ImageGallery";
 import {
@@ -25,6 +25,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 
 const EditVenue = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const updateVenue = useVenueStore((state) => state.updateVenue);
   const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
   const isError = useFetchStore((state) => state.isError);
@@ -67,7 +68,7 @@ const EditVenue = () => {
     setMedia(media.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const venueData = {
       name,
@@ -78,8 +79,8 @@ const EditVenue = () => {
       rating,
       meta,
     };
-    updateVenue(id, venueData);
-    console.log(venueData);
+    await updateVenue(id, venueData);
+    navigate(`/venues/${id}`);
   };
 
   useEffect(() => {

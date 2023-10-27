@@ -172,10 +172,14 @@ export const useVenueStore = create((set) => ({
   },
 
   updateVenue: async (id, venueData) => {
-    const data = await useFetchStore
-      .getState()
-      .apiFetch(`venues/${id}`, "PUT", venueData);
-    console.log(data);
+    try {
+      await useFetchStore.getState().apiFetch(`venues/${id}`, "PUT", venueData);
+      useFetchStore
+        .getState()
+        .setSuccessMsg(`Successfully updated ${venueData.name}`);
+    } catch (error) {
+      useFetchStore.getState().setErrorMsg(error.message);
+    }
   },
 
   /*   // Inside useFetchStore or useVenueStore or wherever deleteVenue is defined
