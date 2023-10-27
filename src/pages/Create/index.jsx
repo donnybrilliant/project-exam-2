@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { useFetchStore, useVenueStore } from "../../stores";
+import { useNavigate } from "react-router-dom";
+import { useVenueStore } from "../../stores";
 import ImageGallery from "../../components/ImageGallery";
+
 import {
   Container,
   Card,
@@ -13,7 +15,6 @@ import {
   Checkbox,
   IconButton,
   InputAdornment,
-  Typography,
 } from "@mui/material";
 import WifiIcon from "@mui/icons-material/Wifi";
 import LocalParkingIcon from "@mui/icons-material/LocalParking";
@@ -21,11 +22,13 @@ import FreeBreakfastIcon from "@mui/icons-material/FreeBreakfast";
 import PetsIcon from "@mui/icons-material/Pets";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
+import Map from "../../components/Map";
 
 const CreateVenue = () => {
   const createVenue = useVenueStore((state) => state.createVenue);
-  const isError = useFetchStore((state) => state.isError);
-  const errorMsg = useFetchStore((state) => state.errorMsg);
+
+  const navigate = useNavigate();
+
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [media, setMedia] = useState([]);
@@ -39,6 +42,55 @@ const CreateVenue = () => {
     breakfast: false,
     pets: false,
   });
+
+  const [location, setLocation] = useState({
+    address: "",
+    city: "",
+    zip: "",
+    country: "",
+    continent: "",
+    lat: 0,
+    lng: 0,
+  });
+
+  const handleGeocode = async () => {
+    const geocoder = new google.maps.Geocoder();
+    const addressString = `${location.address}, ${location.city}, ${location.zip}, ${location.country}, ${location.continent}`;
+    geocoder.geocode({ address: addressString }, (results, status) => {
+      if (status === "OK") {
+        const result = results[0];
+        const { address_components } = result;
+        const newLocation = {
+          lat: result.geometry.location.lat(),
+          lng: result.geometry.location.lng(),
+        };
+
+        address_components.forEach((component) => {
+          const { types, long_name } = component;
+          if (types.includes("street_number") || types.includes("route")) {
+            newLocation.address = long_name;
+          } else if (types.includes("locality")) {
+            newLocation.city = long_name;
+          } else if (types.includes("postal_code")) {
+            newLocation.zip = long_name;
+          } else if (types.includes("country")) {
+            newLocation.country = long_name;
+          } else if (types.includes("continent")) {
+            newLocation.continent = long_name;
+          }
+        });
+
+        setLocation((prev) => ({
+          ...prev,
+          ...newLocation,
+        }));
+      } else {
+        console.error(
+          "Geocode was not successful for the following reason: " + status
+        );
+      }
+    });
+  };
 
   const handleMetaChange = (event) => {
     setMeta({
@@ -64,7 +116,7 @@ const CreateVenue = () => {
     setMedia(media.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const venueData = {
       name,
@@ -74,9 +126,10 @@ const CreateVenue = () => {
       maxGuests: Number(maxGuests),
       rating,
       meta,
+      location,
     };
-    createVenue(venueData);
-    console.log(venueData);
+    const response = await createVenue(venueData);
+    navigate(`/venues/${response.id}`);
   };
 
   return (
@@ -97,7 +150,8 @@ const CreateVenue = () => {
               display: "flex",
               justifyContent: "space-between",
               flexWrap: "wrap",
-              alignItems: "flex-center",
+              alignItems: "center",
+              rowGap: 2,
             }}
           >
             <TextField
@@ -151,9 +205,16 @@ const CreateVenue = () => {
               justifyContent: "space-between",
               alignItems: "center",
               flexWrap: "wrap",
+              marginBlock: 2,
             }}
           >
-            <Stack direction="row" spacing={2}>
+            <Stack
+              direction="row"
+              columnGap={2}
+              sx={{
+                marginTop: 2,
+              }}
+            >
               <Checkbox
                 icon={<WifiIcon />}
                 checkedIcon={<WifiIcon color="info" />}
@@ -193,56 +254,104 @@ const CreateVenue = () => {
               value={price}
               onChange={(e) => setPrice(e.target.value)}
             />
+          </Container>
+          <TextField
+            id="mediaInput"
+            label="Add Media URL"
+            type="url"
+            variant="standard"
+            value={mediaInput}
+            onChange={(e) => setMediaInput(e.target.value)}
+            fullWidth
+            InputProps={{
+              endAdornment: (
+                <IconButton
+                  edge="end"
+                  aria-label="Add Media URL"
+                  onClick={handleMediaSubmit}
+                >
+                  <AddIcon />
+                </IconButton>
+              ),
+            }}
+          />
+          {media.map((url, index) => (
             <TextField
-              id="mediaInput"
-              label="Add Media URL"
-              type="url"
+              key={index}
+              value={url}
               variant="standard"
-              value={mediaInput}
-              onChange={(e) => setMediaInput(e.target.value)}
               fullWidth
+              onChange={(event) => handleMediaChange(event, index)}
               InputProps={{
                 endAdornment: (
-                  <IconButton
-                    edge="end"
-                    aria-label="Add Media URL"
-                    onClick={handleMediaSubmit}
-                  >
-                    <AddIcon />
-                  </IconButton>
+                  <InputAdornment position="end">
+                    <IconButton
+                      edge="end"
+                      aria-label="delete media URL"
+                      onClick={() => handleMediaDelete(index)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </InputAdornment>
                 ),
               }}
             />
-            {media.map((url, index) => (
-              <TextField
-                key={index}
-                value={url}
-                variant="standard"
-                fullWidth
-                onChange={(event) => handleMediaChange(event, index)}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        edge="end"
-                        aria-label="delete media URL"
-                        onClick={() => handleMediaDelete(index)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            ))}
-          </Container>
+          ))}
+          <TextField
+            id="address"
+            label="Address"
+            value={location.address}
+            onChange={(e) =>
+              setLocation((prev) => ({ ...prev, address: e.target.value }))
+            }
+            fullWidth
+          />
+          <TextField
+            id="city"
+            label="City"
+            value={location.city}
+            onChange={(e) =>
+              setLocation((prev) => ({ ...prev, city: e.target.value }))
+            }
+            fullWidth
+          />
+          <TextField
+            id="zip"
+            label="ZIP Code"
+            value={location.zip}
+            onChange={(e) =>
+              setLocation((prev) => ({ ...prev, zip: e.target.value }))
+            }
+            fullWidth
+          />
+          <TextField
+            id="country"
+            label="Country"
+            value={location.country}
+            onChange={(e) =>
+              setLocation((prev) => ({ ...prev, country: e.target.value }))
+            }
+            fullWidth
+          />
+          <TextField
+            id="continent"
+            label="Continent"
+            value={location.continent}
+            onChange={(e) =>
+              setLocation((prev) => ({ ...prev, continent: e.target.value }))
+            }
+            fullWidth
+          />
+          <Button onClick={handleGeocode} variant="outlined">
+            Find Location
+          </Button>
         </CardContent>
         <Button variant="contained" color="primary" fullWidth type="submit">
           Create Venue
         </Button>
-        {isError && <Typography>{errorMsg}</Typography>}
       </Card>
       {media.length > 1 && <ImageGallery media={media} />}
+      {location && <Map location={location} />}
     </Container>
   );
 };
