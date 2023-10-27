@@ -7,6 +7,10 @@ export const useFetchStore = create((set) => ({
   isLoading: false,
   isError: false,
   errorMsg: null,
+  successMsg: null,
+  setErrorMsg: (msg) => set({ errorMsg: msg }),
+  setSuccessMsg: (msg) => set({ successMsg: msg }),
+  clearMessages: () => set({ errorMsg: null, successMsg: null }),
   // Generic fetch action
   apiFetch: async (endpoint, method = "GET", body = null) => {
     set({ isLoading: true, isError: false, errorMsg: null });
@@ -53,6 +57,7 @@ export const useFetchStore = create((set) => ({
         isError: true,
         errorMsg: error.message || "An unexpected error occurred",
       });
+      throw error;
     }
   },
 }));
@@ -173,14 +178,32 @@ export const useVenueStore = create((set) => ({
     console.log(data);
   },
 
-  deleteVenue: async (id) => {
-    await useFetchStore.getState().apiFetch(`venues/${id}`, "DELETE");
-    // After deletion, remove the venue from the local state to reflect the change
-    set((state) => ({
-      venues: state.venues.filter((venue) => venue.id !== id),
-      selectedVenue:
-        state.selectedVenue?.id === id ? null : state.selectedVenue,
-    }));
+  /*   // Inside useFetchStore or useVenueStore or wherever deleteVenue is defined
+  deleteVenue: async (venueId) => {
+    const { apiFetch, setErrorMsg, setSuccessMsg } = get();
+
+    try {
+      await apiFetch(`venues/${venueId}`, "DELETE");
+      setSuccessMsg(`Successfully deleted venue ${venueId}.`);
+    } catch (error) {
+      console.error(error);
+      setErrorMsg(`Failed to delete venue ${venueId}.`);
+    }
+  }, */
+
+  deleteVenue: async (id, name) => {
+    try {
+      await useFetchStore.getState().apiFetch(`venues/${id}`, "DELETE");
+      // After deletion, remove the venue from the local state to reflect the change
+      set((state) => ({
+        venues: state.venues.filter((venue) => venue.id !== id),
+        selectedVenue:
+          state.selectedVenue?.id === id ? null : state.selectedVenue,
+      }));
+      useFetchStore.getState().setSuccessMsg(`Successfully deleted ${name}`);
+    } catch (error) {
+      useFetchStore.getState().setErrorMsg(error.message);
+    }
   },
 
   filterVenues: (searchTerm, startDate, endDate) => {
@@ -221,11 +244,17 @@ export const useVenueStore = create((set) => ({
       .getState()
       .apiFetch("bookings", "POST", bookingData);
   },
-  deleteBooking: async (id) => {
-    const data = await useFetchStore
-      .getState()
-      .apiFetch(`bookings/${id}`, "DELETE");
-    // Update some state??
+  deleteBooking: async (id, name) => {
+    try {
+      await useFetchStore.getState().apiFetch(`bookings/${id}`, "DELETE");
+      // After deletion, remove the venue from the local state to reflect the change??
+      //name should be capitalized
+      useFetchStore
+        .getState()
+        .setSuccessMsg(`Successfully deleted booking at ${name}`);
+    } catch (error) {
+      useFetchStore.getState().setErrorMsg(error.message);
+    }
   },
 }));
 
@@ -234,6 +263,7 @@ export const useGalleryStore = create((set) => ({
   setOpenImageIndex: (index) => set({ openImageIndex: index }),
   goToNextImage: (mediaLength) =>
     set((state) => {
+      // If the current index is less than the length of the media array, increment it by 1
       const newIndex =
         state.openImageIndex < mediaLength - 1 ? state.openImageIndex + 1 : 0;
       return { openImageIndex: newIndex };
@@ -241,6 +271,7 @@ export const useGalleryStore = create((set) => ({
   goToPreviousImage: (mediaLength) =>
     set((state) => {
       const newIndex =
+        // If the current index is greater than 0, decrement it by 1
         state.openImageIndex > 0 ? state.openImageIndex - 1 : mediaLength - 1;
       return { openImageIndex: newIndex };
     }),
@@ -292,4 +323,22 @@ export const useProfileStore = create((set) => ({
       avatar: updatedProfile.avatar,
     });
   },
+}));
+
+export const useDialogStore = create((set) => ({
+  isOpen: false,
+  title: "",
+  description: "",
+  details: "",
+  onConfirm: () => {},
+  openDialog: (title, description, details, onConfirm) =>
+    set({ isOpen: true, title, description, details, onConfirm }),
+  closeDialog: () =>
+    set({
+      isOpen: false,
+      title: "",
+      description: "",
+      details: "",
+      onConfirm: () => {},
+    }),
 }));
