@@ -28,6 +28,9 @@ const Dashboard = () => {
   const [isAvatarFieldVisible, setIsAvatarFieldVisible] = useState(false);
   const [avatar, setAvatar] = useState("");
 
+  const [bookings, setBookings] = useState([]);
+  const [venues, setVenues] = useState([]);
+
   const userInfo = useAuthStore((state) => state.userInfo);
   const userName = userInfo.name;
   const fetchProfileByName = useProfileStore(
@@ -39,6 +42,13 @@ const Dashboard = () => {
   const deleteBooking = useVenueStore((state) => state.deleteBooking);
   const { openDialog } = useDialogStore();
 
+  // might not need this if i have to fetch the venue bookings.. hmm
+  const [ownVenueBookings, setOwnVenueBookings] = useState([]);
+
+  const isBookingAtOwnVenue = (booking) => {
+    return venues.some((venue) => venue.id === booking.venue.id);
+  };
+
   const toggleAvatarField = () => {
     setIsAvatarFieldVisible((prev) => !prev);
   };
@@ -49,9 +59,7 @@ const Dashboard = () => {
   };
 
   const handleDeleteClickBooking = async (bookingId) => {
-    const booking = selectedProfile?.bookings.find(
-      (booking) => booking.id === bookingId
-    );
+    const booking = bookings.find((booking) => booking.id === bookingId);
     openDialog(
       `Cancel Booking at ${booking?.venue.name}`,
       "Are you sure you want to cancel this booking? This action cannot be undone.",
@@ -60,6 +68,9 @@ const Dashboard = () => {
       ).format("DD/MM/YY")}. Guests: ${booking?.guests}`,
       async () => {
         await deleteBooking(bookingId, booking?.venue.name);
+        setBookings((prevBookings) =>
+          prevBookings.filter((booking) => booking.id !== bookingId)
+        );
       }
     );
   };
@@ -68,13 +79,16 @@ const Dashboard = () => {
     const venue = selectedProfile?.venues.find((venue) => venue.id === venueId);
     // TODO: I need to fetch venue to get bookings..
     openDialog(
-      `Delete Venue: ${venueToDeleteName}`,
+      `Delete Venue: ${venue?.name}`,
       "Are you sure you want to delete this venue? This action cannot be undone.",
       `You have ${
         venue?.bookings?.length ? venue.bookings.length : "0"
       } upcoming bookings for this venue.`,
       async () => {
         await deleteVenue(venueId, venue?.name);
+        setVenues((prevVenues) =>
+          prevVenues.filter((venue) => venue.id !== venueId)
+        );
       }
     );
   };
@@ -86,6 +100,16 @@ const Dashboard = () => {
   useEffect(() => {
     if (selectedProfile) {
       setAvatar(selectedProfile.avatar);
+
+      const otherBookings = selectedProfile.bookings.filter(
+        (booking) => !isBookingAtOwnVenue(booking)
+      );
+      const ownBookings = selectedProfile.bookings.filter(isBookingAtOwnVenue);
+      console.log(ownBookings);
+      setBookings(otherBookings);
+      setOwnVenueBookings(ownBookings);
+
+      setVenues(selectedProfile.venues);
     }
   }, [selectedProfile]);
 
@@ -143,7 +167,7 @@ const Dashboard = () => {
         </Button>
         <h2>Your Bookings</h2>
         <List>
-          {selectedProfile?.bookings.map((booking) => (
+          {bookings.map((booking) => (
             <Fragment key={booking.id}>
               <ListItem>
                 <ListItemAvatar>
@@ -196,7 +220,7 @@ const Dashboard = () => {
         </List>
         <h2>Your Venues</h2>
         <List>
-          {selectedProfile?.venues.map((venue) => (
+          {venues.map((venue) => (
             <Fragment key={venue.id}>
               <ListItem>
                 <ListItemAvatar>
