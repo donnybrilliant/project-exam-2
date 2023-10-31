@@ -22,6 +22,7 @@ const Header = () => {
               textDecoration: "none",
               color: "inherit",
             }}
+            reloadDocument
           >
             <Logo />
             <Typography
