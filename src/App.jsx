@@ -10,6 +10,7 @@ import CreateVenue from "./pages/Create";
 import EditVenue from "./pages/EditVenue";
 import Feedback from "./components/Feedback";
 import ConfirmationDialog from "./components/ConfirmationDialog";
+import VenuesPage from "./pages/Venues";
 
 function App() {
   return (
@@ -17,7 +18,9 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
+          <Route path="venues" element={<VenuesPage />} />
           <Route path="venues/:id" element={<VenuePage />} />
+          {/*   add access control */}
           <Route path="venues/:id/edit" element={<EditVenue />} />
           <Route
             path="login"
