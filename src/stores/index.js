@@ -119,12 +119,23 @@ export const useThemeStore = create(
 );
 
 // Venues store for storing venues and selected venue
-
 export const useVenueStore = create((set) => ({
   venues: [],
   filteredVenues: [],
   selectedVenue: null,
+  searchParams: {
+    searchTerm: "",
+    startDate: null,
+    endDate: null,
+    guests: "1",
+  },
+  // Action for updating search params
+  updateStoreSearchParams: (newSearchParams) =>
+    set((state) => ({
+      searchParams: { ...state.searchParams, ...newSearchParams },
+    })),
 
+  // Action for fetching venues with a limit of 100, two times
   fetchAllVenues: async () => {
     const limit = 100;
     const offset = 0;
@@ -182,19 +193,6 @@ export const useVenueStore = create((set) => ({
     }
   },
 
-  /*   // Inside useFetchStore or useVenueStore or wherever deleteVenue is defined
-  deleteVenue: async (venueId) => {
-    const { apiFetch, setErrorMsg, setSuccessMsg } = get();
-
-    try {
-      await apiFetch(`venues/${venueId}`, "DELETE");
-      setSuccessMsg(`Successfully deleted venue ${venueId}.`);
-    } catch (error) {
-      console.error(error);
-      setErrorMsg(`Failed to delete venue ${venueId}.`);
-    }
-  }, */
-
   deleteVenue: async (id, name) => {
     try {
       await useFetchStore.getState().apiFetch(`venues/${id}`, "DELETE");
@@ -210,9 +208,9 @@ export const useVenueStore = create((set) => ({
     }
   },
 
-  filterVenues: (searchTerm, startDate, endDate) => {
+  filterVenues: (searchTerm, startDate, endDate, guests) => {
     set((state) => {
-      const lowerCaseTerm = searchTerm.toLowerCase();
+      const lowerCaseTerm = searchTerm ? searchTerm.toLowerCase() : "";
 
       const filtered = state.venues.filter((venue) => {
         // Text Search
@@ -237,12 +235,16 @@ export const useVenueStore = create((set) => ({
           );
         });
 
-        return textMatch && dateMatch;
+        // Guest Count Search
+        const guestMatch = venue.maxGuests >= guests; // Assuming venue has a capacity property
+
+        return textMatch && dateMatch && guestMatch; // Include guestMatch in the return condition
       });
 
       return { filteredVenues: filtered }; // return the new state value
     });
   },
+
   bookVenue: async (bookingData) => {
     try {
       await useFetchStore.getState().apiFetch("bookings", "POST", bookingData);
