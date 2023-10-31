@@ -135,18 +135,30 @@ export const useVenueStore = create((set) => ({
       searchParams: { ...state.searchParams, ...newSearchParams },
     })),
 
-  // Action for fetching venues with a limit of 100, two times
+  // Action for fetching all venues.
   fetchAllVenues: async () => {
     const limit = 100;
-    const offset = 0;
-    const firstBatch = await useFetchStore
-      .getState()
-      .apiFetch(`venues?_bookings=true&limit=${limit}&offset=${offset}`);
-    const secondBatch = await useFetchStore
-      .getState()
-      .apiFetch(`venues?_bookings=true&limit=${limit}&offset=${limit}`);
-    const allVenues = [...firstBatch, ...secondBatch];
-    set({ venues: allVenues, filteredVenues: allVenues }); // Initialize filteredVenues here
+    let offset = 0;
+    let allVenues = [];
+    let keepFetching = true;
+
+    // Keep fetching venues until fewer than 100 are returned
+    while (keepFetching) {
+      const batch = await useFetchStore
+        .getState()
+        .apiFetch(`venues?_bookings=true&limit=${limit}&offset=${offset}`);
+
+      allVenues = [...allVenues, ...batch];
+
+      // Stop fetching if fewer than 100 venues are returned or update the offset to fetch the next batch
+      if (batch.length < limit) {
+        keepFetching = false;
+      } else {
+        offset += limit;
+      }
+    }
+
+    set({ venues: allVenues, filteredVenues: allVenues });
   },
 
   // Action for fetching all venues
