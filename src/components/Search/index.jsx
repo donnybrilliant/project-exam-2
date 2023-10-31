@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react"; // Import useState hook
+import { useNavigate } from "react-router-dom";
 import { useVenueStore } from "../../stores";
 import dayjs from "dayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -11,21 +12,44 @@ import Person from "@mui/icons-material/Person";
 import SearchIcon from "@mui/icons-material/Search";
 
 const Search = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [guests, setGuests] = useState(1);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
-  const filterVenues = useVenueStore((state) => state.filterVenues);
+  const { searchParams, updateStoreSearchParams } = useVenueStore();
+  const [localSearchParams, setLocalSearchParams] = useState(searchParams);
+  const navigate = useNavigate();
 
-  const handleFilter = (e) => {
+  // Update localSearchParams whenever searchParams changes
+  useEffect(() => {
+    setLocalSearchParams(searchParams);
+  }, [searchParams]);
+
+  // Handle the search, update the store's searchParams and navigate to the venues page
+  const handleSearch = (e) => {
     e.preventDefault();
-    filterVenues(searchTerm, startDate, endDate, guests);
+    updateStoreSearchParams(localSearchParams);
+    navigate(
+      `/venues?searchTerm=${localSearchParams.searchTerm}&startDate=${localSearchParams.startDate}&endDate=${localSearchParams.endDate}&guests=${localSearchParams.guests}`
+    );
   };
+
+  // Update the localSearchParams state whenever a field is changed
+  const updateLocalSearchParams = (key, value) => {
+    setLocalSearchParams((prevState) => ({
+      ...prevState,
+      [key]: value,
+    }));
+  };
+
+  // Convert the startDate and endDate strings to dayjs objects
+  const startDateDate = localSearchParams.startDate
+    ? dayjs(localSearchParams.startDate, "DD/MM/YY")
+    : null;
+  const endDateDate = localSearchParams.endDate
+    ? dayjs(localSearchParams.endDate, "DD/MM/YY")
+    : null;
 
   return (
     <Container
       component="form"
-      onSubmit={handleFilter}
+      onSubmit={handleSearch}
       disableGutters
       sx={{ marginBottom: 4 }}
     >
@@ -35,11 +59,10 @@ const Search = () => {
             fullWidth
             label="Search"
             variant="outlined"
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              //handleFilter();
-            }}
+            value={localSearchParams.searchTerm}
+            onChange={(e) =>
+              updateLocalSearchParams("searchTerm", e.target.value)
+            }
           />
         </Grid>
         <Grid item xs={6} sm={3} md={2}>
@@ -47,13 +70,12 @@ const Search = () => {
             fullWidth
             sx={{ width: "100%" }}
             label="Start Date"
-            value={startDate}
             format="DD/MM/YY"
             disablePast
-            onChange={(date) => {
-              setStartDate(date);
-              //handleFilter();
-            }}
+            value={startDateDate}
+            onChange={(date) =>
+              updateLocalSearchParams("startDate", date.format("DD/MM/YY"))
+            }
           />
         </Grid>
         <Grid item xs={6} sm={3} md={2}>
@@ -61,14 +83,17 @@ const Search = () => {
             fullWidth
             sx={{ width: "100%" }}
             label="End Date"
-            value={endDate}
             format="DD/MM/YY"
             disablePast
-            minDate={startDate ? dayjs(startDate).add(1, "day") : undefined}
-            onChange={(date) => {
-              setEndDate(date);
-              //handleFilter();
-            }}
+            minDate={
+              localSearchParams.startDate
+                ? dayjs(localSearchParams.startDate).add(1, "day")
+                : undefined
+            }
+            value={endDateDate}
+            onChange={(date) =>
+              updateLocalSearchParams("endDate", date.format("DD/MM/YY"))
+            }
           />
         </Grid>
         <Grid item xs={3} sm={2} md={2}>
@@ -78,11 +103,8 @@ const Search = () => {
             variant="outlined"
             type="number"
             inputProps={{ min: "1", max: "100" }}
-            value={guests}
-            onChange={(e) => {
-              setGuests(e.target.value);
-              //handleFilter();
-            }}
+            value={localSearchParams.guests}
+            onChange={(e) => updateLocalSearchParams("guests", e.target.value)}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">

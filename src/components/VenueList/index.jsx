@@ -1,13 +1,11 @@
 import VenueCard from "../VenueCard";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
-import Search from "../Search";
 
 // This component is used to display a list of venues
 const VenueList = ({ venues }) => {
   return (
     <>
-      <Search />
       <Grid container spacing={4}>
         {venues.length === 0 ? (
           <Typography>No venues found</Typography>
