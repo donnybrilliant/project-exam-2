@@ -69,6 +69,10 @@ const VenuePage = () => {
     fetchVenueById(id);
   }, [id]);
 
+  document.title = selectedVenue?.name
+    ? `${selectedVenue.name} - Holidaze`
+    : "Venue - Holidaze";
+
   useEffect(() => {
     if (selectedVenue) {
       // Trigger the fetchProfileByName action with the owner's name

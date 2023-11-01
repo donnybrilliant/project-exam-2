@@ -31,6 +31,8 @@ const EditVenue = () => {
     return <Typography>Loading...</Typography>;
   }
 
+  document.title = `Edit ${initialData.name}`;
+
   return <VenueForm initialData={initialData} onSubmit={handleUpdateVenue} />;
 };
 

@@ -23,6 +23,9 @@ const Dashboard = () => {
   if (isLoading) {
     return <Typography>Loading...</Typography>;
   }
+
+  document.title = "Dashboard";
+
   //console.log(selectedProfile);
   return (
     <>

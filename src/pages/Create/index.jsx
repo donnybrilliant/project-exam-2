@@ -11,6 +11,8 @@ const CreateVenue = () => {
     navigate(`/venues/${response.id}`);
   };
 
+  document.title = "Create Venue - Holidaze";
+
   return <VenueForm onSubmit={handleCreateVenue} />;
 };
 

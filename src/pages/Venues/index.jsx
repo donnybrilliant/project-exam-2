@@ -40,6 +40,8 @@ const VenuesPage = () => {
 
   if (isLoading) return <p>Loading...</p>;
 
+  document.title = "Venues - Holidaze";
+
   return (
     <Container>
       <Search />

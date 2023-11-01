@@ -46,6 +46,8 @@ const Register = () => {
     setIsAvatarFieldVisible((prev) => !prev);
   };
 
+  document.title = "Register - Holidaze";
+
   return (
     <Container sx={{ textAlign: "center" }} maxWidth={"sm"}>
       <Typography>Register</Typography>
