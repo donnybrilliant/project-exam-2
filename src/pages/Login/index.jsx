@@ -28,6 +28,8 @@ const Login = () => {
     navigate(from.pathname, { replace: true });
   };
 
+  document.title = "Login - Holidaze";
+
   return (
     <Container sx={{ textAlign: "center" }} maxWidth={"sm"}>
       <Typography>Login</Typography>

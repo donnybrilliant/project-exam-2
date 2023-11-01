@@ -119,23 +119,56 @@ export const useThemeStore = create(
 );
 
 // Venues store for storing venues and selected venue
-
 export const useVenueStore = create((set) => ({
   venues: [],
   filteredVenues: [],
   selectedVenue: null,
+  searchParams: {
+    searchTerm: "",
+    startDate: null,
+    endDate: null,
+    guests: "1",
+  },
 
+  // Action for checking if a user is the owner of a venue
+  isOwner: () => {
+    const selectedVenue = useVenueStore.getState().selectedVenue;
+    const userInfo = useAuthStore.getState().userInfo;
+    return selectedVenue && selectedVenue.owner
+      ? selectedVenue.owner.name === userInfo.name
+      : false;
+  },
+
+  // Action for updating search params
+  updateStoreSearchParams: (newSearchParams) =>
+    set((state) => ({
+      searchParams: { ...state.searchParams, ...newSearchParams },
+    })),
+
+  // Action for fetching all venues.
   fetchAllVenues: async () => {
     const limit = 100;
-    const offset = 0;
-    const firstBatch = await useFetchStore
-      .getState()
-      .apiFetch(`venues?_bookings=true&limit=${limit}&offset=${offset}`);
-    const secondBatch = await useFetchStore
-      .getState()
-      .apiFetch(`venues?_bookings=true&limit=${limit}&offset=${limit}`);
-    const allVenues = [...firstBatch, ...secondBatch];
-    set({ venues: allVenues, filteredVenues: allVenues }); // Initialize filteredVenues here
+    let offset = 0;
+    let allVenues = [];
+    let keepFetching = true;
+
+    // Keep fetching venues until fewer than 100 are returned
+    while (keepFetching) {
+      const batch = await useFetchStore
+        .getState()
+        .apiFetch(`venues?_bookings=true&limit=${limit}&offset=${offset}`);
+
+      allVenues = [...allVenues, ...batch];
+
+      // Stop fetching if fewer than 100 venues are returned or update the offset to fetch the next batch
+      if (batch.length < limit) {
+        keepFetching = false;
+      } else {
+        offset += limit;
+      }
+    }
+
+    set({ venues: allVenues, filteredVenues: allVenues });
   },
 
   // Action for fetching all venues
@@ -161,7 +194,11 @@ export const useVenueStore = create((set) => ({
       const response = await useFetchStore
         .getState()
         .apiFetch("venues", "POST", venueData);
-      // After creation, add the new venue to the local state to reflect the change??
+      // Update state to include the new venue
+      set((state) => ({
+        venues: [...state.venues, response],
+      }));
+      // add other places?
       useFetchStore
         .getState()
         .setSuccessMsg(`Successfully created ${response.name}`);
@@ -174,6 +211,12 @@ export const useVenueStore = create((set) => ({
   updateVenue: async (id, venueData) => {
     try {
       await useFetchStore.getState().apiFetch(`venues/${id}`, "PUT", venueData);
+      // Update state to reflect the updated venue
+      set((state) => ({
+        venues: state.venues.map((venue) =>
+          venue.id === id ? { ...venue, ...response } : venue
+        ),
+      }));
       useFetchStore
         .getState()
         .setSuccessMsg(`Successfully updated ${venueData.name}`);
@@ -182,27 +225,12 @@ export const useVenueStore = create((set) => ({
     }
   },
 
-  /*   // Inside useFetchStore or useVenueStore or wherever deleteVenue is defined
-  deleteVenue: async (venueId) => {
-    const { apiFetch, setErrorMsg, setSuccessMsg } = get();
-
-    try {
-      await apiFetch(`venues/${venueId}`, "DELETE");
-      setSuccessMsg(`Successfully deleted venue ${venueId}.`);
-    } catch (error) {
-      console.error(error);
-      setErrorMsg(`Failed to delete venue ${venueId}.`);
-    }
-  }, */
-
   deleteVenue: async (id, name) => {
     try {
       await useFetchStore.getState().apiFetch(`venues/${id}`, "DELETE");
       // After deletion, remove the venue from the local state to reflect the change
       set((state) => ({
         venues: state.venues.filter((venue) => venue.id !== id),
-        selectedVenue:
-          state.selectedVenue?.id === id ? null : state.selectedVenue,
       }));
       useFetchStore.getState().setSuccessMsg(`Successfully deleted ${name}`);
     } catch (error) {
@@ -210,9 +238,9 @@ export const useVenueStore = create((set) => ({
     }
   },
 
-  filterVenues: (searchTerm, startDate, endDate) => {
+  filterVenues: (searchTerm, startDate, endDate, guests) => {
     set((state) => {
-      const lowerCaseTerm = searchTerm.toLowerCase();
+      const lowerCaseTerm = searchTerm ? searchTerm.toLowerCase() : "";
 
       const filtered = state.venues.filter((venue) => {
         // Text Search
@@ -237,12 +265,16 @@ export const useVenueStore = create((set) => ({
           );
         });
 
-        return textMatch && dateMatch;
+        // Guest Count Search
+        const guestMatch = venue.maxGuests >= guests; // Assuming venue has a capacity property
+
+        return textMatch && dateMatch && guestMatch; // Include guestMatch in the return condition
       });
 
       return { filteredVenues: filtered }; // return the new state value
     });
   },
+
   bookVenue: async (bookingData) => {
     try {
       await useFetchStore.getState().apiFetch("bookings", "POST", bookingData);
@@ -290,6 +322,7 @@ export const useGalleryStore = create((set) => ({
 export const useProfileStore = create((set) => ({
   profiles: [],
   selectedProfile: null,
+  clearSelectedProfile: () => set({ selectedProfile: null }),
 
   // Action for fetching all profiles
   fetchProfiles: async () => {

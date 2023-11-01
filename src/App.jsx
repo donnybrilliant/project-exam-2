@@ -4,12 +4,17 @@ import Home from "./pages/Home";
 import VenuePage from "./pages/Venue";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import { PublicOnlyRoute, PrivateRoute } from "./components/AccessControl";
+import {
+  PublicOnlyRoute,
+  PrivateRoute,
+  OwnerRoute,
+} from "./components/AccessControl";
 import Dashboard from "./pages/Dashboard";
 import CreateVenue from "./pages/Create";
 import EditVenue from "./pages/EditVenue";
 import Feedback from "./components/Feedback";
 import ConfirmationDialog from "./components/ConfirmationDialog";
+import VenuesPage from "./pages/Venues";
 
 function App() {
   return (
@@ -17,8 +22,17 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
+          <Route path="venues" element={<VenuesPage />} />
           <Route path="venues/:id" element={<VenuePage />} />
-          <Route path="venues/:id/edit" element={<EditVenue />} />
+          {/*   add access control */}
+          <Route
+            path="venues/:id/edit"
+            element={
+              <OwnerRoute>
+                <EditVenue />
+              </OwnerRoute>
+            }
+          />
           <Route
             path="login"
             element={

@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { useVenueStore, useFetchStore } from "../../stores";
 import VenueList from "../../components/VenueList";
 import Container from "@mui/material/Container";
+import { Typography } from "@mui/material";
+import Search from "../../components/Search";
 
 // This component is used to display a home page with a list of venues
 const Home = () => {
@@ -19,15 +21,16 @@ const Home = () => {
     fetchAllVenues();
   }, []);
 
-  if (isLoading) return <h1>Loading...</h1>;
+  //if (isLoading) return <h1>Loading...</h1>;
 
-  if (isError) return <h1>Error: {errorMsg}</h1>;
+  //if (isError) return <h1>Error: {errorMsg}</h1>;
 
   console.log(filteredVenues);
 
   return (
     <Container>
-      {Array.isArray(venues) && <VenueList venues={filteredVenues} />}
+      <Search />
+      <Typography>Hello</Typography>
     </Container>
   );
 };

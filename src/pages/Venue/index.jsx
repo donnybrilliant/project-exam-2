@@ -5,6 +5,7 @@ import {
   useAuthStore,
   useFetchStore,
   useDialogStore,
+  useProfileStore,
 } from "../../stores";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -39,16 +40,24 @@ dayjs.extend(utc);
 const VenuePage = () => {
   // Get id from URL
   let { id } = useParams();
+  const { searchParams } = useVenueStore();
+
   // Get states and actions from venuesStore
   const token = useAuthStore((state) => state.token);
+  const userInfo = useAuthStore((state) => state.userInfo);
   const selectedVenue = useVenueStore((state) => state.selectedVenue);
   const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
+  const fetchProfileByName = useProfileStore(
+    (state) => state.fetchProfileByName
+  );
+  const selectedProfile = useProfileStore((state) => state.selectedProfile);
   const isLoading = useFetchStore((state) => state.isLoading);
   const bookVenue = useVenueStore((state) => state.bookVenue);
   const [dateRange, setDateRange] = useState([null, null]);
   const [guests, setGuests] = useState(1);
   const [bookingMade, setBookingMade] = useState(false);
   const [bookingCount, setBookingCount] = useState(0);
+  const isOwner = useVenueStore((state) => state.isOwner());
 
   const { openDialog } = useDialogStore();
 
@@ -60,10 +69,40 @@ const VenuePage = () => {
     fetchVenueById(id);
   }, [id]);
 
+  document.title = selectedVenue?.name
+    ? `${selectedVenue.name} - Holidaze`
+    : "Venue - Holidaze";
+
+  useEffect(() => {
+    if (selectedVenue) {
+      // Trigger the fetchProfileByName action with the owner's name
+      fetchProfileByName(selectedVenue.owner.name);
+    }
+    return () => {
+      // Clear profile data when component unmounts - is it neccessary when i have loading state on dashboard?
+      useProfileStore.getState().clearSelectedProfile();
+    };
+  }, [selectedVenue]);
+
+  // need correct date format for calendar...
+  /*  useEffect(() => {
+    // Check if there are values in the store
+    if (searchParams.startDate && searchParams.endDate) {
+      const start = dayjs(searchParams.startDate);
+      const end = dayjs(searchParams.endDate);
+      setDateRange([start.toDate(), end.toDate()]);
+    }
+    if (searchParams.guests) {
+      setGuests(searchParams.guests);
+    }
+    // ... rest of your code ...
+  }, [searchParams]); */
+
   //if (isLoading) return <h1>Loading...</h1>;
 
   //console.log(dateRange[0]);
   //console.log(selectedVenue);
+  //console.log(selectedProfile);
 
   const navigateToLogin = () => {
     navigate("/login", { state: { from: location } });
@@ -96,7 +135,7 @@ const VenuePage = () => {
   };
 
   return (
-    <Container>
+    <Container maxWidth="md">
       <Card>
         {selectedVenue?.media.length > 0 ? (
           <CardMedia
@@ -270,7 +309,11 @@ const VenuePage = () => {
           fullWidth
           onClick={!token ? navigateToLogin : handleBooking}
         >
-          {!token ? "Login to Book" : "Book"}
+          {!token
+            ? "Login to Book"
+            : dateRange[0] === null || dateRange[1] === null
+            ? "Select Dates to Book"
+            : "Book"}
         </Button>
       </Card>
       {selectedVenue?.media?.length > 1 && (
@@ -285,15 +328,44 @@ const VenuePage = () => {
           flexWrap: "wrap",
         }}
       >
-        <CardHeader
-          avatar={
+        <Tooltip
+          title={
+            <>
+              <Typography variant="body2">
+                Venues: {selectedProfile?._count.venues}
+              </Typography>
+              <Typography variant="body2">
+                Bookings: {selectedProfile?._count.bookings}
+              </Typography>
+            </>
+          }
+          arrow
+        >
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              marginBlock: 2,
+              cursor: "default",
+            }}
+          >
             <Avatar
               alt={selectedVenue?.owner?.name}
               src={selectedVenue?.owner?.avatar}
+              sx={{ marginRight: 1 }}
             />
-          }
-          title={selectedVenue?.owner?.name}
-        />
+
+            <Typography>{selectedVenue?.owner?.name}</Typography>
+          </Box>
+        </Tooltip>
+        {isOwner && (
+          <Button
+            variant="outlined"
+            onClick={() => navigate(`/venues/${selectedVenue?.id}/edit`)}
+          >
+            Edit Venue
+          </Button>
+        )}
         <Box>
           <Typography>
             Created:{" "}
