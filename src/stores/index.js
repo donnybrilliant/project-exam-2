@@ -184,7 +184,11 @@ export const useVenueStore = create((set) => ({
       const response = await useFetchStore
         .getState()
         .apiFetch("venues", "POST", venueData);
-      // After creation, add the new venue to the local state to reflect the change??
+      // Update state to include the new venue
+      set((state) => ({
+        venues: [...state.venues, response],
+      }));
+      // add other places?
       useFetchStore
         .getState()
         .setSuccessMsg(`Successfully created ${response.name}`);
@@ -197,6 +201,12 @@ export const useVenueStore = create((set) => ({
   updateVenue: async (id, venueData) => {
     try {
       await useFetchStore.getState().apiFetch(`venues/${id}`, "PUT", venueData);
+      // Update state to reflect the updated venue
+      set((state) => ({
+        venues: state.venues.map((venue) =>
+          venue.id === id ? { ...venue, ...response } : venue
+        ),
+      }));
       useFetchStore
         .getState()
         .setSuccessMsg(`Successfully updated ${venueData.name}`);
@@ -211,8 +221,6 @@ export const useVenueStore = create((set) => ({
       // After deletion, remove the venue from the local state to reflect the change
       set((state) => ({
         venues: state.venues.filter((venue) => venue.id !== id),
-        selectedVenue:
-          state.selectedVenue?.id === id ? null : state.selectedVenue,
       }));
       useFetchStore.getState().setSuccessMsg(`Successfully deleted ${name}`);
     } catch (error) {
