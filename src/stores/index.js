@@ -129,6 +129,16 @@ export const useVenueStore = create((set) => ({
     endDate: null,
     guests: "1",
   },
+
+  // Action for checking if a user is the owner of a venue
+  isOwner: () => {
+    const selectedVenue = useVenueStore.getState().selectedVenue;
+    const userInfo = useAuthStore.getState().userInfo;
+    return selectedVenue && selectedVenue.owner
+      ? selectedVenue.owner.name === userInfo.name
+      : false;
+  },
+
   // Action for updating search params
   updateStoreSearchParams: (newSearchParams) =>
     set((state) => ({
@@ -312,6 +322,7 @@ export const useGalleryStore = create((set) => ({
 export const useProfileStore = create((set) => ({
   profiles: [],
   selectedProfile: null,
+  clearSelectedProfile: () => set({ selectedProfile: null }),
 
   // Action for fetching all profiles
   fetchProfiles: async () => {
