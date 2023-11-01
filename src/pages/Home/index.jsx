@@ -1,36 +1,168 @@
 import { useEffect } from "react";
 import { useVenueStore, useFetchStore } from "../../stores";
-import VenueList from "../../components/VenueList";
 import Container from "@mui/material/Container";
-import { Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import Search from "../../components/Search";
+import VenueCarousel from "../../components/VenueCarousel";
+import Box from "@mui/material/Box";
+import Logo from "../../components/Layout/Header/Logo";
+import Avatar from "@mui/material/Avatar";
 
 // This component is used to display a home page with a list of venues
 const Home = () => {
   // Get states and actions from venuesStore
-  const fetchVenues = useVenueStore((state) => state.fetchVenues);
   const fetchAllVenues = useVenueStore((state) => state.fetchAllVenues);
-  const isLoading = useFetchStore((state) => state.isLoading);
-  const isError = useFetchStore((state) => state.isError);
-  const errorMsg = useFetchStore((state) => state.errorMsg);
   const venues = useVenueStore((state) => state.venues);
-  const filteredVenues = useVenueStore((state) => state.filteredVenues);
 
-  // Fetch venues when token and fetchVenues function change
+  // Fetch venues when component mounts
   useEffect(() => {
     fetchAllVenues();
-  }, []);
+  }, [fetchAllVenues]);
 
-  //if (isLoading) return <h1>Loading...</h1>;
+  // Top Rated Venues: Sort by rating in descending order
+  const topRatedVenues = [...venues]
+    .sort((a, b) => b.rating - a.rating)
+    .slice(0, 10);
 
-  //if (isError) return <h1>Error: {errorMsg}</h1>;
+  // Most Popular Venues: Sort by booking count in descending order
+  const mostPopularVenues = [...venues]
+    .sort((a, b) => b.bookings.length - a.bookings.length)
+    .slice(0, 10);
 
-  console.log(filteredVenues);
+  // Newest Venues: Sort by created date in descending order (newest first)
+  const newVenues = [...venues]
+    .sort((a, b) => new Date(b.created) - new Date(a.created))
+    .slice(0, 10);
 
   return (
     <Container>
       <Search />
-      <Typography>Hello</Typography>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          flexWrap: "wrap",
+          justifyContent: "center",
+          gap: 3,
+          marginBlock: 3,
+        }}
+      >
+        <Box
+          sx={{
+            width: "400px",
+          }}
+        >
+          <Typography variant="h1" gutterBottom>
+            Welcome to Holidaze
+          </Typography>
+          <Typography variant="h2" gutterBottom>
+            Your Personalized Holiday Planner
+          </Typography>
+          <Typography gutterBottom>
+            Search for your next holiday destination in the search bar above, or
+            browse our top rated, most popular, and newest venues below.
+          </Typography>
+        </Box>
+        <Avatar sx={{ width: 125, height: 125 }} />
+      </Box>
+
+      <Box sx={{ my: 4 }}>
+        <Typography variant="h5" gutterBottom>
+          Your Perfect Getaway is Just a Click Away!
+        </Typography>
+        <Typography paragraph>
+          Dive into a plethora of venues that cater to every discerning
+          traveler. Whether you're eyeing a serene countryside retreat or a
+          bustling city escape, Holidaze is your go-to platform for a tailored
+          holiday experience.
+        </Typography>
+        <Button variant="contained" color="primary" size="large">
+          Discover Top Venues
+        </Button>
+      </Box>
+
+      <Box sx={{ my: 4 }}>
+        <Typography variant="h5" gutterBottom>
+          Explore at Your Fingertips
+        </Typography>
+        <Typography paragraph>
+          Our easy-to-navigate platform opens up a world of venues for you to
+          explore and book. Your next holiday is just a browse away.
+        </Typography>
+        <Button variant="contained" color="primary" size="large">
+          Browse Venues
+        </Button>
+      </Box>
+
+      <Box sx={{ my: 4 }}>
+        <Typography variant="h5" gutterBottom>
+          Seamlessly Manage Your Bookings
+        </Typography>
+        <Typography paragraph>
+          With Holidaze, managing your bookings is a breeze. Access your
+          personal dashboard to view, edit, or cancel your bookings anytime,
+          anywhere.
+        </Typography>
+        <Button variant="contained" color="primary" size="large">
+          Go to Dashboard
+        </Button>
+      </Box>
+
+      <Box sx={{ my: 4 }}>
+        <Typography variant="h5" gutterBottom>
+          Empowering Venue Managers
+        </Typography>
+        <Typography paragraph>
+          Are you a venue owner? Join Holidaze to list your venue, manage
+          bookings, and connect with potential customers effortlessly.
+        </Typography>
+        <Button variant="contained" color="primary" size="large">
+          Register Your Venue
+        </Button>
+      </Box>
+
+      <Typography variant="h5" gutterBottom>
+        Discover, Book, and Manage Venues with Ease
+      </Typography>
+      <Typography>
+        Are you seeking the perfect getaway or planning an event? Holidaze is
+        here to make your experience hassle-free and delightful. Discover a wide
+        range of venues, from tranquil retreats in the countryside to vibrant
+        city escapes.
+      </Typography>
+      <Typography>
+        At Holidaze, we bring you closer to your dream holiday: Explore Diverse
+        Venues: Discover venues that cater to every taste and occasion.
+      </Typography>
+      <Typography>
+        Personalized Experiences: Create an account and enjoy a tailored holiday
+        booking experience.
+      </Typography>
+      <Typography>
+        Manage Your Bookings Effortlessly: Keep track of your bookings and
+        manage them with ease through your personal dashboard.
+      </Typography>
+      <Typography>
+        Venue Management for Owners: Are you a venue owner? Join our platform
+        and connect with potential customers like never before. Join us and step
+        into a world of relaxed and rewarding holiday planning.
+        <Button variant="contained" color="primary">
+          Register Your Venue
+        </Button>
+      </Typography>
+
+      <Typography variant="h4" component="h2" marginTop={5} gutterBottom>
+        Top Rated Venues
+      </Typography>
+      <VenueCarousel venues={topRatedVenues} />
+      <Typography variant="h4" component="h2" marginTop={5} gutterBottom>
+        Most Popular Venues
+      </Typography>
+      <VenueCarousel venues={mostPopularVenues} />
+      <Typography variant="h4" component="h2" marginTop={5} gutterBottom>
+        Newest Venues
+      </Typography>
+      <VenueCarousel venues={newVenues} />
     </Container>
   );
 };
