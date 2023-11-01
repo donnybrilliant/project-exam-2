@@ -57,6 +57,7 @@ const VenuePage = () => {
   const [guests, setGuests] = useState(1);
   const [bookingMade, setBookingMade] = useState(false);
   const [bookingCount, setBookingCount] = useState(0);
+  const isOwner = useVenueStore((state) => state.isOwner());
 
   const { openDialog } = useDialogStore();
 
@@ -68,13 +69,15 @@ const VenuePage = () => {
     fetchVenueById(id);
   }, [id]);
 
-  const isOwner = selectedVenue?.owner?.name === userInfo?.name;
-
   useEffect(() => {
     if (selectedVenue) {
       // Trigger the fetchProfileByName action with the owner's name
       fetchProfileByName(selectedVenue.owner.name);
     }
+    return () => {
+      // Clear profile data when component unmounts
+      useProfileStore.getState().clearSelectedProfile();
+    };
   }, [selectedVenue]);
 
   // need correct date format for calendar...
@@ -94,8 +97,8 @@ const VenuePage = () => {
   //if (isLoading) return <h1>Loading...</h1>;
 
   //console.log(dateRange[0]);
-  console.log(selectedVenue);
-  console.log(selectedProfile);
+  //console.log(selectedVenue);
+  //console.log(selectedProfile);
 
   const navigateToLogin = () => {
     navigate("/login", { state: { from: location } });
