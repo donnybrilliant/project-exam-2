@@ -75,7 +75,7 @@ const VenuePage = () => {
       fetchProfileByName(selectedVenue.owner.name);
     }
     return () => {
-      // Clear profile data when component unmounts
+      // Clear profile data when component unmounts - is it neccessary when i have loading state on dashboard?
       useProfileStore.getState().clearSelectedProfile();
     };
   }, [selectedVenue]);
@@ -305,7 +305,11 @@ const VenuePage = () => {
           fullWidth
           onClick={!token ? navigateToLogin : handleBooking}
         >
-          {!token ? "Login to Book" : "Book"}
+          {!token
+            ? "Login to Book"
+            : dateRange[0] === null || dateRange[1] === null
+            ? "Select Dates to Book"
+            : "Book"}
         </Button>
       </Card>
       {selectedVenue?.media?.length > 1 && (
