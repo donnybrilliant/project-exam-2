@@ -26,18 +26,13 @@ const Register = () => {
   const errorMsg = useFetchStore((state) => state.errorMsg);
   const login = useAuthStore((state) => state.login);
   const [isAvatarFieldVisible, setIsAvatarFieldVisible] = useState(false);
+  const register = useAuthStore((state) => state.register);
 
   // This function is used to register the user and then login
   const handleRegister = async (event) => {
     event.preventDefault();
-    const register = await apiFetch("auth/register", "POST", {
-      name,
-      email,
-      password,
-      avatar,
-    });
-    if (register) {
-      await login(email, password);
+    const registered = await register(name, email, password, avatar);
+    if (registered) {
       navigate("/dashboard", { replace: true });
     }
   };
