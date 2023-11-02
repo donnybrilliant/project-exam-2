@@ -65,7 +65,7 @@ const Register = () => {
             margin="normal"
             fullWidth
             id="avatar"
-            label="Avatar"
+            label="Avatar URL"
             name="avatar"
             value={avatar}
             onChange={(e) => setAvatar(e.target.value)}
@@ -113,7 +113,7 @@ const Register = () => {
         </Button>
       </Box>
       <Link component={RouterLink} to={"/login"}>
-        {"Already have an account? Login"}
+        Already have an account? Login
       </Link>
       {errorMsg && <Typography>{errorMsg}</Typography>}
     </Container>

@@ -80,49 +80,32 @@ export const useAuthStore = create(
         set({ token: null, userInfo: null });
       },
       register: async (name, email, password, avatar) => {
-        try {
-          const data = await useFetchStore
-            .getState()
-            .apiFetch("auth/register", "POST", {
-              name,
-              email,
-              password,
-              avatar,
-            });
-          return data;
-        } catch (error) {
-          useFetchStore
-            .getState()
-            .setErrorMsg(
-              error.message ||
-                "An unexpected error occurred during registration"
-            );
-        }
+        const data = await useFetchStore
+          .getState()
+          .apiFetch("auth/register", "POST", {
+            name,
+            email,
+            password,
+            avatar,
+          });
+        return data;
       },
       login: async (email, password) => {
-        try {
-          const data = await useFetchStore
-            .getState()
-            .apiFetch("auth/login", "POST", { email, password });
+        const data = await useFetchStore
+          .getState()
+          .apiFetch("auth/login", "POST", { email, password });
 
-          if (data) {
-            const userInfo = {
-              name: data.name,
-              email: data.email,
-              avatar: data.avatar,
-              venueManager: data.venueManager,
-            };
-            set({ token: data.accessToken, userInfo });
-            useFetchStore
-              .getState()
-              .setSuccessMsg(`Successfully logged in as ${data.name}`);
-          }
-        } catch (error) {
+        if (data) {
+          const userInfo = {
+            name: data.name,
+            email: data.email,
+            avatar: data.avatar,
+            venueManager: data.venueManager,
+          };
+          set({ token: data.accessToken, userInfo });
           useFetchStore
             .getState()
-            .setErrorMsg(
-              error.message || "An unexpected error occurred during login"
-            );
+            .setSuccessMsg(`Successfully logged in as ${data.name}`);
         }
       },
     }),
@@ -165,7 +148,7 @@ export const useVenueStore = create((set) => ({
   isOwner: () => {
     const selectedVenue = useVenueStore.getState().selectedVenue;
     const userInfo = useAuthStore.getState().userInfo;
-    return selectedVenue && selectedVenue.owner
+    return userInfo && selectedVenue && selectedVenue.owner
       ? selectedVenue.owner.name === userInfo.name
       : false;
   },
