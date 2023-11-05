@@ -46,25 +46,61 @@ const Search = () => {
       .join(" "); // Join words back together
   };
 
-  // Filter the options for the autocomplete based on city and country
+  // Function to filter the options in the Autocomplete component
   const filterOptions = (options, { inputValue }) => {
     const lowerCaseInputValue = inputValue.toLowerCase();
-    const locationsSet = new Set(); // Use a Set to ensure uniqueness
 
+    // Arrays to store cities, countries, and venue names
+    const arrays = {
+      city: [],
+      country: [],
+      venue: [],
+    };
+
+    // Function to add values to the appropriate arrays while checking for non-blank values
+    const addToArrays = (category, value) => {
+      if (value && value.trim() !== "" && arrays.hasOwnProperty(category)) {
+        const formattedValue = capitalize(value.toLowerCase());
+        arrays[category].push(formattedValue);
+      }
+    };
+
+    const cities = arrays.city;
+    const countries = arrays.country;
+    const venueNames = arrays.venue;
+
+    // Iterate through the venues and add cities, countries, and venue names to the arrays
     options.forEach((venue) => {
       const { city, country } = venue.location;
       if (city && city.toLowerCase().includes(lowerCaseInputValue)) {
-        locationsSet.add(capitalize(city.toLowerCase())); // Capitalize each word in the city name
+        addToArrays("city", city);
       }
       if (country && country.toLowerCase().includes(lowerCaseInputValue)) {
-        locationsSet.add(capitalize(country.toLowerCase())); // Capitalize each word in the country name
+        addToArrays("country", country);
+      }
+      if (
+        venue.name &&
+        venue.name.toLowerCase().includes(lowerCaseInputValue)
+      ) {
+        addToArrays("venue", venue.name);
       }
     });
 
-    // Convert to array and sort alphabetically
-    return Array.from(locationsSet).sort((a, b) =>
-      a.toLowerCase().localeCompare(b.toLowerCase())
-    );
+    // Sort each array alphabetically
+    const sortAlphabetically = (a, b) =>
+      a.toLowerCase().localeCompare(b.toLowerCase());
+    cities.sort(sortAlphabetically);
+    countries.sort(sortAlphabetically);
+    venueNames.sort(sortAlphabetically);
+
+    // Concatenate the arrays together
+    const concatenatedArray = [...cities, ...countries, ...venueNames];
+
+    // Remove duplicate entries
+    const uniqueEntriesSet = new Set(concatenatedArray);
+
+    // Convert the Set back to an array and return it
+    return Array.from(uniqueEntriesSet);
   };
 
   // Update localSearchParams whenever searchParams changes
@@ -109,6 +145,7 @@ const Search = () => {
           <Autocomplete
             fullWidth
             freeSolo
+            value={localSearchParams.searchTerm || ""}
             options={venues}
             getOptionLabel={(option) => option}
             onInputChange={(event, newInputValue) =>
