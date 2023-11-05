@@ -3,7 +3,7 @@ import { styled, keyframes } from "@mui/system";
 import IconButton from "@mui/material/IconButton";
 
 // Create a logo svg component
-const LogoIcon = createSvgIcon(
+export const LogoIcon = createSvgIcon(
   <svg
     id="Logo"
     data-name="Logo"
