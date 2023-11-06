@@ -266,11 +266,18 @@ export const useVenueStore = create((set) => ({
     }
   },
 
-  filterVenues: (searchTerm, startDate, endDate, guests, sortType) => {
+  filterVenues: (
+    searchTerm,
+    startDate,
+    endDate,
+    guests,
+    sortType,
+    amenitiesFilters
+  ) => {
     set((state) => {
       const lowerCaseTerm = searchTerm ? searchTerm.toLowerCase() : "";
 
-      const filtered = state.venues.filter((venue) => {
+      let newFilteredVenues = state.venues.filter((venue) => {
         // Text Search
         const textMatch = [
           venue.name,
@@ -299,8 +306,24 @@ export const useVenueStore = create((set) => ({
         return textMatch && dateMatch && guestMatch; // Include guestMatch in the return condition
       });
 
+      if (amenitiesFilters) {
+        newFilteredVenues = newFilteredVenues.filter((venue) => {
+          return (
+            (!amenitiesFilters.wifi ||
+              venue.meta.wifi === amenitiesFilters.wifi) &&
+            (!amenitiesFilters.parking ||
+              venue.meta.parking === amenitiesFilters.parking) &&
+            (!amenitiesFilters.breakfast ||
+              venue.meta.breakfast === amenitiesFilters.breakfast) &&
+            (!amenitiesFilters.pets ||
+              venue.meta.pets === amenitiesFilters.pets)
+            // ... add other amenities checks here ...
+          );
+        });
+      }
+
       if (sortType) {
-        filtered.sort((a, b) => {
+        newFilteredVenues.sort((a, b) => {
           let comparison = 0;
           switch (sortType) {
             case "alphabetical":
@@ -330,8 +353,7 @@ export const useVenueStore = create((set) => ({
         });
       }
 
-      console.log(state.isReversed, sortType);
-      return { filteredVenues: filtered }; // return the new state value
+      return { filteredVenues: newFilteredVenues }; // return the new state value
     });
   },
 
