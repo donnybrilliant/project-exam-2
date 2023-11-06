@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 
 const BASE_URL = "https://api.noroff.dev/api/v1/holidaze";
 
+// Fetch store for handling API requests
 export const useFetchStore = create((set) => ({
   isLoading: false,
   isError: false,
@@ -144,19 +145,21 @@ export const useVenueStore = create((set) => ({
     guests: "1",
   },
   maxPrice: 0,
+  maxSliderValue: 500,
   sortType: null,
-  // sortOrder is removed
-  updateSortType: (type) => set({ sortType: type }),
-  // updateSortOrder is removed
-
   isReversed: false,
 
+  // Action for updating the sort type
+  updateSortType: (type) => set({ sortType: type }),
+
+  // Action for reversing the filtered venues
   reverseFilteredVenues: () =>
     set((state) => ({
       filteredVenues: [...state.filteredVenues].reverse(),
       isReversed: !state.isReversed,
     })),
 
+  // Action for updating the max price
   setMaxPrice: () => {
     const venues = useVenueStore.getState().venues;
     const calculatedMaxPrice = venues.reduce((max, venue) => {
@@ -206,7 +209,7 @@ export const useVenueStore = create((set) => ({
     useVenueStore.getState().setMaxPrice();
   },
 
-  // Action for fetching all venues
+  // Action for fetching venues
   fetchVenues: async () => {
     const data = await useFetchStore.getState().apiFetch("venues");
     if (data) {
@@ -224,6 +227,8 @@ export const useVenueStore = create((set) => ({
       return data;
     }
   },
+
+  // Action for creating a venue
   createVenue: async (venueData) => {
     try {
       const response = await useFetchStore
@@ -243,6 +248,7 @@ export const useVenueStore = create((set) => ({
     }
   },
 
+  // Action for updating a venue
   updateVenue: async (id, venueData) => {
     try {
       const response = await useFetchStore
@@ -262,6 +268,7 @@ export const useVenueStore = create((set) => ({
     }
   },
 
+  // Action for deleting a venue
   deleteVenue: async (id, name) => {
     try {
       await useFetchStore.getState().apiFetch(`venues/${id}`, "DELETE");
@@ -275,6 +282,7 @@ export const useVenueStore = create((set) => ({
     }
   },
 
+  // Action for sorting and filtering venues
   filterVenues: (
     searchTerm,
     startDate,
@@ -312,11 +320,12 @@ export const useVenueStore = create((set) => ({
         });
 
         // Guest Count Search
-        const guestMatch = venue.maxGuests >= guests; // Assuming venue has a capacity property
+        const guestMatch = venue.maxGuests >= guests;
 
-        return textMatch && dateMatch && guestMatch; // Include guestMatch in the return condition
+        return textMatch && dateMatch && guestMatch;
       });
 
+      // Filter by amenities
       if (amenitiesFilters) {
         newFilteredVenues = newFilteredVenues.filter((venue) => {
           return (
@@ -328,19 +337,25 @@ export const useVenueStore = create((set) => ({
               venue.meta.breakfast === amenitiesFilters.breakfast) &&
             (!amenitiesFilters.pets ||
               venue.meta.pets === amenitiesFilters.pets)
-            // ... add other amenities checks here ...
           );
         });
       }
 
+      // Filter by price range
       if (priceRange) {
         newFilteredVenues = newFilteredVenues.filter((venue) => {
-          // Assuming venue has a price property
-          const price = venue.price; // Or however you access the venue's price
-          return price >= priceRange[0] && price <= priceRange[1];
+          const price = venue.price;
+          // If the slider is at max, consider any price up to maxPrice
+          const upperBound =
+            priceRange[1] === useVenueStore.getState().maxSliderValue
+              ? useVenueStore.getState().maxPrice
+              : priceRange[1];
+
+          return price >= priceRange[0] && price <= upperBound;
         });
       }
 
+      // Sort the filtered venues
       if (sortType) {
         newFilteredVenues.sort((a, b) => {
           let comparison = 0;
@@ -362,7 +377,6 @@ export const useVenueStore = create((set) => ({
               // Assuming you count bookings for popularity
               comparison = a.bookings.length - b.bookings.length;
               break;
-            // Add other cases as needed
             default:
               // Handle default case or throw an error
               break;
@@ -372,17 +386,18 @@ export const useVenueStore = create((set) => ({
         });
       }
 
+      // Filter by minimum rating
       if (minRating) {
         newFilteredVenues = newFilteredVenues.filter((venue) => {
-          // Assuming venue has a rating property
           return venue.rating >= minRating;
         });
       }
 
-      return { filteredVenues: newFilteredVenues }; // return the new state value
+      return { filteredVenues: newFilteredVenues };
     });
   },
 
+  // Action for creating a booking
   bookVenue: async (bookingData) => {
     try {
       await useFetchStore.getState().apiFetch("bookings", "POST", bookingData);
@@ -393,6 +408,8 @@ export const useVenueStore = create((set) => ({
       useFetchStore.getState().setErrorMsg(error.message);
     }
   },
+
+  // Action for deleting a booking
   deleteBooking: async (id, name) => {
     try {
       await useFetchStore.getState().apiFetch(`bookings/${id}`, "DELETE");
@@ -407,6 +424,7 @@ export const useVenueStore = create((set) => ({
   },
 }));
 
+// Gallery store for storing the index of the open image
 export const useGalleryStore = create((set) => ({
   openImageIndex: null,
   setOpenImageIndex: (index) => set({ openImageIndex: index }),
@@ -475,6 +493,7 @@ export const useProfileStore = create((set) => ({
   },
 }));
 
+// Dialog store for showing dialogs
 export const useDialogStore = create((set) => ({
   isOpen: false,
   title: "",
