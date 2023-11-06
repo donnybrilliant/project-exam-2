@@ -1,6 +1,7 @@
 import VenueCard from "../VenueCard";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
+import SortAndFilter from "../SortAndFilter";
 
 // This component is used to display a list of venues
 const VenueList = ({ venues }) => {
@@ -10,6 +11,7 @@ const VenueList = ({ venues }) => {
         <Typography>No venues found</Typography>
       ) : (
         <>
+          <SortAndFilter />
           <Typography
             variant="body2"
             sx={{ marginBottom: 1 }}

@@ -143,6 +143,14 @@ export const useVenueStore = create((set) => ({
     endDate: null,
     guests: "1",
   },
+  sortType: null,
+  sortOrder: null,
+  updateSortType: (type) => set({ sortType: type }),
+  updateSortOrder: (order) => set({ sortOrder: order }),
+  reverseFilteredVenues: () =>
+    set((state) => ({
+      filteredVenues: [...state.filteredVenues].reverse(),
+    })),
 
   // Action for checking if a user is the owner of a venue
   isOwner: () => {
@@ -224,7 +232,9 @@ export const useVenueStore = create((set) => ({
 
   updateVenue: async (id, venueData) => {
     try {
-      await useFetchStore.getState().apiFetch(`venues/${id}`, "PUT", venueData);
+      const response = await useFetchStore
+        .getState()
+        .apiFetch(`venues/${id}`, "PUT", venueData);
       // Update state to reflect the updated venue
       set((state) => ({
         venues: state.venues.map((venue) =>
@@ -252,7 +262,14 @@ export const useVenueStore = create((set) => ({
     }
   },
 
-  filterVenues: (searchTerm, startDate, endDate, guests) => {
+  filterVenues: (
+    searchTerm,
+    startDate,
+    endDate,
+    guests,
+    sortType,
+    sortOrder
+  ) => {
     set((state) => {
       const lowerCaseTerm = searchTerm ? searchTerm.toLowerCase() : "";
 
@@ -285,6 +302,38 @@ export const useVenueStore = create((set) => ({
         return textMatch && dateMatch && guestMatch; // Include guestMatch in the return condition
       });
 
+      if (sortType && sortOrder) {
+        filtered.sort((a, b) => {
+          let comparison = 0;
+          switch (sortType) {
+            case "alphabetical":
+              comparison = a.name.localeCompare(b.name);
+              break;
+            case "price":
+              comparison = a.price - b.price;
+              break;
+            case "created":
+              // Assuming you have a created date in ISO format
+              comparison = new Date(a.created) - new Date(b.created);
+              break;
+            case "rating":
+              comparison = a.rating - b.rating;
+              break;
+            case "popularity":
+              // Assuming you count bookings for popularity
+              comparison = a.bookings.length - b.bookings.length;
+              break;
+            // Add other cases as needed
+            default:
+              // Handle default case or throw an error
+              break;
+          }
+          // Reverse the comparison if sortOrder is 'desc'
+          return sortOrder === "desc" ? comparison * -1 : comparison;
+        });
+      }
+      console.log(filtered);
+      console.log(sortOrder, sortType);
       return { filteredVenues: filtered }; // return the new state value
     });
   },
