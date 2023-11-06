@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 
 const BASE_URL = "https://api.noroff.dev/api/v1/holidaze";
 
+// Fetch store for handling API requests
 export const useFetchStore = create((set) => ({
   isLoading: false,
   isError: false,
@@ -79,6 +80,17 @@ export const useAuthStore = create(
       clearAuthInfo: () => {
         set({ token: null, userInfo: null });
       },
+      register: async (name, email, password, avatar) => {
+        const data = await useFetchStore
+          .getState()
+          .apiFetch("auth/register", "POST", {
+            name,
+            email,
+            password,
+            avatar,
+          });
+        return data;
+      },
       login: async (email, password) => {
         const data = await useFetchStore
           .getState()
@@ -92,6 +104,9 @@ export const useAuthStore = create(
             venueManager: data.venueManager,
           };
           set({ token: data.accessToken, userInfo });
+          useFetchStore
+            .getState()
+            .setSuccessMsg(`Successfully logged in as ${data.name}`);
         }
       },
     }),
@@ -129,12 +144,35 @@ export const useVenueStore = create((set) => ({
     endDate: null,
     guests: "1",
   },
+  maxPrice: 0,
+  maxSliderValue: 500,
+  sortType: null,
+  isReversed: false,
+
+  // Action for updating the sort type
+  updateSortType: (type) => set({ sortType: type }),
+
+  // Action for reversing the filtered venues
+  reverseFilteredVenues: () =>
+    set((state) => ({
+      filteredVenues: [...state.filteredVenues].reverse(),
+      isReversed: !state.isReversed,
+    })),
+
+  // Action for updating the max price
+  setMaxPrice: () => {
+    const venues = useVenueStore.getState().venues;
+    const calculatedMaxPrice = venues.reduce((max, venue) => {
+      return Math.max(max, venue.price);
+    }, 0);
+    set({ maxPrice: calculatedMaxPrice });
+  },
 
   // Action for checking if a user is the owner of a venue
   isOwner: () => {
     const selectedVenue = useVenueStore.getState().selectedVenue;
     const userInfo = useAuthStore.getState().userInfo;
-    return selectedVenue && selectedVenue.owner
+    return userInfo && selectedVenue && selectedVenue.owner
       ? selectedVenue.owner.name === userInfo.name
       : false;
   },
@@ -167,11 +205,11 @@ export const useVenueStore = create((set) => ({
         offset += limit;
       }
     }
-
     set({ venues: allVenues, filteredVenues: allVenues });
+    useVenueStore.getState().setMaxPrice();
   },
 
-  // Action for fetching all venues
+  // Action for fetching venues
   fetchVenues: async () => {
     const data = await useFetchStore.getState().apiFetch("venues");
     if (data) {
@@ -189,6 +227,8 @@ export const useVenueStore = create((set) => ({
       return data;
     }
   },
+
+  // Action for creating a venue
   createVenue: async (venueData) => {
     try {
       const response = await useFetchStore
@@ -208,9 +248,12 @@ export const useVenueStore = create((set) => ({
     }
   },
 
+  // Action for updating a venue
   updateVenue: async (id, venueData) => {
     try {
-      await useFetchStore.getState().apiFetch(`venues/${id}`, "PUT", venueData);
+      const response = await useFetchStore
+        .getState()
+        .apiFetch(`venues/${id}`, "PUT", venueData);
       // Update state to reflect the updated venue
       set((state) => ({
         venues: state.venues.map((venue) =>
@@ -225,6 +268,7 @@ export const useVenueStore = create((set) => ({
     }
   },
 
+  // Action for deleting a venue
   deleteVenue: async (id, name) => {
     try {
       await useFetchStore.getState().apiFetch(`venues/${id}`, "DELETE");
@@ -238,11 +282,21 @@ export const useVenueStore = create((set) => ({
     }
   },
 
-  filterVenues: (searchTerm, startDate, endDate, guests) => {
+  // Action for sorting and filtering venues
+  filterVenues: (
+    searchTerm,
+    startDate,
+    endDate,
+    guests,
+    sortType,
+    amenitiesFilters,
+    priceRange,
+    minRating
+  ) => {
     set((state) => {
       const lowerCaseTerm = searchTerm ? searchTerm.toLowerCase() : "";
 
-      const filtered = state.venues.filter((venue) => {
+      let newFilteredVenues = state.venues.filter((venue) => {
         // Text Search
         const textMatch = [
           venue.name,
@@ -266,15 +320,84 @@ export const useVenueStore = create((set) => ({
         });
 
         // Guest Count Search
-        const guestMatch = venue.maxGuests >= guests; // Assuming venue has a capacity property
+        const guestMatch = venue.maxGuests >= guests;
 
-        return textMatch && dateMatch && guestMatch; // Include guestMatch in the return condition
+        return textMatch && dateMatch && guestMatch;
       });
 
-      return { filteredVenues: filtered }; // return the new state value
+      // Filter by amenities
+      if (amenitiesFilters) {
+        newFilteredVenues = newFilteredVenues.filter((venue) => {
+          return (
+            (!amenitiesFilters.wifi ||
+              venue.meta.wifi === amenitiesFilters.wifi) &&
+            (!amenitiesFilters.parking ||
+              venue.meta.parking === amenitiesFilters.parking) &&
+            (!amenitiesFilters.breakfast ||
+              venue.meta.breakfast === amenitiesFilters.breakfast) &&
+            (!amenitiesFilters.pets ||
+              venue.meta.pets === amenitiesFilters.pets)
+          );
+        });
+      }
+
+      // Filter by price range
+      if (priceRange) {
+        newFilteredVenues = newFilteredVenues.filter((venue) => {
+          const price = venue.price;
+          // If the slider is at max, consider any price up to maxPrice
+          const upperBound =
+            priceRange[1] === useVenueStore.getState().maxSliderValue
+              ? useVenueStore.getState().maxPrice
+              : priceRange[1];
+
+          return price >= priceRange[0] && price <= upperBound;
+        });
+      }
+
+      // Sort the filtered venues
+      if (sortType) {
+        newFilteredVenues.sort((a, b) => {
+          let comparison = 0;
+          switch (sortType) {
+            case "alphabetical":
+              comparison = a.name.localeCompare(b.name);
+              break;
+            case "price":
+              comparison = a.price - b.price;
+              break;
+            case "created":
+              // Assuming you have a created date in ISO format
+              comparison = new Date(a.created) - new Date(b.created);
+              break;
+            case "rating":
+              comparison = a.rating - b.rating;
+              break;
+            case "popularity":
+              // Assuming you count bookings for popularity
+              comparison = a.bookings.length - b.bookings.length;
+              break;
+            default:
+              // Handle default case or throw an error
+              break;
+          }
+          // Apply reverse order if isReversed is true
+          return state.isReversed ? comparison * -1 : comparison;
+        });
+      }
+
+      // Filter by minimum rating
+      if (minRating) {
+        newFilteredVenues = newFilteredVenues.filter((venue) => {
+          return venue.rating >= minRating;
+        });
+      }
+
+      return { filteredVenues: newFilteredVenues };
     });
   },
 
+  // Action for creating a booking
   bookVenue: async (bookingData) => {
     try {
       await useFetchStore.getState().apiFetch("bookings", "POST", bookingData);
@@ -285,6 +408,8 @@ export const useVenueStore = create((set) => ({
       useFetchStore.getState().setErrorMsg(error.message);
     }
   },
+
+  // Action for deleting a booking
   deleteBooking: async (id, name) => {
     try {
       await useFetchStore.getState().apiFetch(`bookings/${id}`, "DELETE");
@@ -299,6 +424,7 @@ export const useVenueStore = create((set) => ({
   },
 }));
 
+// Gallery store for storing the index of the open image
 export const useGalleryStore = create((set) => ({
   openImageIndex: null,
   setOpenImageIndex: (index) => set({ openImageIndex: index }),
@@ -367,6 +493,7 @@ export const useProfileStore = create((set) => ({
   },
 }));
 
+// Dialog store for showing dialogs
 export const useDialogStore = create((set) => ({
   isOpen: false,
   title: "",

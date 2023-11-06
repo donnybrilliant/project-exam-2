@@ -58,6 +58,7 @@ const VenuePage = () => {
   const [bookingMade, setBookingMade] = useState(false);
   const [bookingCount, setBookingCount] = useState(0);
   const isOwner = useVenueStore((state) => state.isOwner());
+  const accessToken = useAuthStore((state) => state.token);
 
   const { openDialog } = useDialogStore();
 
@@ -74,7 +75,7 @@ const VenuePage = () => {
     : "Venue - Holidaze";
 
   useEffect(() => {
-    if (selectedVenue) {
+    if (selectedVenue && accessToken) {
       // Trigger the fetchProfileByName action with the owner's name
       fetchProfileByName(selectedVenue.owner.name);
     }
@@ -98,10 +99,11 @@ const VenuePage = () => {
     // ... rest of your code ...
   }, [searchParams]); */
 
-  //if (isLoading) return <h1>Loading...</h1>;
+  if (isLoading) return <h1>Loading...</h1>;
+  if (!selectedVenue) return <h1>Venue Not Found</h1>;
 
   //console.log(dateRange[0]);
-  //console.log(selectedVenue);
+  console.log(selectedVenue);
   //console.log(selectedProfile);
 
   const navigateToLogin = () => {

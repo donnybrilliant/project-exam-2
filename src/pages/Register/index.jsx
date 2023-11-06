@@ -26,18 +26,13 @@ const Register = () => {
   const errorMsg = useFetchStore((state) => state.errorMsg);
   const login = useAuthStore((state) => state.login);
   const [isAvatarFieldVisible, setIsAvatarFieldVisible] = useState(false);
+  const register = useAuthStore((state) => state.register);
 
   // This function is used to register the user and then login
   const handleRegister = async (event) => {
     event.preventDefault();
-    const register = await apiFetch("auth/register", "POST", {
-      name,
-      email,
-      password,
-      avatar,
-    });
-    if (register) {
-      await login(email, password);
+    const registered = await register(name, email, password, avatar);
+    if (registered) {
       navigate("/dashboard", { replace: true });
     }
   };
@@ -70,7 +65,7 @@ const Register = () => {
             margin="normal"
             fullWidth
             id="avatar"
-            label="Avatar"
+            label="Avatar URL"
             name="avatar"
             value={avatar}
             onChange={(e) => setAvatar(e.target.value)}
@@ -118,7 +113,7 @@ const Register = () => {
         </Button>
       </Box>
       <Link component={RouterLink} to={"/login"}>
-        {"Already have an account? Login"}
+        Already have an account? Login
       </Link>
       {errorMsg && <Typography>{errorMsg}</Typography>}
     </Container>

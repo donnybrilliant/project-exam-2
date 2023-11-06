@@ -23,9 +23,9 @@ const Login = () => {
   // This function is used to login the user
   const handleLogin = async (event) => {
     event.preventDefault();
-    await login(email, password);
+    const loggedIn = await login(email, password);
     const { from } = location.state || { from: { pathname: "/" } };
-    navigate(from.pathname, { replace: true });
+    if (loggedIn) navigate(from.pathname, { replace: true });
   };
 
   document.title = "Login - Holidaze";
@@ -67,9 +67,8 @@ const Login = () => {
         </Button>
       </Box>
       <Link component={RouterLink} to={"/register"}>
-        {"Don't have an account? Register"}
+        Don't have an account? Register
       </Link>
-      {errorMsg && <Typography>{errorMsg}</Typography>}
     </Container>
   );
 };
