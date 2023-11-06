@@ -282,7 +282,8 @@ export const useVenueStore = create((set) => ({
     guests,
     sortType,
     amenitiesFilters,
-    priceRange
+    priceRange,
+    minRating
   ) => {
     set((state) => {
       const lowerCaseTerm = searchTerm ? searchTerm.toLowerCase() : "";
@@ -368,6 +369,13 @@ export const useVenueStore = create((set) => ({
           }
           // Apply reverse order if isReversed is true
           return state.isReversed ? comparison * -1 : comparison;
+        });
+      }
+
+      if (minRating) {
+        newFilteredVenues = newFilteredVenues.filter((venue) => {
+          // Assuming venue has a rating property
+          return venue.rating >= minRating;
         });
       }
 

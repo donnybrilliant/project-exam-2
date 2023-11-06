@@ -11,6 +11,7 @@ import {
   Select,
   FormControl,
   Slider,
+  Rating,
 } from "@mui/material";
 import WifiIcon from "@mui/icons-material/Wifi";
 import LocalParkingIcon from "@mui/icons-material/LocalParking";
@@ -39,9 +40,10 @@ const SortAndFilter = () => {
   });
   const maxPrice = useVenueStore((state) => state.maxPrice);
   const [priceRange, setPriceRange] = useState([0, MAX_SLIDER_VALUE]);
+  const [minRating, setMinRating] = useState(0);
 
   useEffect(() => {
-    // Adjust the logic here to treat MAX_SLIDER_VALUE as 'no upper limit'
+    // Call filterVenues with all the filters, including the new minimum rating
     filterVenues(
       searchParams.searchTerm,
       searchParams.startDate,
@@ -49,11 +51,10 @@ const SortAndFilter = () => {
       searchParams.guests,
       currentSortType || "default",
       amenityFilters,
-      priceRange[1] === MAX_SLIDER_VALUE
-        ? [priceRange[0], maxPrice]
-        : priceRange
+      priceRange,
+      minRating // Include the minimum rating in the filter
     );
-  }, [amenityFilters, currentSortType, priceRange, searchParams, maxPrice]);
+  }, [amenityFilters, currentSortType, priceRange, minRating]);
 
   // handleFilterChange now only updates state and relies on useEffect to call filterVenues
   const handleFilterChange = (type, value) => {
@@ -65,6 +66,10 @@ const SortAndFilter = () => {
         [type]: value,
       }));
     }
+  };
+
+  const handleRatingChange = (event, newValue) => {
+    setMinRating(newValue); // Update the minimum rating state
   };
 
   const handleAmenityChange = (event) => {
@@ -87,6 +92,7 @@ const SortAndFilter = () => {
         display: "flex",
         alignItems: "center",
         flexWrap: "wrap",
+        justifyContent: "space-between",
       }}
     >
       <IconButton onClick={handleToggleSortOrder}>
@@ -152,6 +158,13 @@ const SortAndFilter = () => {
         valueLabelDisplay="auto"
         sx={{ width: "100px" }}
         valueLabelFormat={valueLabelFormat}
+      />
+      <Rating
+        name="min-rating"
+        value={minRating}
+        onChange={handleRatingChange} // Update the rating filter
+        // Check consistency with create venue
+        precision={0.5} // Set precision if you want to allow half-star ratings
       />
     </Container>
   );
