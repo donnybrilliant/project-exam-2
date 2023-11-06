@@ -13,6 +13,7 @@ const VenueCarousel = ({ venues }) => {
           // For Chrome, Safari, and Edge
           display: "none",
         },
+        "> *": { flexShrink: 0 },
       }}
     >
       {venues.map((venue, index) => (

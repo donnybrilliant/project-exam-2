@@ -16,13 +16,13 @@ import {
   Box,
   Typography,
   Chip,
+  Divider,
 } from "@mui/material";
 import WifiIcon from "@mui/icons-material/Wifi";
 import LocalParkingIcon from "@mui/icons-material/LocalParking";
 import FreeBreakfastIcon from "@mui/icons-material/FreeBreakfast";
 import PetsIcon from "@mui/icons-material/Pets";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import CloseIcon from "@mui/icons-material/Close";
 
 const SortAndFilter = () => {
   const getLabelText = (value) => {
@@ -265,6 +265,7 @@ const SortAndFilter = () => {
               />
             )}
           </Box>
+          <Divider />
           <Box>
             <Typography>Ameneties:</Typography>
             <Stack direction="row">
@@ -310,6 +311,7 @@ const SortAndFilter = () => {
               />
             </Stack>
           </Box>
+          <Divider />
           <Box>
             <Typography>
               Price Range: {priceRange[0]} - {valueLabelFormat(priceRange[1])}
@@ -326,6 +328,7 @@ const SortAndFilter = () => {
               valueLabelFormat={valueLabelFormat}
             />
           </Box>
+          <Divider />
           Rating: {minRating} {minRating === 1 ? "Star" : "Stars"}
           <Box sx={{ textAlign: "center" }}>
             <Rating
