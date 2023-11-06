@@ -144,12 +144,16 @@ export const useVenueStore = create((set) => ({
     guests: "1",
   },
   sortType: null,
-  sortOrder: null,
+  // sortOrder is removed
   updateSortType: (type) => set({ sortType: type }),
-  updateSortOrder: (order) => set({ sortOrder: order }),
+  // updateSortOrder is removed
+
+  isReversed: false,
+
   reverseFilteredVenues: () =>
     set((state) => ({
       filteredVenues: [...state.filteredVenues].reverse(),
+      isReversed: !state.isReversed,
     })),
 
   // Action for checking if a user is the owner of a venue
@@ -262,14 +266,7 @@ export const useVenueStore = create((set) => ({
     }
   },
 
-  filterVenues: (
-    searchTerm,
-    startDate,
-    endDate,
-    guests,
-    sortType,
-    sortOrder
-  ) => {
+  filterVenues: (searchTerm, startDate, endDate, guests, sortType) => {
     set((state) => {
       const lowerCaseTerm = searchTerm ? searchTerm.toLowerCase() : "";
 
@@ -302,7 +299,7 @@ export const useVenueStore = create((set) => ({
         return textMatch && dateMatch && guestMatch; // Include guestMatch in the return condition
       });
 
-      if (sortType && sortOrder) {
+      if (sortType) {
         filtered.sort((a, b) => {
           let comparison = 0;
           switch (sortType) {
@@ -328,12 +325,12 @@ export const useVenueStore = create((set) => ({
               // Handle default case or throw an error
               break;
           }
-          // Reverse the comparison if sortOrder is 'desc'
-          return sortOrder === "desc" ? comparison * -1 : comparison;
+          // Apply reverse order if isReversed is true
+          return state.isReversed ? comparison * -1 : comparison;
         });
       }
-      console.log(filtered);
-      console.log(sortOrder, sortType);
+
+      console.log(state.isReversed, sortType);
       return { filteredVenues: filtered }; // return the new state value
     });
   },

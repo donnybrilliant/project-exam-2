@@ -6,37 +6,26 @@ import { useVenueStore } from "../../stores";
 
 const SortAndFilter = () => {
   const [anchorEl, setAnchorEl] = useState(null);
-  const sortOrder = useVenueStore((state) => state.sortOrder);
   const updateSortType = useVenueStore((state) => state.updateSortType);
-  const updateSortOrder = useVenueStore((state) => state.updateSortOrder);
   const filterVenues = useVenueStore((state) => state.filterVenues);
-  const searchParams = useVenueStore.getState().searchParams;
-  const currentSortType = useVenueStore.getState().sortType;
   const reverseFilteredVenues = useVenueStore(
     (state) => state.reverseFilteredVenues
   );
+  const searchParams = useVenueStore.getState().searchParams;
+  const isReversed = useVenueStore((state) => state.isReversed);
 
   const handleToggleSortOrder = () => {
-    const newOrder = sortOrder === "asc" ? "desc" : "asc";
-    updateSortOrder(newOrder); // Update sortOrder in Zustand store
-
-    if (!currentSortType) {
-      reverseFilteredVenues(); // Use the action from the store to reverse the list
-    } else {
-      handleSortChange(currentSortType, newOrder);
-    }
+    reverseFilteredVenues();
   };
 
-  const handleSortChange = (type, order) => {
+  const handleSortChange = (type) => {
     updateSortType(type);
-    updateSortOrder(order);
     filterVenues(
       searchParams.searchTerm,
       searchParams.startDate,
       searchParams.endDate,
       searchParams.guests,
-      type,
-      order
+      type
     );
   };
 
@@ -48,22 +37,14 @@ const SortAndFilter = () => {
     setAnchorEl(null);
   };
 
-  // This function is called when an item from the sort menu is selected.
   const handleSort = (type) => {
-    // Set the sort type in the store
-    updateSortType(type);
-
-    // If a new sort type is selected, we default the sort order to 'asc'
-    updateSortOrder("asc");
-
-    // Then, apply the sort with the new sort type and default order
-    handleSortChange(type, "asc");
+    handleSortChange(type);
   };
 
   return (
     <>
       <IconButton onClick={handleToggleSortOrder}>
-        {sortOrder === "desc" ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
+        {isReversed ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
       </IconButton>
       <Button onClick={handleMenuOpen}>Sort</Button>
       <Menu
