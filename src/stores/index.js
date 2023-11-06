@@ -143,6 +143,7 @@ export const useVenueStore = create((set) => ({
     endDate: null,
     guests: "1",
   },
+  maxPrice: 0,
   sortType: null,
   // sortOrder is removed
   updateSortType: (type) => set({ sortType: type }),
@@ -155,6 +156,14 @@ export const useVenueStore = create((set) => ({
       filteredVenues: [...state.filteredVenues].reverse(),
       isReversed: !state.isReversed,
     })),
+
+  setMaxPrice: () => {
+    const venues = useVenueStore.getState().venues;
+    const calculatedMaxPrice = venues.reduce((max, venue) => {
+      return Math.max(max, venue.price);
+    }, 0);
+    set({ maxPrice: calculatedMaxPrice });
+  },
 
   // Action for checking if a user is the owner of a venue
   isOwner: () => {
@@ -193,8 +202,8 @@ export const useVenueStore = create((set) => ({
         offset += limit;
       }
     }
-
     set({ venues: allVenues, filteredVenues: allVenues });
+    useVenueStore.getState().setMaxPrice();
   },
 
   // Action for fetching all venues
@@ -272,7 +281,8 @@ export const useVenueStore = create((set) => ({
     endDate,
     guests,
     sortType,
-    amenitiesFilters
+    amenitiesFilters,
+    priceRange
   ) => {
     set((state) => {
       const lowerCaseTerm = searchTerm ? searchTerm.toLowerCase() : "";
@@ -319,6 +329,14 @@ export const useVenueStore = create((set) => ({
               venue.meta.pets === amenitiesFilters.pets)
             // ... add other amenities checks here ...
           );
+        });
+      }
+
+      if (priceRange) {
+        newFilteredVenues = newFilteredVenues.filter((venue) => {
+          // Assuming venue has a price property
+          const price = venue.price; // Or however you access the venue's price
+          return price >= priceRange[0] && price <= priceRange[1];
         });
       }
 

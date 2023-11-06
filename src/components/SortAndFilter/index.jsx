@@ -10,6 +10,7 @@ import {
   InputLabel,
   Select,
   FormControl,
+  Slider,
 } from "@mui/material";
 import WifiIcon from "@mui/icons-material/Wifi";
 import LocalParkingIcon from "@mui/icons-material/LocalParking";
@@ -17,6 +18,11 @@ import FreeBreakfastIcon from "@mui/icons-material/FreeBreakfast";
 import PetsIcon from "@mui/icons-material/Pets";
 
 const SortAndFilter = () => {
+  const MAX_SLIDER_VALUE = 5000; // Your fixed upper limit
+  const valueLabelFormat = (value) => {
+    // Check if the value is at max and return 'Max' or the value itself accordingly
+    return value === MAX_SLIDER_VALUE ? "Max" : value;
+  };
   const currentSortType = useVenueStore.getState().sortType;
   const updateSortType = useVenueStore((state) => state.updateSortType);
   const filterVenues = useVenueStore((state) => state.filterVenues);
@@ -31,17 +37,23 @@ const SortAndFilter = () => {
     breakfast: false,
     pets: false,
   });
+  const maxPrice = useVenueStore((state) => state.maxPrice);
+  const [priceRange, setPriceRange] = useState([0, MAX_SLIDER_VALUE]);
+
   useEffect(() => {
-    // Call filterVenues with the updated filters and sort type
+    // Adjust the logic here to treat MAX_SLIDER_VALUE as 'no upper limit'
     filterVenues(
       searchParams.searchTerm,
       searchParams.startDate,
       searchParams.endDate,
       searchParams.guests,
       currentSortType || "default",
-      amenityFilters
+      amenityFilters,
+      priceRange[1] === MAX_SLIDER_VALUE
+        ? [priceRange[0], maxPrice]
+        : priceRange
     );
-  }, [amenityFilters, currentSortType]);
+  }, [amenityFilters, currentSortType, priceRange, searchParams, maxPrice]);
 
   // handleFilterChange now only updates state and relies on useEffect to call filterVenues
   const handleFilterChange = (type, value) => {
@@ -129,6 +141,18 @@ const SortAndFilter = () => {
           name="pets"
         />
       </Stack>
+      <Slider
+        getAriaLabel={() => "Price range"}
+        value={priceRange}
+        onChange={(event, newValue) => {
+          setPriceRange(newValue);
+        }}
+        min={0}
+        max={MAX_SLIDER_VALUE}
+        valueLabelDisplay="auto"
+        sx={{ width: "100px" }}
+        valueLabelFormat={valueLabelFormat}
+      />
     </Container>
   );
 };
