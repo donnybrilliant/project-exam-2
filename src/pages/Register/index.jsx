@@ -6,13 +6,13 @@ import {
   Typography,
   Box,
   TextField,
-  Button,
   Link,
   Avatar,
   Badge,
   IconButton,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 // This component is used to display a register page
 const Register = () => {
@@ -108,9 +108,15 @@ const Register = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <Button type="submit" fullWidth variant="contained" sx={{ my: 3 }}>
+        <LoadingButton
+          type="submit"
+          fullWidth
+          variant="contained"
+          sx={{ my: 3 }}
+          loading={isLoading}
+        >
           Register
-        </Button>
+        </LoadingButton>
       </Box>
       <Link component={RouterLink} to={"/login"}>
         Already have an account? Login
