@@ -1,22 +1,24 @@
 import { useEffect, useState } from "react";
-import { useProfileStore } from "../../stores";
+import { useProfileStore, useFetchStore } from "../../stores";
 import {
   Avatar,
   Typography,
   IconButton,
   Badge,
-  Button,
   TextField,
   InputAdornment,
   Container,
+  Skeleton,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 const UserInfo = () => {
   const [isAvatarFieldVisible, setIsAvatarFieldVisible] = useState(false);
   const [avatar, setAvatar] = useState("");
   const selectedProfile = useProfileStore((state) => state.selectedProfile);
   const updateAvatar = useProfileStore((state) => state.updateAvatar);
+  const isLoading = useFetchStore((state) => state.isLoading);
 
   const toggleAvatarField = () => {
     setIsAvatarFieldVisible((prev) => !prev);
@@ -61,17 +63,35 @@ const UserInfo = () => {
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                <Button onClick={handleAvatarUpdate}>Save</Button>
+                <LoadingButton onClick={handleAvatarUpdate} loading={isLoading}>
+                  Save
+                </LoadingButton>
               </InputAdornment>
             ),
           }}
         />
       )}
       <Container sx={{ marginBlock: 2 }}>
-        <Typography>Username: {selectedProfile?.name}</Typography>
-        <Typography>Email: {selectedProfile?.email}</Typography>
         <Typography>
-          VenueManager: {selectedProfile?.venueManager ? "Yes" : "No"}
+          {isLoading ? (
+            <Skeleton width={160} sx={{ marginInline: "auto" }} />
+          ) : (
+            `Username: ${selectedProfile?.name}`
+          )}
+        </Typography>
+        <Typography>
+          {isLoading ? (
+            <Skeleton width={160} sx={{ marginInline: "auto" }} />
+          ) : (
+            `Email: ${selectedProfile?.email}`
+          )}
+        </Typography>
+        <Typography>
+          {isLoading ? (
+            <Skeleton width={160} sx={{ marginInline: "auto" }} />
+          ) : (
+            `Venue Manager: ${selectedProfile?.venueManager ? "Yes" : "No"}`
+          )}
         </Typography>
       </Container>
     </>
