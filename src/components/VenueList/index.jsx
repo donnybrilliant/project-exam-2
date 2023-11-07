@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography";
 import SortAndFilter from "../SortAndFilter";
 import Container from "@mui/material/Container";
 import { useFetchStore } from "../../stores";
-import VenueCardSkeleton from "../Skeletons";
+import { VenueCardSkeleton } from "../Skeletons";
 
 // This component is used to display a list of venues
 const VenueList = ({ venues }) => {
