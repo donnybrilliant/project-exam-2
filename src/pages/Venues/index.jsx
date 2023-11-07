@@ -38,7 +38,7 @@ const VenuesPage = () => {
     fetchDataAndFilter();
   }, [fetchAllVenues, filterVenues, searchParams, updateStoreSearchParams]);
 
-  if (isLoading) return <p>Loading...</p>;
+  //if (isLoading) return <p>Loading...</p>;
 
   document.title = "Venues - Holidaze";
 
