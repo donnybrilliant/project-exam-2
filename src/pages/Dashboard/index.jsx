@@ -20,9 +20,7 @@ const Dashboard = () => {
     fetchProfileByName(userName);
   }, [userName]);
 
-  if (isLoading) {
-    return <Typography>Loading...</Typography>;
-  }
+  // if (isLoading) return <Typography>Loading...</Typography>;
 
   document.title = "Dashboard";
 

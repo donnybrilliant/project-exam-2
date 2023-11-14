@@ -33,6 +33,7 @@ import LocalParkingIcon from "@mui/icons-material/LocalParking";
 import FreeBreakfastIcon from "@mui/icons-material/FreeBreakfast";
 import PetsIcon from "@mui/icons-material/Pets";
 import PlaceIcon from "@mui/icons-material/Place";
+import { VenuePageSkeleton } from "../../components/Skeletons";
 
 dayjs.extend(utc);
 
@@ -99,11 +100,10 @@ const VenuePage = () => {
     // ... rest of your code ...
   }, [searchParams]); */
 
-  if (isLoading) return <h1>Loading...</h1>;
-  if (!selectedVenue) return <h1>Venue Not Found</h1>;
+  // if (isLoading) return <h1>Loading...</h1>;
 
   //console.log(dateRange[0]);
-  console.log(selectedVenue);
+  //console.log(selectedVenue);
   //console.log(selectedProfile);
 
   const navigateToLogin = () => {
@@ -136,257 +136,269 @@ const VenuePage = () => {
     }
   };
 
-  return (
-    <Container maxWidth="md">
-      <Card>
-        {selectedVenue?.media.length > 0 ? (
-          <CardMedia
-            component="img"
-            height="350"
-            image={selectedVenue?.media[0]}
-            alt={selectedVenue?.name}
-          />
-        ) : (
-          <Box
-            sx={{
-              height: 350,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            No photo
-          </Box>
-        )}
-        <CardContent>
-          <Container
-            disableGutters
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              flexWrap: "wrap",
-              alignItems: "center",
-              marginBottom: 1,
-              gap: 1,
-            }}
-          >
-            <Typography variant="h1" component="div">
-              {selectedVenue?.name}
-            </Typography>
-            <Rating
-              name="venue-rating"
-              value={selectedVenue?.rating ?? 0}
-              precision={0.5}
-              readOnly
-              style={{ marginLeft: -2 }}
+  if (isLoading) return <VenuePageSkeleton />;
+  else if (selectedVenue) {
+    return (
+      <Container maxWidth="md">
+        <Card>
+          {selectedVenue?.media.length > 0 ? (
+            <CardMedia
+              component="img"
+              height="350"
+              image={selectedVenue?.media[0]}
+              alt={selectedVenue?.name}
             />
-          </Container>
-          <Link
-            href="#map"
-            color="text.secondary"
-            sx={{
-              textTransform: "capitalize",
-              display: "flex",
-              alignItems: "center",
-              marginLeft: -0.5,
-              marginBlock: 2,
-            }}
-          >
-            <PlaceIcon fontSize="small" />
-            {selectedVenue?.location.city === ""
-              ? "Unknown"
-              : selectedVenue?.location.city}
-            {selectedVenue?.location.country === ""
-              ? ""
-              : ", " + selectedVenue?.location.country}
-          </Link>
-          <Typography variant="h2">Description:</Typography>
-          <Typography sx={{ marginBlock: 1 }}>
-            {selectedVenue?.description}
-          </Typography>
-
-          <Typography color="text.secondary" align="right" sx={{ py: 2 }}>
-            Max Guests: {selectedVenue?.maxGuests}
-          </Typography>
-
-          <Container
-            disableGutters
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: 2,
-              marginBottom: 5,
-            }}
-          >
-            <Stack direction="row" spacing={2}>
-              <Tooltip
-                title={selectedVenue?.meta.wifi ? "Has Wifi" : "No Wifi"}
-                arrow
-              >
-                <WifiIcon
-                  fontSize="large"
-                  color={selectedVenue?.meta.wifi ? "" : "disabled"}
-                />
-              </Tooltip>
-              <Tooltip
-                title={
-                  selectedVenue?.meta.parking ? "Has Parking" : "No Parking"
-                }
-                arrow
-              >
-                <LocalParkingIcon
-                  fontSize="large"
-                  color={selectedVenue?.meta.parking ? "" : "disabled"}
-                />
-              </Tooltip>
-              <Tooltip
-                title={
-                  selectedVenue?.meta.breakfast
-                    ? "Breakfast included"
-                    : "No Breakfast"
-                }
-                arrow
-              >
-                <FreeBreakfastIcon
-                  fontSize="large"
-                  color={selectedVenue?.meta.breakfast ? "" : "disabled"}
-                />
-              </Tooltip>
-              <Tooltip
-                title={selectedVenue?.meta.pets ? "Pets allowed" : "No Pets"}
-                arrow
-              >
-                <PetsIcon
-                  fontSize="large"
-                  color={selectedVenue?.meta.pets ? "" : "disabled"}
-                />
-              </Tooltip>
-            </Stack>
-            <Typography
+          ) : (
+            <Box
               sx={{
+                height: 350,
                 display: "flex",
+                justifyContent: "center",
                 alignItems: "center",
               }}
             >
-              <span style={{ textDecoration: "underline" }}>
-                Price per night:
-              </span>
-              <Typography variant="price" sx={{ marginLeft: 0.5 }}>
-                ${selectedVenue?.price}
+              No photo
+            </Box>
+          )}
+          <CardContent>
+            <Container
+              disableGutters
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                alignItems: "center",
+                marginBottom: 1,
+                gap: 1,
+              }}
+            >
+              <Typography variant="h1" component="div">
+                {selectedVenue?.name}
               </Typography>
+              <Rating
+                name="venue-rating"
+                value={selectedVenue?.rating ?? 0}
+                precision={0.5}
+                readOnly
+                style={{ marginLeft: -2 }}
+              />
+            </Container>
+            <Link
+              href="#map"
+              color="text.secondary"
+              sx={{
+                textTransform: "capitalize",
+                display: "flex",
+                alignItems: "center",
+                marginLeft: -0.5,
+                marginBlock: 2,
+              }}
+            >
+              <PlaceIcon fontSize="small" />
+              {selectedVenue?.location.city === ""
+                ? "Unknown"
+                : selectedVenue?.location.city}
+              {selectedVenue?.location.country === ""
+                ? ""
+                : ", " + selectedVenue?.location.country}
+            </Link>
+            <Typography variant="h2">Description:</Typography>
+            <Typography sx={{ marginBlock: 1 }}>
+              {selectedVenue?.description}
             </Typography>
-          </Container>
-        </CardContent>
-        <Calendar
-          key={bookingCount}
-          selectedVenue={selectedVenue}
-          dateRange={dateRange}
-          setDateRange={setDateRange}
-          bookingMade={bookingMade}
-        />
-        <Container
-          sx={{
-            width: "320px",
-            textAlign: "right",
-            marginBottom: 4,
-            marginTop: -4,
-          }}
-        >
-          <TextField
-            id="guests"
-            label="Number of Guests"
-            type="number"
-            variant="standard"
-            inputProps={{ min: "1", max: selectedVenue?.maxGuests }}
-            value={guests}
-            onChange={(e) => setGuests(e.target.value)}
-            sx={{ width: "100px", marginRight: 1 }}
+
+            <Typography color="text.secondary" align="right" sx={{ py: 2 }}>
+              Max Guests: {selectedVenue?.maxGuests}
+            </Typography>
+
+            <Container
+              disableGutters
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: 2,
+                marginBottom: 5,
+              }}
+            >
+              <Stack direction="row" spacing={2}>
+                <Tooltip
+                  title={selectedVenue?.meta.wifi ? "Has Wifi" : "No Wifi"}
+                  arrow
+                >
+                  <WifiIcon
+                    fontSize="large"
+                    color={selectedVenue?.meta.wifi ? "" : "disabled"}
+                  />
+                </Tooltip>
+                <Tooltip
+                  title={
+                    selectedVenue?.meta.parking ? "Has Parking" : "No Parking"
+                  }
+                  arrow
+                >
+                  <LocalParkingIcon
+                    fontSize="large"
+                    color={selectedVenue?.meta.parking ? "" : "disabled"}
+                  />
+                </Tooltip>
+                <Tooltip
+                  title={
+                    selectedVenue?.meta.breakfast
+                      ? "Breakfast included"
+                      : "No Breakfast"
+                  }
+                  arrow
+                >
+                  <FreeBreakfastIcon
+                    fontSize="large"
+                    color={selectedVenue?.meta.breakfast ? "" : "disabled"}
+                  />
+                </Tooltip>
+                <Tooltip
+                  title={selectedVenue?.meta.pets ? "Pets allowed" : "No Pets"}
+                  arrow
+                >
+                  <PetsIcon
+                    fontSize="large"
+                    color={selectedVenue?.meta.pets ? "" : "disabled"}
+                  />
+                </Tooltip>
+              </Stack>
+              <Typography
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <span style={{ textDecoration: "underline" }}>
+                  Price per night:
+                </span>
+                <Typography variant="price" sx={{ marginLeft: 0.5 }}>
+                  ${selectedVenue?.price}
+                </Typography>
+              </Typography>
+            </Container>
+          </CardContent>
+          <Calendar
+            key={bookingCount}
+            selectedVenue={selectedVenue}
+            dateRange={dateRange}
+            setDateRange={setDateRange}
+            bookingMade={bookingMade}
           />
-        </Container>
-        <Button
-          variant="contained"
-          color="primary"
-          fullWidth
-          onClick={!token ? navigateToLogin : handleBooking}
-        >
-          {!token
-            ? "Login to Book"
-            : dateRange[0] === null || dateRange[1] === null
-            ? "Select Dates to Book"
-            : "Book"}
-        </Button>
-      </Card>
-      {selectedVenue?.media?.length > 1 && (
-        <ImageGallery media={selectedVenue?.media} />
-      )}
-      <Container
-        disableGutters
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          flexWrap: "wrap",
-        }}
-      >
-        <Tooltip
-          title={
-            <>
-              <Typography variant="body2">
-                Venues: {selectedProfile?._count.venues}
-              </Typography>
-              <Typography variant="body2">
-                Bookings: {selectedProfile?._count.bookings}
-              </Typography>
-            </>
-          }
-          arrow
-        >
-          <Box
+          <Container
             sx={{
-              display: "flex",
-              alignItems: "center",
-              marginBlock: 2,
-              cursor: "default",
+              width: "320px",
+              textAlign: "right",
+              marginBottom: 4,
+              marginTop: -4,
             }}
           >
-            <Avatar
-              alt={selectedVenue?.owner?.name}
-              src={selectedVenue?.owner?.avatar}
-              sx={{ marginRight: 1 }}
+            <TextField
+              id="guests"
+              label="Number of Guests"
+              type="number"
+              variant="standard"
+              inputProps={{ min: "1", max: selectedVenue?.maxGuests }}
+              value={guests}
+              onChange={(e) => setGuests(e.target.value)}
+              sx={{ width: "100px", marginRight: 1 }}
             />
-
-            <Typography>{selectedVenue?.owner?.name}</Typography>
-          </Box>
-        </Tooltip>
-        {isOwner && (
+          </Container>
           <Button
-            variant="outlined"
-            onClick={() => navigate(`/venues/${selectedVenue?.id}/edit`)}
+            variant="contained"
+            color="primary"
+            fullWidth
+            onClick={!token ? navigateToLogin : handleBooking}
           >
-            Edit Venue
+            {!token
+              ? "Login to Book"
+              : dateRange[0] === null || dateRange[1] === null
+              ? "Select Dates to Book"
+              : "Book"}
           </Button>
-        )}
-        <Box>
-          <Typography>
-            Created:{" "}
-            {dayjs.utc(selectedVenue?.created).endOf("day").format("DD/MM/YY")}
-          </Typography>
-          {selectedVenue?.created !== selectedVenue?.updated && (
+        </Card>
+
+        <Container
+          disableGutters
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            marginTop: 2,
+          }}
+        >
+          <Tooltip
+            title={
+              accessToken ? (
+                <>
+                  <Typography variant="body2">
+                    Venues: {selectedProfile?._count.venues}
+                  </Typography>
+                  <Typography variant="body2">
+                    Bookings: {selectedProfile?._count.bookings}
+                  </Typography>
+                </>
+              ) : (
+                "Login for more info"
+              )
+            }
+            arrow
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                marginBlock: 2,
+                cursor: "default",
+              }}
+            >
+              <Avatar
+                alt={selectedVenue?.owner?.name}
+                src={selectedVenue?.owner?.avatar}
+                sx={{ marginRight: 1 }}
+              />
+
+              <Typography>{selectedVenue?.owner?.name}</Typography>
+            </Box>
+          </Tooltip>
+          {isOwner && (
+            <Button
+              variant="outlined"
+              onClick={() => navigate(`/venues/${selectedVenue?.id}/edit`)}
+            >
+              Edit Venue
+            </Button>
+          )}
+          <Box>
             <Typography>
-              Updated:{" "}
+              Created:{" "}
               {dayjs
-                .utc(selectedVenue?.updated)
+                .utc(selectedVenue?.created)
                 .endOf("day")
                 .format("DD/MM/YY")}
             </Typography>
-          )}
-        </Box>
+            {selectedVenue?.created !== selectedVenue?.updated && (
+              <Typography>
+                Updated:{" "}
+                {dayjs
+                  .utc(selectedVenue?.updated)
+                  .endOf("day")
+                  .format("DD/MM/YY")}
+              </Typography>
+            )}
+          </Box>
+        </Container>
+        {selectedVenue?.media?.length > 1 && (
+          <ImageGallery media={selectedVenue?.media} />
+        )}
+        {selectedVenue?.location && <Map location={selectedVenue.location} />}
       </Container>
-      {selectedVenue?.location && <Map location={selectedVenue.location} />}
-    </Container>
-  );
+    );
+  } else if (!selectedVenue) return <h1>Venue Not Found</h1>;
 };
 
 export default VenuePage;

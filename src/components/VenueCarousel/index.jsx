@@ -1,8 +1,11 @@
 import React from "react";
 import { Box } from "@mui/material";
 import VenueCard from "../VenueCard";
+import { useFetchStore } from "../../stores";
+import { VenueCardSkeleton } from "../Skeletons";
 
 const VenueCarousel = ({ venues }) => {
+  const isLoading = useFetchStore((state) => state.isLoading);
   return (
     <Box
       sx={{
@@ -16,11 +19,17 @@ const VenueCarousel = ({ venues }) => {
         "> *": { flexShrink: 0 },
       }}
     >
-      {venues.map((venue, index) => (
-        <Box key={index} sx={{ margin: 1 }}>
-          <VenueCard venue={venue} />
-        </Box>
-      ))}
+      {isLoading
+        ? Array.from(new Array(4)).map((item, index) => (
+            <Box key={index} sx={{ margin: 1, width: "330px" }}>
+              <VenueCardSkeleton />
+            </Box>
+          ))
+        : venues.map((venue, index) => (
+            <Box key={index} sx={{ margin: 1 }}>
+              <VenueCard venue={venue} />
+            </Box>
+          ))}
     </Box>
   );
 };

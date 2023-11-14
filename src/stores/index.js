@@ -419,7 +419,9 @@ export const useVenueStore = create((set) => ({
         .getState()
         .setSuccessMsg(`Successfully deleted booking at ${name}`);
     } catch (error) {
-      useFetchStore.getState().setErrorMsg(error.message);
+      return useFetchStore.getState().setErrorMsg(error.message);
+    } finally {
+      useDialogStore.setState({ isOpen: false });
     }
   },
 }));

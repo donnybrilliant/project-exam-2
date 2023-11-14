@@ -10,13 +10,14 @@ import {
   Link,
   Avatar,
 } from "@mui/material";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 // This component is used to display a login page
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const login = useAuthStore((state) => state.login);
-  const errorMsg = useFetchStore((state) => state.errorMsg);
+  const isLoading = useFetchStore((state) => state.isLoading);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -62,9 +63,15 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <Button type="submit" fullWidth variant="contained" sx={{ my: 3 }}>
+        <LoadingButton
+          type="submit"
+          fullWidth
+          variant="contained"
+          loading={isLoading}
+          sx={{ my: 3 }}
+        >
           Sign In
-        </Button>
+        </LoadingButton>
       </Box>
       <Link component={RouterLink} to={"/register"}>
         Don't have an account? Register

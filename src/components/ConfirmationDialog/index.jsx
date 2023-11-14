@@ -1,16 +1,16 @@
-// ConfirmationDialog.js
-import React from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
-import { useDialogStore } from "../../stores"; // Adjust path as necessary
+import { useDialogStore, useFetchStore } from "../../stores"; // Adjust path as necessary
+import LoadingButton from "@mui/lab/LoadingButton";
 
 const ConfirmationDialog = () => {
   const { isOpen, title, description, details, onConfirm, closeDialog } =
     useDialogStore();
+  const isLoading = useFetchStore((state) => state.isLoading);
 
   return (
     <Dialog
@@ -39,19 +39,12 @@ const ConfirmationDialog = () => {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={closeDialog} color="primary">
+        <Button onClick={closeDialog} disabled={isLoading}>
           Cancel
         </Button>
-        <Button
-          onClick={() => {
-            onConfirm();
-            closeDialog();
-          }}
-          color="primary"
-          autoFocus
-        >
+        <LoadingButton onClick={onConfirm} loading={isLoading}>
           Confirm
-        </Button>
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );

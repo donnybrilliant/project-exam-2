@@ -24,7 +24,7 @@ function App() {
           <Route index element={<Home />} />
           <Route path="venues" element={<VenuesPage />} />
           <Route path="venues/:id" element={<VenuePage />} />
-          {/*   add access control */}
+
           <Route
             path="venues/:id/edit"
             element={

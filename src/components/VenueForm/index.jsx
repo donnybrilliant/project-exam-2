@@ -24,8 +24,10 @@ import PetsIcon from "@mui/icons-material/Pets";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Map from "../../components/Map";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 const VenueForm = ({ onSubmit, initialData = {} }) => {
+  const isLoading = useFetchStore((state) => state.isLoading);
   const setErrorMsg = useFetchStore((state) => state.setErrorMsg);
   const [name, setName] = useState(initialData.name || "");
   const [description, setDescription] = useState(initialData.description || "");
@@ -386,9 +388,14 @@ const VenueForm = ({ onSubmit, initialData = {} }) => {
             />
           </Box>
         </CardContent>
-        <Button variant="contained" color="primary" fullWidth type="submit">
+        <LoadingButton
+          variant="contained"
+          fullWidth
+          type="submit"
+          loading={isLoading}
+        >
           {initialData.id ? "Update Venue" : "Create Venue"}
-        </Button>
+        </LoadingButton>
       </Card>
       {media.length > 1 && <ImageGallery media={media} />}
       {location && <Map location={location} />}
