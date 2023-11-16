@@ -4,6 +4,7 @@ import { useVenueStore, useFetchStore } from "../../stores";
 import Search from "../../components/Search";
 import VenueList from "../../components/VenueList";
 import Container from "@mui/material/Container";
+import dayjs from "dayjs";
 
 // In your VenuesPage component
 const VenuesPage = () => {
@@ -19,14 +20,29 @@ const VenuesPage = () => {
   // Update the searchParams in the URL whenever the store's searchParams changes
   useEffect(() => {
     const fetchDataAndFilter = async () => {
-      await fetchAllVenues();
       const params = {
         searchTerm: searchParams.get("searchTerm") || "",
         startDate: searchParams.get("startDate") || null,
         endDate: searchParams.get("endDate") || null,
         guests: searchParams.get("guests") || "1",
       };
+
+      // Parse the dates
+      const startDateObj = params.startDate
+        ? dayjs(params.startDate, "DD/MM/YY")
+        : null;
+      const endDateObj = params.endDate
+        ? dayjs(params.endDate, "DD/MM/YY")
+        : null;
+
+      // Compare the dates and reset endDate to null if startDate is greater
+      if (startDateObj && endDateObj && startDateObj.isAfter(endDateObj)) {
+        params.endDate = null;
+      }
+
       updateStoreSearchParams(params);
+
+      await fetchAllVenues();
 
       // Get the search params from the store and filter the venues
       const { searchTerm, startDate, endDate, guests } =
