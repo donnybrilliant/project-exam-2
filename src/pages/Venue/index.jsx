@@ -12,28 +12,11 @@ import utc from "dayjs/plugin/utc";
 import Calendar from "../../components/Calendar";
 import Map from "../../components/Map";
 import ImageGallery from "../../components/ImageGallery";
-import {
-  Container,
-  Card,
-  CardMedia,
-  CardContent,
-  Typography,
-  Rating,
-  Button,
-  Stack,
-  Avatar,
-  CardHeader,
-  Box,
-  TextField,
-  Tooltip,
-  Link,
-} from "@mui/material";
-import WifiIcon from "@mui/icons-material/Wifi";
-import LocalParkingIcon from "@mui/icons-material/LocalParking";
-import FreeBreakfastIcon from "@mui/icons-material/FreeBreakfast";
-import PetsIcon from "@mui/icons-material/Pets";
-import PlaceIcon from "@mui/icons-material/Place";
+import { Container, Card, Typography, Button, TextField } from "@mui/material";
+
 import { VenuePageSkeleton } from "../../components/Skeletons";
+import VenueDetails from "../../components/VenueDetails";
+import VenueOwnerDetails from "../../components/VenueOwnerDetails";
 
 dayjs.extend(utc);
 
@@ -45,21 +28,30 @@ const VenuePage = () => {
 
   // Get states and actions from venuesStore
   const token = useAuthStore((state) => state.token);
-  const userInfo = useAuthStore((state) => state.userInfo);
   const selectedVenue = useVenueStore((state) => state.selectedVenue);
   const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
   const fetchProfileByName = useProfileStore(
     (state) => state.fetchProfileByName
   );
-  const selectedProfile = useProfileStore((state) => state.selectedProfile);
+
   const isLoading = useFetchStore((state) => state.isLoading);
   const bookVenue = useVenueStore((state) => state.bookVenue);
-  const [dateRange, setDateRange] = useState([null, null]);
-  const [guests, setGuests] = useState(1);
   const [bookingMade, setBookingMade] = useState(false);
   const [bookingCount, setBookingCount] = useState(0);
-  const isOwner = useVenueStore((state) => state.isOwner());
-  const accessToken = useAuthStore((state) => state.token);
+
+  const [dateRange, setDateRange] = useState(() => {
+    const startDate =
+      searchParams.startDate && searchParams.startDate !== "null"
+        ? dayjs(searchParams.startDate, "DD/MM/YY")
+        : null;
+    const endDate =
+      searchParams.endDate && searchParams.endDate !== "null"
+        ? dayjs(searchParams.endDate, "DD/MM/YY")
+        : null;
+    return [startDate, endDate];
+  });
+
+  const [guests, setGuests] = useState(searchParams?.guests || 1);
 
   const { openDialog } = useDialogStore();
 
@@ -76,7 +68,7 @@ const VenuePage = () => {
     : "Venue - Holidaze";
 
   useEffect(() => {
-    if (selectedVenue && accessToken) {
+    if (selectedVenue && token) {
       // Trigger the fetchProfileByName action with the owner's name
       fetchProfileByName(selectedVenue.owner.name);
     }
@@ -86,24 +78,13 @@ const VenuePage = () => {
     };
   }, [selectedVenue]);
 
-  // need correct date format for calendar...
-  /*  useEffect(() => {
-    // Check if there are values in the store
-    if (searchParams.startDate && searchParams.endDate) {
-      const start = dayjs(searchParams.startDate);
-      const end = dayjs(searchParams.endDate);
-      setDateRange([start.toDate(), end.toDate()]);
-    }
-    if (searchParams.guests) {
-      setGuests(searchParams.guests);
-    }
-    // ... rest of your code ...
-  }, [searchParams]); */
-
-  // if (isLoading) return <h1>Loading...</h1>;
+  // This shouldnt be needed.. But if not it scrolls to the bottom on load sometimes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   //console.log(dateRange[0]);
-  //console.log(selectedVenue);
+  //console.log(selectedVenue?.bookings);
   //console.log(selectedProfile);
 
   const navigateToLogin = () => {
@@ -127,278 +108,73 @@ const VenuePage = () => {
           bookingData?.dateTo
         ).format("DD/MM/YY")}. Guests: ${bookingData?.guests}`,
         async () => {
+          console.log(bookingData);
           await bookVenue(bookingData);
           setDateRange([null, null]);
           setGuests(1);
           setBookingCount((prevCount) => prevCount + 1);
+          // go to bookings page
         }
       );
     }
   };
 
   if (isLoading) return <VenuePageSkeleton />;
-  else if (selectedVenue) {
-    return (
-      <Container maxWidth="md">
-        <Card>
-          {selectedVenue?.media.length > 0 ? (
-            <CardMedia
-              component="img"
-              height="350"
-              image={selectedVenue?.media[0]}
-              alt={selectedVenue?.name}
-            />
-          ) : (
-            <Box
-              sx={{
-                height: 350,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              No photo
-            </Box>
-          )}
-          <CardContent>
-            <Container
-              disableGutters
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                flexWrap: "wrap",
-                alignItems: "center",
-                marginBottom: 1,
-                gap: 1,
-              }}
-            >
-              <Typography variant="h1" component="div">
-                {selectedVenue?.name}
-              </Typography>
-              <Rating
-                name="venue-rating"
-                value={selectedVenue?.rating ?? 0}
-                precision={0.5}
-                readOnly
-                style={{ marginLeft: -2 }}
-              />
-            </Container>
-            <Link
-              href="#map"
-              color="text.secondary"
-              sx={{
-                textTransform: "capitalize",
-                display: "flex",
-                alignItems: "center",
-                marginLeft: -0.5,
-                marginBlock: 2,
-              }}
-            >
-              <PlaceIcon fontSize="small" />
-              {selectedVenue?.location.city === ""
-                ? "Unknown"
-                : selectedVenue?.location.city}
-              {selectedVenue?.location.country === ""
-                ? ""
-                : ", " + selectedVenue?.location.country}
-            </Link>
-            <Typography variant="h2">Description:</Typography>
-            <Typography sx={{ marginBlock: 1 }}>
-              {selectedVenue?.description}
-            </Typography>
+  if (!selectedVenue) {
+    return <Typography>Venue Not Found</Typography>;
+  }
 
-            <Typography color="text.secondary" align="right" sx={{ py: 2 }}>
-              Max Guests: {selectedVenue?.maxGuests}
-            </Typography>
-
-            <Container
-              disableGutters
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                flexWrap: "wrap",
-                gap: 2,
-                marginBottom: 5,
-              }}
-            >
-              <Stack direction="row" spacing={2}>
-                <Tooltip
-                  title={selectedVenue?.meta.wifi ? "Has Wifi" : "No Wifi"}
-                  arrow
-                >
-                  <WifiIcon
-                    fontSize="large"
-                    color={selectedVenue?.meta.wifi ? "" : "disabled"}
-                  />
-                </Tooltip>
-                <Tooltip
-                  title={
-                    selectedVenue?.meta.parking ? "Has Parking" : "No Parking"
-                  }
-                  arrow
-                >
-                  <LocalParkingIcon
-                    fontSize="large"
-                    color={selectedVenue?.meta.parking ? "" : "disabled"}
-                  />
-                </Tooltip>
-                <Tooltip
-                  title={
-                    selectedVenue?.meta.breakfast
-                      ? "Breakfast included"
-                      : "No Breakfast"
-                  }
-                  arrow
-                >
-                  <FreeBreakfastIcon
-                    fontSize="large"
-                    color={selectedVenue?.meta.breakfast ? "" : "disabled"}
-                  />
-                </Tooltip>
-                <Tooltip
-                  title={selectedVenue?.meta.pets ? "Pets allowed" : "No Pets"}
-                  arrow
-                >
-                  <PetsIcon
-                    fontSize="large"
-                    color={selectedVenue?.meta.pets ? "" : "disabled"}
-                  />
-                </Tooltip>
-              </Stack>
-              <Typography
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <span style={{ textDecoration: "underline" }}>
-                  Price per night:
-                </span>
-                <Typography variant="price" sx={{ marginLeft: 0.5 }}>
-                  ${selectedVenue?.price}
-                </Typography>
-              </Typography>
-            </Container>
-          </CardContent>
-          <Calendar
-            key={bookingCount}
-            selectedVenue={selectedVenue}
-            dateRange={dateRange}
-            setDateRange={setDateRange}
-            bookingMade={bookingMade}
-          />
-          <Container
-            sx={{
-              width: "320px",
-              textAlign: "right",
-              marginBottom: 4,
-              marginTop: -4,
-            }}
-          >
-            <TextField
-              id="guests"
-              label="Number of Guests"
-              type="number"
-              variant="standard"
-              inputProps={{ min: "1", max: selectedVenue?.maxGuests }}
-              value={guests}
-              onChange={(e) => setGuests(e.target.value)}
-              sx={{ width: "100px", marginRight: 1 }}
-            />
-          </Container>
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            onClick={!token ? navigateToLogin : handleBooking}
-          >
-            {!token
-              ? "Login to Book"
-              : dateRange[0] === null || dateRange[1] === null
-              ? "Select Dates to Book"
-              : "Book"}
-          </Button>
-        </Card>
-
+  return (
+    <Container maxWidth="md">
+      <Card>
+        <VenueDetails venue={selectedVenue} />
+        <Calendar
+          key={bookingCount}
+          selectedVenue={selectedVenue}
+          dateRange={dateRange}
+          setDateRange={setDateRange}
+          bookingMade={bookingMade}
+        />
         <Container
-          disableGutters
           sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            marginTop: 2,
+            width: "320px",
+            textAlign: "right",
+            marginBottom: 4,
+            marginTop: -4,
           }}
         >
-          <Tooltip
-            title={
-              accessToken ? (
-                <>
-                  <Typography variant="body2">
-                    Venues: {selectedProfile?._count.venues}
-                  </Typography>
-                  <Typography variant="body2">
-                    Bookings: {selectedProfile?._count.bookings}
-                  </Typography>
-                </>
-              ) : (
-                "Login for more info"
-              )
-            }
-            arrow
-          >
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                marginBlock: 2,
-                cursor: "default",
-              }}
-            >
-              <Avatar
-                alt={selectedVenue?.owner?.name}
-                src={selectedVenue?.owner?.avatar}
-                sx={{ marginRight: 1 }}
-              />
-
-              <Typography>{selectedVenue?.owner?.name}</Typography>
-            </Box>
-          </Tooltip>
-          {isOwner && (
-            <Button
-              variant="outlined"
-              onClick={() => navigate(`/venues/${selectedVenue?.id}/edit`)}
-            >
-              Edit Venue
-            </Button>
-          )}
-          <Box>
-            <Typography>
-              Created:{" "}
-              {dayjs
-                .utc(selectedVenue?.created)
-                .endOf("day")
-                .format("DD/MM/YY")}
-            </Typography>
-            {selectedVenue?.created !== selectedVenue?.updated && (
-              <Typography>
-                Updated:{" "}
-                {dayjs
-                  .utc(selectedVenue?.updated)
-                  .endOf("day")
-                  .format("DD/MM/YY")}
-              </Typography>
-            )}
-          </Box>
+          <TextField
+            id="guests"
+            label="Number of Guests"
+            type="number"
+            variant="standard"
+            inputProps={{ min: "1", max: selectedVenue?.maxGuests }}
+            value={guests}
+            onChange={(e) => setGuests(e.target.value)}
+            sx={{ width: "100px", marginRight: 1 }}
+          />
         </Container>
-        {selectedVenue?.media?.length > 1 && (
-          <ImageGallery media={selectedVenue?.media} />
-        )}
-        {selectedVenue?.location && <Map location={selectedVenue.location} />}
-      </Container>
-    );
-  } else if (!selectedVenue) return <h1>Venue Not Found</h1>;
+        <Button
+          variant="contained"
+          color="primary"
+          fullWidth
+          onClick={!token ? navigateToLogin : handleBooking}
+        >
+          {!token
+            ? "Login to Book"
+            : dateRange[0] === null || dateRange[1] === null
+            ? "Select Dates to Book"
+            : "Book"}
+        </Button>
+      </Card>
+
+      <VenueOwnerDetails selectedVenue={selectedVenue} />
+      {selectedVenue?.media?.length > 1 && (
+        <ImageGallery media={selectedVenue?.media} />
+      )}
+      {selectedVenue?.location && <Map location={selectedVenue.location} />}
+    </Container>
+  );
 };
 
 export default VenuePage;
