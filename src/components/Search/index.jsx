@@ -1,111 +1,30 @@
 import { useState, useEffect } from "react"; // Import useState hook
 import { useNavigate } from "react-router-dom";
-import { useVenueStore } from "../../stores";
+import { useVenueStore, useFetchStore } from "../../stores";
 import dayjs from "dayjs";
+import AutocompleteSearch from "../AutocompleteSearch";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
-import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import Person from "@mui/icons-material/Person";
 import SearchIcon from "@mui/icons-material/Search";
-import Autocomplete from "@mui/material/Autocomplete";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 // Search bar component
 const Search = () => {
-  const { venues, searchParams, updateStoreSearchParams } = useVenueStore();
+  const { searchParams, updateStoreSearchParams } = useVenueStore();
   const [localSearchParams, setLocalSearchParams] = useState(searchParams);
+  const [endDatePickerOpen, setEndDatePickerOpen] = useState(false);
+  const isLoading = useFetchStore((state) => state.isLoading);
+
   const navigate = useNavigate();
-
-  // Helper function to capitalize each word in a string
-  const capitalize = (str) => {
-    str = str.trim(); // Remove leading/trailing whitespace
-
-    // Remove comma at the end if present
-    if (str.endsWith(",")) {
-      str = str.slice(0, -1);
-    }
-
-    return str
-      .split(" ") // Split into words
-      .map((word) => {
-        if (word.startsWith("(") && word.endsWith(")")) {
-          // Capitalize word inside parentheses
-          return (
-            "(" +
-            word.charAt(1).toLocaleUpperCase() +
-            word.slice(2, -1).toLocaleLowerCase() +
-            ")"
-          );
-        }
-        return (
-          word.charAt(0).toLocaleUpperCase() + word.slice(1).toLocaleLowerCase()
-        ); // Capitalize first letter, rest to lowercase
-      })
-      .join(" "); // Join words back together
-  };
-
-  // Function to filter the options in the Autocomplete component
-  const filterOptions = (options, { inputValue }) => {
-    const lowerCaseInputValue = inputValue.toLowerCase();
-
-    // Arrays to store cities, countries, and venue names
-    const arrays = {
-      city: [],
-      country: [],
-      venue: [],
-    };
-
-    // Function to add values to the appropriate arrays while checking for non-blank values
-    const addToArrays = (category, value) => {
-      if (value && value.trim() !== "" && arrays.hasOwnProperty(category)) {
-        const formattedValue = capitalize(value.toLowerCase());
-        arrays[category].push(formattedValue);
-      }
-    };
-
-    const cities = arrays.city;
-    const countries = arrays.country;
-    const venueNames = arrays.venue;
-
-    // Iterate through the venues and add cities, countries, and venue names to the arrays
-    options.forEach((venue) => {
-      const { city, country } = venue.location;
-      if (city && city.toLowerCase().includes(lowerCaseInputValue)) {
-        addToArrays("city", city);
-      }
-      if (country && country.toLowerCase().includes(lowerCaseInputValue)) {
-        addToArrays("country", country);
-      }
-      if (
-        venue.name &&
-        venue.name.toLowerCase().includes(lowerCaseInputValue)
-      ) {
-        addToArrays("venue", venue.name);
-      }
-    });
-
-    // Sort each array alphabetically
-    const sortAlphabetically = (a, b) =>
-      a.toLowerCase().localeCompare(b.toLowerCase());
-    cities.sort(sortAlphabetically);
-    countries.sort(sortAlphabetically);
-    venueNames.sort(sortAlphabetically);
-
-    // Concatenate the arrays together
-    const concatenatedArray = [...cities, ...countries, ...venueNames];
-
-    // Remove duplicate entries
-    const uniqueEntriesSet = new Set(concatenatedArray);
-
-    // Convert the Set back to an array and return it
-    return Array.from(uniqueEntriesSet);
-  };
 
   // Update localSearchParams whenever searchParams changes
   useEffect(() => {
     setLocalSearchParams(searchParams);
+    // console.log(localSearchParams);
   }, [searchParams]);
 
   // Handle the search, update the store's searchParams and navigate to the venues page
@@ -126,12 +45,28 @@ const Search = () => {
   };
 
   // Convert the startDate and endDate strings to dayjs objects
-  const startDateDate = localSearchParams.startDate
+  const startDateValue = localSearchParams.startDate
     ? dayjs(localSearchParams.startDate, "DD/MM/YY")
     : null;
-  const endDateDate = localSearchParams.endDate
+  const endDateValue = localSearchParams.endDate
     ? dayjs(localSearchParams.endDate, "DD/MM/YY")
     : null;
+
+  const handleStartDateChange = (newValue) => {
+    // Format and update the start date
+    const formattedDate = dayjs(newValue).format("DD/MM/YY");
+    updateLocalSearchParams("startDate", formattedDate);
+    // Open the end date picker
+    setEndDatePickerOpen(true);
+  };
+
+  const handleEndDateChange = (newValue) => {
+    // Format and update the end date
+    const formattedDate = dayjs(newValue).format("DD/MM/YY");
+    updateLocalSearchParams("endDate", formattedDate);
+    // You might want to close the end date picker here
+    setEndDatePickerOpen(false);
+  };
 
   return (
     <Container
@@ -142,63 +77,51 @@ const Search = () => {
     >
       <Grid container rowSpacing={2} sx={{ alignItems: "center" }}>
         <Grid item xs={12} sm={3} md={4}>
-          <Autocomplete
-            fullWidth
-            freeSolo
-            value={localSearchParams.searchTerm || ""}
-            options={venues}
-            getOptionLabel={(option) => option}
-            onInputChange={(event, newInputValue) =>
-              updateStoreSearchParams({ searchTerm: newInputValue })
-            }
-            filterOptions={filterOptions}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Search Destination"
-                variant="outlined"
-              />
-            )}
-            renderOption={(props, option) => (
-              <li key={option} {...props}>
-                {option}
-              </li>
-            )}
+          <AutocompleteSearch
+            localSearchParams={localSearchParams}
+            updateLocalSearchParams={updateLocalSearchParams}
           />
         </Grid>
         <Grid item xs={6} sm={3} md={2}>
           <DatePicker
+            id="start-date"
+            name="startDate"
             fullWidth
             sx={{ width: "100%" }}
             label="Start Date"
             format="DD/MM/YY"
             disablePast
-            value={startDateDate}
-            onChange={(date) =>
-              updateLocalSearchParams("startDate", date.format("DD/MM/YY"))
+            maxDate={
+              endDateValue ? dayjs(endDateValue).subtract(1, "day") : null
             }
+            value={startDateValue}
+            onChange={handleStartDateChange}
+            onAccept={handleStartDateChange} // Call the same function on accept
           />
         </Grid>
         <Grid item xs={6} sm={3} md={2}>
           <DatePicker
+            id="end-date"
+            name="endDate"
             fullWidth
             sx={{ width: "100%" }}
             label="End Date"
             format="DD/MM/YY"
             disablePast
             minDate={
-              localSearchParams.startDate
-                ? dayjs(localSearchParams.startDate).add(1, "day")
-                : undefined
+              startDateValue ? dayjs(startDateValue).add(1, "day") : undefined
             }
-            value={endDateDate}
-            onChange={(date) =>
-              updateLocalSearchParams("endDate", date.format("DD/MM/YY"))
-            }
+            value={endDateValue}
+            open={endDatePickerOpen} // Controlled by state
+            onOpen={() => setEndDatePickerOpen(true)} // Optional: Explicitly set open state
+            onClose={() => setEndDatePickerOpen(false)} // Close picker when focus is lost
+            onChange={handleEndDateChange}
           />
         </Grid>
         <Grid item xs={3} sm={2} md={2}>
           <TextField
+            id="guests"
+            name="guests"
             fullWidth
             label="Guests"
             variant="outlined"
@@ -216,14 +139,15 @@ const Search = () => {
           />
         </Grid>
         <Grid item xs={9} sm={1} md={2}>
-          <Button
+          <LoadingButton
             type="submit"
             fullWidth
             variant="contained"
+            loading={isLoading}
             sx={{ height: "54px" }}
           >
             <SearchIcon />
-          </Button>
+          </LoadingButton>
         </Grid>
       </Grid>
     </Container>
