@@ -1,5 +1,15 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import dayjs from "dayjs";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import utc from "dayjs/plugin/utc";
+import isBetween from "dayjs/plugin/isBetween";
+
+dayjs.extend(utc);
+dayjs.extend(isSameOrBefore);
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isBetween);
 
 const BASE_URL = "https://api.noroff.dev/api/v1/holidaze";
 
@@ -300,6 +310,7 @@ export const useVenueStore = create((set) => ({
         // Text Search
         const textMatch = [
           venue.name,
+          venue.description,
           venue.location.city,
           venue.location.address,
           venue.location.continent,
@@ -308,14 +319,25 @@ export const useVenueStore = create((set) => ({
         ].some((field) => field && field.toLowerCase().includes(lowerCaseTerm));
 
         // Date Range Search
+
         const dateMatch = !venue.bookings.some((booking) => {
+          const bookingStart = dayjs(booking.dateFrom);
+          const bookingEnd = dayjs(booking.dateTo);
+          const searchStart = dayjs.utc(startDate, "DD/MM/YY");
+          const searchEnd = dayjs.utc(endDate, "DD/MM/YY");
+
+          // If there is no start and end date, return false
+          if (!searchStart && !searchEnd) {
+            return false;
+          }
+
           return (
-            (startDate &&
-              booking.dateFrom <= startDate &&
-              booking.dateTo >= startDate) ||
-            (endDate &&
-              booking.dateFrom <= endDate &&
-              booking.dateTo >= endDate)
+            (searchStart &&
+              searchStart.isValid() &&
+              searchStart.isBetween(bookingStart, bookingEnd, null, "[]")) ||
+            (searchEnd &&
+              searchEnd.isValid() &&
+              searchEnd.isBetween(bookingStart, bookingEnd, null, "[]"))
           );
         });
 
