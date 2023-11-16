@@ -82,7 +82,7 @@ const VenueCard = ({ venue }) => {
                   width: "210px",
                 }}
               >
-                {venue.name}
+                {venue.name.trim() === "" ? "No Name" : venue.name}
               </Typography>
               <Rating
                 size="small"
