@@ -1,13 +1,12 @@
 import { useTheme } from "@mui/material/styles";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { PickersDay } from "@mui/x-date-pickers/PickersDay";
 dayjs.extend(utc);
 
 const Calendar = ({ selectedVenue, dateRange, setDateRange }) => {
+  // Check if the selected venue has any bookings that overlap with the selected date range
   const checkDisabledDatesInRange = (startDate, endDate) => {
     for (let d = startDate; d <= endDate; d = dayjs(d).add(1, "day")) {
       if (
@@ -23,76 +22,97 @@ const Calendar = ({ selectedVenue, dateRange, setDateRange }) => {
     }
     return false;
   };
+
+  // Handle date clicks in the calendar
   const handleDateClick = (date) => {
     setDateRange((prevRange) => {
-      const startDate = prevRange[0];
-      const endDate = date;
+      let [start, end] = prevRange;
 
-      // Set start date if no start date is selected
-      if (!startDate) {
+      // No dates are selected, set the clicked date as the start date
+      if (!start && !end) {
         return [date, null];
-      } else if (
-        // Reset start date if end date is clicked twice
-        prevRange[1] &&
-        dayjs(prevRange[1]).isSame(dayjs(date), "day")
+      }
+
+      // Only end date is selected and the clicked date is before it, set the clicked date as the start date
+      if (!start && end && dayjs(date).isBefore(end, "day")) {
+        return [date, end];
+      }
+
+      // If a date is clicked twice, set the start to the clicked date and the end to null
+      if (dayjs(date).isSame(start, "day") || dayjs(date).isSame(end, "day")) {
+        return [date, null];
+      }
+
+      // Set the clicked date as the new start date if it is before the current start date
+      if (start && dayjs(date).isBefore(start, "day")) {
+        return [date, null];
+      }
+
+      // Set the clicked date as the new end date if it is after the current start date
+      // and does not include any disabled dates in the new range
+      if (
+        start &&
+        dayjs(date).isAfter(start, "day") &&
+        !checkDisabledDatesInRange(start, date)
       ) {
-        return [date, null];
-      }
-      // Set new start date if selected date is before the current start date
-      if (dayjs(date).isBefore(dayjs(startDate), "day")) {
-        return [date, null];
-      }
-      // If the selected date is in the disabled range, set it as the new start date
-      if (checkDisabledDatesInRange(startDate, date)) {
-        return [date, null];
+        return [start, date];
       }
 
-      // Reset start date if new start date and end date are the same
-      if (dayjs(startDate).isSame(dayjs(endDate), "day")) {
-        return [startDate, null];
-      }
-      // Extend range if two dates already selected
-      if (prevRange[1]) {
-        return [startDate, endDate];
+      // If the clicked date is within the current range, maintain the current range
+      if (start && end && dayjs(date).isBetween(start, end, "day")) {
+        return prevRange;
       }
 
-      return [startDate, endDate];
+      // Clicking outside the current range resets the range
+      return [date, null];
     });
   };
 
-  // Custom day component to highlight days in calendar
+  // Custom day component to highlight days in the calendar
   const CustomDay = (props) => {
     const theme = useTheme();
+    const { day } = props;
+    const isStart = dateRange[0] && dayjs(day).isSame(dateRange[0], "day");
+    const isEnd = dateRange[1] && dayjs(day).isSame(dateRange[1], "day");
     const inRange =
-      dateRange[0] &&
-      dateRange[1] &&
-      dayjs(props.day).isBetween(dateRange[0], dateRange[1], "day", "[]");
+      isStart ||
+      isEnd ||
+      (dateRange[0] &&
+        dateRange[1] &&
+        dayjs(day).isAfter(dateRange[0], "day") &&
+        dayjs(day).isBefore(dateRange[1], "day"));
 
     const matchedStyles = inRange
       ? {
           backgroundColor: theme.palette.primary.main,
           color: theme.palette.common.white,
+          "&:hover": {
+            backgroundColor: theme.palette.primary.dark,
+          },
+          "&:focus": {
+            backgroundColor: theme.palette.primary.dark,
+          },
         }
       : {};
+
     return <PickersDay {...props} sx={{ ...matchedStyles }} />;
   };
+
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <DateCalendar
-        onChange={handleDateClick}
-        slots={{ day: CustomDay }}
-        disablePast
-        value={dateRange[0]}
-        shouldDisableDate={(day) => {
-          return selectedVenue?.bookings.some(
-            (booking) =>
-              day.isAfter(
-                dayjs.utc(booking.dateFrom).subtract(1, "day").startOf("day")
-              ) && day.isBefore(dayjs.utc(booking.dateTo).startOf("day"))
-          );
-        }}
-      />
-    </LocalizationProvider>
+    <DateCalendar
+      onChange={handleDateClick}
+      slots={{ day: CustomDay }}
+      disablePast
+      value={dateRange[0]}
+      shouldDisableDate={(day) => {
+        return selectedVenue?.bookings.some(
+          (booking) =>
+            day.isAfter(
+              dayjs.utc(booking.dateFrom).subtract(1, "day").startOf("day")
+            ) && day.isBefore(dayjs.utc(booking.dateTo).startOf("day"))
+        );
+      }}
+    />
   );
 };
 
