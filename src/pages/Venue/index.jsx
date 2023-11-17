@@ -8,37 +8,33 @@ import {
   useProfileStore,
 } from "../../stores";
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
 import Calendar from "../../components/Calendar";
 import Map from "../../components/Map";
 import ImageGallery from "../../components/ImageGallery";
 import { Container, Card, Typography, Button, TextField } from "@mui/material";
-
 import { VenuePageSkeleton } from "../../components/Skeletons";
 import VenueDetails from "../../components/VenueDetails";
 import VenueOwnerDetails from "../../components/VenueOwnerDetails";
-
-dayjs.extend(utc);
 
 // Venue page component
 const VenuePage = () => {
   // Get id from URL
   let { id } = useParams();
   const { searchParams } = useVenueStore();
+  const { openDialog, closeDialog } = useDialogStore();
 
   // Get states and actions from venuesStore
   const token = useAuthStore((state) => state.token);
+  const isLoading = useFetchStore((state) => state.isLoading);
   const selectedVenue = useVenueStore((state) => state.selectedVenue);
   const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
   const fetchProfileByName = useProfileStore(
     (state) => state.fetchProfileByName
   );
-
-  const isLoading = useFetchStore((state) => state.isLoading);
   const bookVenue = useVenueStore((state) => state.bookVenue);
-  const [bookingMade, setBookingMade] = useState(false);
-  const [bookingCount, setBookingCount] = useState(0);
 
+  // Local states for booking
+  const [guests, setGuests] = useState(searchParams?.guests || 1);
   const [dateRange, setDateRange] = useState(() => {
     const startDate =
       searchParams.startDate && searchParams.startDate !== "null"
@@ -50,11 +46,6 @@ const VenuePage = () => {
         : null;
     return [startDate, endDate];
   });
-
-  const [guests, setGuests] = useState(searchParams?.guests || 1);
-
-  const { openDialog } = useDialogStore();
-
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -63,18 +54,21 @@ const VenuePage = () => {
     fetchVenueById(id);
   }, [id]);
 
-  document.title = selectedVenue?.name
-    ? `${selectedVenue.name} - Holidaze`
-    : "Venue - Holidaze";
-
+  // Update the document title and fetch profile by name when selectedVenue changes
   useEffect(() => {
-    if (selectedVenue && token) {
-      // Trigger the fetchProfileByName action with the owner's name
-      fetchProfileByName(selectedVenue.owner.name);
+    if (selectedVenue) {
+      document.title = `${selectedVenue.name} - Holidaze`;
+      if (token) {
+        fetchProfileByName(selectedVenue.owner.name);
+      }
+    } else {
+      document.title = "Venue - Holidaze";
     }
+
+    // Clean-up function to reset title or clear profile data if needed
     return () => {
-      // Clear profile data when component unmounts - is it neccessary when i have loading state on dashboard?
-      useProfileStore.getState().clearSelectedProfile();
+      document.title = "Holidaze";
+      // Optionally clear profile data here if necessary
     };
   }, [selectedVenue]);
 
@@ -83,38 +77,65 @@ const VenuePage = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  //console.log(dateRange[0]);
-  //console.log(selectedVenue?.bookings);
-  //console.log(selectedProfile);
-
+  // Redirect to login page if not logged in
   const navigateToLogin = () => {
     navigate("/login", { state: { from: location } });
   };
 
+  // Handle booking confirmation
+  const handleBookingConfirm = async (bookingData) => {
+    console.log(bookingData);
+    await bookVenue(bookingData);
+    setDateRange([null, null]);
+    setGuests(1);
+    closeDialog();
+    navigate("/dashboard");
+  };
+
+  // Open the confirmation dialog with booking details
   const handleBooking = () => {
     if (id && dateRange[0] && dateRange[1] && guests) {
+      const numberOfNights = dateRange[1].diff(dateRange[0], "day");
+      const pricePerNight = selectedVenue.price;
+      const totalPrice = numberOfNights * pricePerNight;
+
+      // Create the booking data object
       const bookingData = {
         name: selectedVenue?.name,
         venueId: id,
-        dateFrom: dayjs(dateRange[0]).add(1, "day"),
-        dateTo: dayjs(dateRange[1]).add(1, "day"),
+        dateFrom: dateRange[0],
+        dateTo: dateRange[1],
         guests: Number(guests),
       };
+
+      // Create the booking details for the dialog
+      const bookingDetails = () => (
+        <>
+          <h3>Your booking details:</h3>
+          <div>
+            <strong>Number of nights:</strong> {numberOfNights}
+          </div>
+          <div>
+            <strong>Dates:</strong> {bookingData.dateFrom.format("DD/MM/YY")} -{" "}
+            {bookingData.dateTo.format("DD/MM/YY")}
+          </div>
+          <div>
+            <strong>Guests:</strong> {bookingData.guests}
+          </div>
+          <div>
+            <strong>Price per night:</strong> ${pricePerNight}
+          </div>
+          <div>
+            <strong>Total price:</strong> ${totalPrice}
+          </div>
+        </>
+      );
+
       openDialog(
-        // Add number of nights?
-        `Book Venue: ${selectedVenue?.name}`,
-        "Confirmation your booking details below:",
-        `Dates: ${dayjs(bookingData?.dateFrom).format("DD/MM/YY")} - ${dayjs(
-          bookingData?.dateTo
-        ).format("DD/MM/YY")}. Guests: ${bookingData?.guests}`,
-        async () => {
-          console.log(bookingData);
-          await bookVenue(bookingData);
-          setDateRange([null, null]);
-          setGuests(1);
-          setBookingCount((prevCount) => prevCount + 1);
-          // go to bookings page
-        }
+        `Confirm Booking at ${selectedVenue?.name}`,
+        "Please check your booking details, confirm and enjoy your Holidaze!",
+        bookingDetails,
+        () => handleBookingConfirm(bookingData)
       );
     }
   };
@@ -129,11 +150,9 @@ const VenuePage = () => {
       <Card>
         <VenueDetails venue={selectedVenue} />
         <Calendar
-          key={bookingCount}
           selectedVenue={selectedVenue}
           dateRange={dateRange}
           setDateRange={setDateRange}
-          bookingMade={bookingMade}
         />
         <Container
           sx={{
