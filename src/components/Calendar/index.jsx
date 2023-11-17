@@ -1,26 +1,19 @@
 import { useTheme } from "@mui/material/styles";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { PickersDay } from "@mui/x-date-pickers/PickersDay";
-dayjs.extend(utc);
+import dayjs from "dayjs";
 
+// Calendar component
 const Calendar = ({ selectedVenue, dateRange, setDateRange }) => {
   // Check if the selected venue has any bookings that overlap with the selected date range
   const checkDisabledDatesInRange = (startDate, endDate) => {
-    for (let d = startDate; d <= endDate; d = dayjs(d).add(1, "day")) {
-      if (
-        selectedVenue?.bookings.some(
-          (booking) =>
-            d.isAfter(
-              dayjs.utc(booking.dateFrom).subtract(1, "day").startOf("day")
-            ) && d.isBefore(dayjs.utc(booking.dateTo).startOf("day"))
-        )
-      ) {
-        return true;
-      }
-    }
-    return false;
+    const start = dayjs(startDate).startOf("day");
+    const end = dayjs(endDate).endOf("day");
+    return selectedVenue?.bookings.some((booking) => {
+      const bookingStart = dayjs(booking.dateFrom).startOf("day");
+      const bookingEnd = dayjs(booking.dateTo);
+      return start.isBefore(bookingEnd) && end.isAfter(bookingStart);
+    });
   };
 
   // Handle date clicks in the calendar
@@ -105,12 +98,8 @@ const Calendar = ({ selectedVenue, dateRange, setDateRange }) => {
       disablePast
       value={dateRange[0]}
       shouldDisableDate={(day) => {
-        return selectedVenue?.bookings.some(
-          (booking) =>
-            day.isAfter(
-              dayjs.utc(booking.dateFrom).subtract(1, "day").startOf("day")
-            ) && day.isBefore(dayjs.utc(booking.dateTo).startOf("day"))
-        );
+        const utcDay = dayjs(day).utc();
+        return checkDisabledDatesInRange(utcDay, utcDay);
       }}
     />
   );
