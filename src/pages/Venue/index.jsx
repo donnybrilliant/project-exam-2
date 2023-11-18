@@ -21,7 +21,7 @@ const VenuePage = () => {
   // Get id from URL
   let { id } = useParams();
   const { searchParams } = useVenueStore();
-  const { openDialog, closeDialog } = useDialogStore();
+  const { openDialog } = useDialogStore();
 
   // Get states and actions from venuesStore
   const token = useAuthStore((state) => state.token);
@@ -88,7 +88,6 @@ const VenuePage = () => {
     await bookVenue(bookingData);
     setDateRange([null, null]);
     setGuests(1);
-    closeDialog();
     navigate("/dashboard");
   };
 
@@ -140,6 +139,7 @@ const VenuePage = () => {
     }
   };
 
+  // Should maybe change the logic of the loading here as it will show the skeleton when it loads for booking confirmation, which is not wanted.
   if (isLoading) return <VenuePageSkeleton />;
   if (!selectedVenue) {
     return <Typography>Venue Not Found</Typography>;
