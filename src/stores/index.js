@@ -5,3 +5,4 @@ export { useThemeStore } from "./theme";
 export { useGalleryStore } from "./gallery";
 export { useVenueStore } from "./venue";
 export { useProfileStore } from "./profile";
+export { useSearchStore } from "./search";

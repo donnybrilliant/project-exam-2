@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { MenuItem, IconButton, Tooltip } from "@mui/material";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import { useVenueStore } from "../../stores";
+import { useSearchStore } from "../../stores";
 import {
   Checkbox,
   Stack,
@@ -50,19 +50,19 @@ const SortAndFilter = () => {
     return isAmenityDefault && isPriceDefault && isRatingDefault;
   };
 
-  const MAX_SLIDER_VALUE = useVenueStore((state) => state.maxSliderValue);
+  const MAX_SLIDER_VALUE = useSearchStore((state) => state.maxSliderValue);
   const valueLabelFormat = (value) => {
     // Check if the value is at max and return 'Max' or the value itself accordingly
     return value === MAX_SLIDER_VALUE ? "Max" : value;
   };
-  const currentSortType = useVenueStore.getState().sortType;
-  const updateSortType = useVenueStore((state) => state.updateSortType);
-  const filterVenues = useVenueStore((state) => state.filterVenues);
-  const reverseFilteredVenues = useVenueStore(
+  const currentSortType = useSearchStore.getState().sortType;
+  const updateSortType = useSearchStore((state) => state.updateSortType);
+  const filterVenues = useSearchStore((state) => state.filterVenues);
+  const reverseFilteredVenues = useSearchStore(
     (state) => state.reverseFilteredVenues
   );
-  const searchParams = useVenueStore.getState().searchParams;
-  const isReversed = useVenueStore((state) => state.isReversed);
+  const searchParams = useSearchStore.getState().searchParams;
+  const isReversed = useSearchStore((state) => state.isReversed);
   const [amenityFilters, setAmenityFilters] = useState({
     wifi: false,
     parking: false,
