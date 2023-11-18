@@ -1,5 +1,13 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import dayjs from "dayjs";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import isBetween from "dayjs/plugin/isBetween";
+
+dayjs.extend(isSameOrBefore);
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isBetween);
 
 const BASE_URL = "https://api.noroff.dev/api/v1/holidaze";
 
@@ -300,6 +308,7 @@ export const useVenueStore = create((set) => ({
         // Text Search
         const textMatch = [
           venue.name,
+          venue.description,
           venue.location.city,
           venue.location.address,
           venue.location.continent,
@@ -308,14 +317,25 @@ export const useVenueStore = create((set) => ({
         ].some((field) => field && field.toLowerCase().includes(lowerCaseTerm));
 
         // Date Range Search
+
         const dateMatch = !venue.bookings.some((booking) => {
+          const bookingStart = dayjs(booking.dateFrom);
+          const bookingEnd = dayjs(booking.dateTo);
+          const searchStart = dayjs(startDate, "DD/MM/YY");
+          const searchEnd = dayjs(endDate, "DD/MM/YY");
+
+          // If there is no start and end date, return false
+          if (!searchStart && !searchEnd) {
+            return false;
+          }
+
           return (
-            (startDate &&
-              booking.dateFrom <= startDate &&
-              booking.dateTo >= startDate) ||
-            (endDate &&
-              booking.dateFrom <= endDate &&
-              booking.dateTo >= endDate)
+            (searchStart &&
+              searchStart.isValid() &&
+              searchStart.isBetween(bookingStart, bookingEnd, null, "[]")) ||
+            (searchEnd &&
+              searchEnd.isValid() &&
+              searchEnd.isBetween(bookingStart, bookingEnd, null, "[]"))
           );
         });
 
@@ -406,6 +426,8 @@ export const useVenueStore = create((set) => ({
         .setSuccessMsg(`Booking at ${bookingData.name} was successful!`);
     } catch (error) {
       useFetchStore.getState().setErrorMsg(error.message);
+    } finally {
+      useDialogStore.getState().closeDialog();
     }
   },
 
@@ -421,7 +443,7 @@ export const useVenueStore = create((set) => ({
     } catch (error) {
       return useFetchStore.getState().setErrorMsg(error.message);
     } finally {
-      useDialogStore.setState({ isOpen: false });
+      useDialogStore.getState().closeDialog();
     }
   },
 }));
@@ -500,7 +522,7 @@ export const useDialogStore = create((set) => ({
   isOpen: false,
   title: "",
   description: "",
-  details: "",
+  details: null,
   onConfirm: () => {},
   openDialog: (title, description, details, onConfirm) =>
     set({ isOpen: true, title, description, details, onConfirm }),
@@ -509,7 +531,7 @@ export const useDialogStore = create((set) => ({
       isOpen: false,
       title: "",
       description: "",
-      details: "",
+      details: null,
       onConfirm: () => {},
     }),
 }));

@@ -2,6 +2,7 @@ import "@fontsource/poppins"; // Import Poppins font
 import "@fontsource/outfit"; // Import Outfit font
 
 import { createTheme, ThemeProvider } from "@mui/material";
+import { GlobalStyles } from "@mui/material";
 import { useMemo } from "react";
 import { useThemeStore } from "../../stores";
 
@@ -68,5 +69,16 @@ export const useMyTheme = () => {
 export const ThemeProviderComponent = ({ children }) => {
   const theme = useMyTheme();
 
-  return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
+  return (
+    <ThemeProvider theme={theme}>
+      <GlobalStyles
+        styles={{
+          main: {
+            minHeight: "100dvh",
+          },
+        }}
+      />
+      {children}
+    </ThemeProvider>
+  );
 };
