@@ -14,7 +14,7 @@ dayjs.extend(utc);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="utc">
+    <LocalizationProvider dateAdapter={AdapterDayjs} locale="utc">
       <ThemeProviderComponent>
         <CssBaseline />
         <BrowserRouter>
