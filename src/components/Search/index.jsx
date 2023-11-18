@@ -53,10 +53,15 @@ const Search = () => {
     : null;
 
   const handleStartDateChange = (newValue) => {
-    // Format and update the start date
     const formattedDate = dayjs(newValue).format("DD/MM/YY");
     updateLocalSearchParams("startDate", formattedDate);
-    // Open the end date picker
+
+    // If both startDate and endDate are set, adjust endDate
+    if (endDateValue && startDateValue) {
+      const newEndDate = dayjs(newValue).add(1, "day").format("DD/MM/YY");
+      updateLocalSearchParams("endDate", newEndDate);
+    }
+
     setEndDatePickerOpen(true);
   };
 
@@ -64,7 +69,6 @@ const Search = () => {
     // Format and update the end date
     const formattedDate = dayjs(newValue).format("DD/MM/YY");
     updateLocalSearchParams("endDate", formattedDate);
-    // You might want to close the end date picker here
     setEndDatePickerOpen(false);
   };
 
@@ -92,11 +96,13 @@ const Search = () => {
             format="DD/MM/YY"
             disablePast
             maxDate={
-              endDateValue ? dayjs(endDateValue).subtract(1, "day") : null
+              endDateValue && !startDateValue
+                ? dayjs(endDateValue).subtract(1, "day")
+                : undefined
             }
             value={startDateValue}
             onChange={handleStartDateChange}
-            onAccept={handleStartDateChange} // Call the same function on accept
+            onAccept={handleStartDateChange}
           />
         </Grid>
         <Grid item xs={6} sm={3} md={2}>
@@ -112,9 +118,9 @@ const Search = () => {
               startDateValue ? dayjs(startDateValue).add(1, "day") : undefined
             }
             value={endDateValue}
-            open={endDatePickerOpen} // Controlled by state
-            onOpen={() => setEndDatePickerOpen(true)} // Optional: Explicitly set open state
-            onClose={() => setEndDatePickerOpen(false)} // Close picker when focus is lost
+            open={endDatePickerOpen}
+            onOpen={() => setEndDatePickerOpen(true)}
+            onClose={() => setEndDatePickerOpen(false)}
             onChange={handleEndDateChange}
           />
         </Grid>
