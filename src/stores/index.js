@@ -3,10 +3,8 @@ import { persist } from "zustand/middleware";
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
-import utc from "dayjs/plugin/utc";
 import isBetween from "dayjs/plugin/isBetween";
 
-dayjs.extend(utc);
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isBetween);
@@ -323,8 +321,8 @@ export const useVenueStore = create((set) => ({
         const dateMatch = !venue.bookings.some((booking) => {
           const bookingStart = dayjs(booking.dateFrom);
           const bookingEnd = dayjs(booking.dateTo);
-          const searchStart = dayjs.utc(startDate, "DD/MM/YY");
-          const searchEnd = dayjs.utc(endDate, "DD/MM/YY");
+          const searchStart = dayjs(startDate, "DD/MM/YY");
+          const searchEnd = dayjs(endDate, "DD/MM/YY");
 
           // If there is no start and end date, return false
           if (!searchStart && !searchEnd) {
@@ -428,6 +426,8 @@ export const useVenueStore = create((set) => ({
         .setSuccessMsg(`Booking at ${bookingData.name} was successful!`);
     } catch (error) {
       useFetchStore.getState().setErrorMsg(error.message);
+    } finally {
+      useDialogStore.getState().closeDialog();
     }
   },
 
@@ -443,7 +443,7 @@ export const useVenueStore = create((set) => ({
     } catch (error) {
       return useFetchStore.getState().setErrorMsg(error.message);
     } finally {
-      useDialogStore.setState({ isOpen: false });
+      useDialogStore.getState().closeDialog();
     }
   },
 }));
@@ -531,7 +531,7 @@ export const useDialogStore = create((set) => ({
       isOpen: false,
       title: "",
       description: "",
-      details: "",
+      details: null,
       onConfirm: () => {},
     }),
 }));
