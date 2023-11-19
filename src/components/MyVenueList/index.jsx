@@ -24,6 +24,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import EventBusyIcon from "@mui/icons-material/EventBusy";
 
 const MyVenueList = () => {
+  // Should be taken from userInfo in authstore..
   const selectedProfile = useProfileStore((state) => state.selectedProfile);
   const [venues, setVenues] = useState([]);
   const deleteVenue = useVenueStore((state) => state.deleteVenue);

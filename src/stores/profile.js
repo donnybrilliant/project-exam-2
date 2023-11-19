@@ -10,14 +10,14 @@ export const useProfileStore = create((set) => ({
   clearSelectedProfile: () => set({ selectedProfile: null }),
 
   // Action for fetching all profiles
-  fetchProfiles: async () => {
+  /*   fetchProfiles: async () => {
     const data = await useFetchStore
       .getState()
       .apiFetch("profiles?_venues=true&_bookings=true");
     if (data) {
       set({ venues: data });
     }
-  },
+  }, */
 
   // Action for fetching a single profile
   fetchProfileByName: async (name) => {
