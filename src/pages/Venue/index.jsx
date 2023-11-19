@@ -6,6 +6,7 @@ import {
   useFetchStore,
   useDialogStore,
   useProfileStore,
+  useBookingStore,
 } from "../../stores";
 import dayjs from "dayjs";
 import Calendar from "../../components/Calendar";

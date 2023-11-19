@@ -6,3 +6,4 @@ export { useGalleryStore } from "./gallery";
 export { useVenueStore } from "./venue";
 export { useProfileStore } from "./profile";
 export { useSearchStore } from "./search";
+export { useBookingStore } from "./booking";
