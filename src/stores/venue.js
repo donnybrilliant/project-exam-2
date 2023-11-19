@@ -117,6 +117,8 @@ export const useVenueStore = create((set) => ({
       useFetchStore.getState().setSuccessMsg(`Successfully deleted ${name}`);
     } catch (error) {
       useFetchStore.getState().setErrorMsg(error.message);
+    } finally {
+      useDialogStore.getState().closeDialog();
     }
   },
 }));

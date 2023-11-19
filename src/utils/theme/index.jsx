@@ -7,7 +7,7 @@ import { useMemo } from "react";
 import { useThemeStore } from "../../stores";
 
 // This component is used to create a theme based on the color mode
-export const useMyTheme = () => {
+const useMyTheme = () => {
   const mode = useThemeStore((state) => state.colorMode);
 
   // Create a theme instance only if the color mode changes

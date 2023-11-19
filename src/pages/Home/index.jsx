@@ -1,15 +1,13 @@
 import { useEffect } from "react";
-import { useVenueStore, useFetchStore } from "../../stores";
+import { useVenueStore } from "../../stores";
 import Container from "@mui/material/Container";
 import { Button, Typography } from "@mui/material";
 import Search from "../../components/Search";
 import VenueCarousel from "../../components/VenueCarousel";
 import Box from "@mui/material/Box";
-import Logo, { LogoIcon } from "../../components/Layout/Header/Logo";
-import Avatar from "@mui/material/Avatar";
-import dayjs from "dayjs";
+import { LogoIcon } from "../../components/Layout/Header/Logo";
+
 import Paper from "@mui/material/Paper";
-import Card from "@mui/material/Card";
 
 // This component is used to display a home page with a list of venues
 const Home = () => {
