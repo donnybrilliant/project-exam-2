@@ -7,6 +7,7 @@ import {
   useDialogStore,
   useProfileStore,
   useBookingStore,
+  useSearchStore,
 } from "../../stores";
 import dayjs from "dayjs";
 import Calendar from "../../components/Calendar";
@@ -21,7 +22,7 @@ import VenueOwnerDetails from "../../components/VenueOwnerDetails";
 const VenuePage = () => {
   // Get id from URL
   let { id } = useParams();
-  const { searchParams } = useVenueStore();
+  const { searchParams } = useSearchStore();
   const { openDialog } = useDialogStore();
 
   // Get states and actions from venuesStore
@@ -32,7 +33,7 @@ const VenuePage = () => {
   const fetchProfileByName = useProfileStore(
     (state) => state.fetchProfileByName
   );
-  const bookVenue = useVenueStore((state) => state.bookVenue);
+  const bookVenue = useBookingStore((state) => state.bookVenue);
 
   // Local states for booking
   const [guests, setGuests] = useState(searchParams?.guests || 1);
