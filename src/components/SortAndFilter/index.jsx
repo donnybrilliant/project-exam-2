@@ -24,11 +24,29 @@ import FreeBreakfastIcon from "@mui/icons-material/FreeBreakfast";
 import PetsIcon from "@mui/icons-material/Pets";
 import FilterListIcon from "@mui/icons-material/FilterList";
 
+// Sort and filter component
 const SortAndFilter = () => {
-  const getLabelText = (value) => {
-    return `${value} Star${value !== 1 ? "s" : ""}`;
-  };
+  const currentSortType = useVenueStore.getState().sortType;
+  const updateSortType = useVenueStore((state) => state.updateSortType);
+  const filterVenues = useVenueStore((state) => state.filterVenues);
+  const reverseFilteredVenues = useVenueStore(
+    (state) => state.reverseFilteredVenues
+  );
+  const searchParams = useVenueStore.getState().searchParams;
+  const isReversed = useVenueStore((state) => state.isReversed);
+  const MAX_SLIDER_VALUE = useVenueStore((state) => state.maxSliderValue);
+  const [amenityFilters, setAmenityFilters] = useState({
+    wifi: false,
+    parking: false,
+    breakfast: false,
+    pets: false,
+  });
+  const [priceRange, setPriceRange] = useState([0, MAX_SLIDER_VALUE]);
+  const [minRating, setMinRating] = useState(0);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
 
+  // Check if the filters are the default values
   const areFiltersDefault = () => {
     const defaultFilters = {
       wifi: false,
@@ -50,61 +68,20 @@ const SortAndFilter = () => {
     return isAmenityDefault && isPriceDefault && isRatingDefault;
   };
 
-  const MAX_SLIDER_VALUE = useSearchStore((state) => state.maxSliderValue);
+
+  // Check if the value is the max slider value, if so, return "Max"
+
   const valueLabelFormat = (value) => {
-    // Check if the value is at max and return 'Max' or the value itself accordingly
     return value === MAX_SLIDER_VALUE ? "Max" : value;
   };
-  const currentSortType = useSearchStore.getState().sortType;
-  const updateSortType = useSearchStore((state) => state.updateSortType);
-  const filterVenues = useSearchStore((state) => state.filterVenues);
-  const reverseFilteredVenues = useSearchStore(
-    (state) => state.reverseFilteredVenues
-  );
-  const searchParams = useSearchStore.getState().searchParams;
-  const isReversed = useSearchStore((state) => state.isReversed);
-  const [amenityFilters, setAmenityFilters] = useState({
-    wifi: false,
-    parking: false,
-    breakfast: false,
-    pets: false,
-  });
-  const [priceRange, setPriceRange] = useState([0, MAX_SLIDER_VALUE]);
-  const [minRating, setMinRating] = useState(0);
-  const clearFilters = () => {
-    setPriceRange([0, MAX_SLIDER_VALUE]);
-    setMinRating(0);
-    setAmenityFilters({
-      wifi: false,
-      parking: false,
-      breakfast: false,
-      pets: false,
-    });
-  };
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
+
+  // Get the label text for the rating
+  const getLabelText = (value) => {
+    return `${value} Star${value !== 1 ? "s" : ""}`;
   };
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  useEffect(() => {
-    filterVenues(
-      searchParams.searchTerm,
-      searchParams.startDate,
-      searchParams.endDate,
-      searchParams.guests,
-      currentSortType || "default",
-      amenityFilters,
-      priceRange,
-      minRating
-    );
-  }, [amenityFilters, currentSortType, priceRange, minRating]);
-
+  // Update the sort type or amenity filters
   const handleFilterChange = (type, value) => {
     if (type === "sort") {
       updateSortType(value);
@@ -132,6 +109,38 @@ const SortAndFilter = () => {
     const newSortType = event.target.value;
     handleFilterChange("sort", newSortType);
   };
+
+  const clearFilters = () => {
+    setPriceRange([0, MAX_SLIDER_VALUE]);
+    setMinRating(0);
+    setAmenityFilters({
+      wifi: false,
+      parking: false,
+      breakfast: false,
+      pets: false,
+    });
+  };
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  useEffect(() => {
+    filterVenues(
+      searchParams.searchTerm,
+      searchParams.startDate,
+      searchParams.endDate,
+      searchParams.guests,
+      currentSortType || "default",
+      amenityFilters,
+      priceRange,
+      minRating
+    );
+  }, [amenityFilters, currentSortType, priceRange, minRating]);
 
   return (
     <Container
@@ -259,7 +268,7 @@ const SortAndFilter = () => {
                   clearFilters();
                 }}
                 size="small"
-                sx={{ marginRight: -2 }}
+                sx={{ marginRight: -1 }}
                 variant="outlined"
                 clickable
               />

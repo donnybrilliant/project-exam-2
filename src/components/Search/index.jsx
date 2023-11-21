@@ -103,6 +103,9 @@ const Search = () => {
             value={startDateValue}
             onChange={handleStartDateChange}
             onAccept={handleStartDateChange}
+            slotProps={{
+              field: { clearable: true },
+            }}
           />
         </Grid>
         <Grid item xs={6} sm={3} md={2}>
@@ -122,6 +125,9 @@ const Search = () => {
             onOpen={() => setEndDatePickerOpen(true)}
             onClose={() => setEndDatePickerOpen(false)}
             onChange={handleEndDateChange}
+            slotProps={{
+              field: { clearable: true },
+            }}
           />
         </Grid>
         <Grid item xs={3} sm={2} md={2}>
