@@ -1,17 +1,3 @@
-import { useEffect, useState } from "react";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
-import {
-  useVenueStore,
-  useAuthStore,
-  useFetchStore,
-  useDialogStore,
-  useProfileStore,
-} from "../../stores";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import Calendar from "../../components/Calendar";
-import Map from "../../components/Map";
-import ImageGallery from "../../components/ImageGallery";
 import {
   Container,
   Card,
@@ -21,18 +7,12 @@ import {
   Rating,
   Button,
   Stack,
-  Avatar,
-  CardHeader,
   Box,
-  TextField,
-  Tooltip,
-  Link,
 } from "@mui/material";
 import WifiIcon from "@mui/icons-material/Wifi";
 import LocalParkingIcon from "@mui/icons-material/LocalParking";
 import FreeBreakfastIcon from "@mui/icons-material/FreeBreakfast";
 import PetsIcon from "@mui/icons-material/Pets";
-import PlaceIcon from "@mui/icons-material/Place";
 import { DateCalendar } from "@mui/x-date-pickers";
 import { Skeleton } from "@mui/material";
 

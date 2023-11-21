@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { MenuItem, IconButton, Tooltip } from "@mui/material";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import { useVenueStore } from "../../stores";
+import { useSearchStore } from "../../stores";
 import {
   Checkbox,
   Stack,
@@ -68,10 +68,13 @@ const SortAndFilter = () => {
     return isAmenityDefault && isPriceDefault && isRatingDefault;
   };
 
+
   // Check if the value is the max slider value, if so, return "Max"
+
   const valueLabelFormat = (value) => {
     return value === MAX_SLIDER_VALUE ? "Max" : value;
   };
+
 
   // Get the label text for the rating
   const getLabelText = (value) => {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"; // Import useState hook
 import { useNavigate } from "react-router-dom";
-import { useVenueStore, useFetchStore } from "../../stores";
+import { useFetchStore, useSearchStore } from "../../stores";
 import dayjs from "dayjs";
 import AutocompleteSearch from "../AutocompleteSearch";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -14,7 +14,7 @@ import LoadingButton from "@mui/lab/LoadingButton";
 
 // Search bar component
 const Search = () => {
-  const { searchParams, updateStoreSearchParams } = useVenueStore();
+  const { searchParams, updateStoreSearchParams } = useSearchStore();
   const [localSearchParams, setLocalSearchParams] = useState(searchParams);
   const [endDatePickerOpen, setEndDatePickerOpen] = useState(false);
   const isLoading = useFetchStore((state) => state.isLoading);

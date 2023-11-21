@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useVenueStore, useFetchStore } from "../../stores";
+import { useVenueStore, useFetchStore, useSearchStore } from "../../stores";
 import Search from "../../components/Search";
 import VenueList from "../../components/VenueList";
 import Container from "@mui/material/Container";
@@ -10,12 +10,9 @@ import dayjs from "dayjs";
 const VenuesPage = () => {
   const isLoading = useFetchStore((state) => state.isLoading);
   const [searchParams, setSearchParams] = useSearchParams();
-  const {
-    fetchAllVenues,
-    filterVenues,
-    filteredVenues,
-    updateStoreSearchParams,
-  } = useVenueStore();
+  const { fetchAllVenues } = useVenueStore();
+  const { filterVenues, filteredVenues, updateStoreSearchParams } =
+    useSearchStore();
 
   // Update the searchParams in the URL whenever the store's searchParams changes
   useEffect(() => {
@@ -46,7 +43,7 @@ const VenuesPage = () => {
 
       // Get the search params from the store and filter the venues
       const { searchTerm, startDate, endDate, guests } =
-        useVenueStore.getState().searchParams;
+        useSearchStore.getState().searchParams;
       filterVenues(searchTerm, startDate, endDate, guests);
     };
 
