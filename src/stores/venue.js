@@ -60,6 +60,7 @@ export const useVenueStore = create((set) => ({
     const data = await useFetchStore
       .getState()
       .apiFetch(`venues/${id}?_owner=true&_bookings=true`);
+    // add error handling here? Or is it enough with the error handling in fetch and on the page?
     if (data) {
       set({ selectedVenue: data });
       return data;
@@ -92,7 +93,7 @@ export const useVenueStore = create((set) => ({
       const response = await useFetchStore
         .getState()
         .apiFetch(`venues/${id}`, "PUT", venueData);
-      // Update state to reflect the updated venue
+      // Update state to reflect the updated venue - is this needed?
       set((state) => ({
         venues: state.venues.map((venue) =>
           venue.id === id ? { ...venue, ...response } : venue
@@ -118,6 +119,7 @@ export const useVenueStore = create((set) => ({
     } catch (error) {
       useFetchStore.getState().setErrorMsg(error.message);
     } finally {
+      // dialog actions should be moved outside of store
       useDialogStore.getState().closeDialog();
     }
   },
