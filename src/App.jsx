@@ -15,6 +15,7 @@ import EditVenue from "./pages/EditVenue";
 import Feedback from "./components/Feedback";
 import ConfirmationDialog from "./components/ConfirmationDialog";
 import VenuesPage from "./pages/Venues";
+import VenueManager from "./components/VenueManager";
 
 function App() {
   return (
@@ -63,6 +64,14 @@ function App() {
             element={
               <PrivateRoute>
                 <CreateVenue />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="venuemanager"
+            element={
+              <PrivateRoute>
+                <VenueManager />
               </PrivateRoute>
             }
           />
