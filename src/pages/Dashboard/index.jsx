@@ -37,7 +37,7 @@ const Dashboard = () => {
 
   document.title = "Dashboard";
 
-  console.log(selectedProfile);
+  console.log(bookings);
   return (
     <>
       <Container sx={{ textAlign: "center" }}>
@@ -47,10 +47,10 @@ const Dashboard = () => {
           <Button
             variant="contained"
             component={Link}
-            to={"/dashboard/venues/create"}
+            to={"/venuemanager"}
             sx={{ marginBlock: 2 }}
           >
-            Register Venue
+            Go to Venue Manager
           </Button>
         ) : (
           <>
