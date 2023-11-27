@@ -23,19 +23,21 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EventBusyIcon from "@mui/icons-material/EventBusy";
 
-const MyVenueList = () => {
+const MyVenueList = ({ venues }) => {
   // Should be taken from userInfo in authstore..
-  const selectedProfile = useProfileStore((state) => state.selectedProfile);
-  const [venues, setVenues] = useState([]);
+
   const deleteVenue = useVenueStore((state) => state.deleteVenue);
 
   const { openDialog } = useDialogStore();
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
+  const [menuState, setMenuState] = useState({
+    anchorEl: null,
+    venueId: null,
+  });
+  const open = Boolean(menuState.anchorEl);
 
   const handleDeleteClickVenue = (venueId) => {
-    const venue = selectedProfile?.venues.find((venue) => venue.id === venueId);
-    // TODO: I need to fetch venue to get bookings..
+    const venue = venues.find((venue) => venue.id === venueId);
+
     openDialog(
       `Delete Venue: ${venue?.name}`,
       "Are you sure you want to delete this venue? This action cannot be undone.",
@@ -43,29 +45,24 @@ const MyVenueList = () => {
         venue?.bookings?.length ? venue.bookings.length : "0"
       } upcoming bookings for this venue.`,
       async () => {
-        await deleteVenue(venueId, venue?.name);
-        setVenues((prevVenues) =>
+        await deleteVenue(venueId, venue.name);
+        /*   setVenues((prevVenues) =>
           prevVenues.filter((venue) => venue.id !== venueId)
-        );
+        ); */
       }
     );
   };
 
-  useEffect(() => {
-    if (selectedProfile) {
-      setVenues(selectedProfile.venues);
-    }
-  }, [selectedProfile]);
-
-  // This function is used to open the menu
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
+  // This function is used to open the menu for a specific booking
+  const handleClick = (event, venueId) => {
+    setMenuState({ anchorEl: event.currentTarget, venueId });
   };
 
-  // This function is used to close the menu
+  // This function is now used to close the menu
   const handleClose = () => {
-    setAnchorEl(null);
+    setMenuState({ anchorEl: null, venueId: null });
   };
+
   return (
     <>
       {venues.length === 0 && (
@@ -82,7 +79,7 @@ const MyVenueList = () => {
               secondaryAction={
                 <Tooltip title="Open Menu" arrow>
                   <IconButton
-                    onClick={handleClick}
+                    onClick={(event) => handleClick(event, venue.id)}
                     edge="end"
                     aria-label="venue-menu"
                     aria-controls={open ? "venue-menu" : undefined}
@@ -110,8 +107,10 @@ const MyVenueList = () => {
             <Divider />
             <Menu
               id="venue-menu"
-              anchorEl={anchorEl}
-              open={open}
+              anchorEl={menuState.anchorEl}
+              open={
+                Boolean(menuState.anchorEl) && menuState.venueId === venue.id
+              }
               onClose={handleClose}
               onClick={handleClose}
               anchorOrigin={{
