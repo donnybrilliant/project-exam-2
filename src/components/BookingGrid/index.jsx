@@ -128,8 +128,8 @@ const BookingGrid = ({ venueBookings }) => {
             </Tooltip>
             <Tooltip title="Contact Customer">
               <IconButton
-                component={MuiLink}
-                href={`mailto:${params.row.customer.email}`}
+                component={Link}
+                to={`mailto:${params.row.customer.email}`}
                 onClick={(event) => {
                   event.stopPropagation();
                 }}

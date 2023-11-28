@@ -98,7 +98,7 @@ const Dashboard = () => {
         ) : (
           <Container className="marginBlock">
             <Typography variant="h3">Want to list your venue?</Typography>
-            <Button as={Link} onClick={handleBecomeVenueManager}>
+            <Button component={Link} onClick={handleBecomeVenueManager}>
               Click here to become a venue manager
             </Button>
           </Container>

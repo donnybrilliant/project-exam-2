@@ -71,7 +71,7 @@ const MyVenueList = ({ venues }) => {
           <Typography variant="h2" sx={{ marginBottom: 1 }}>
             You have no venues yet.
           </Typography>
-          <Button as={Link} to={"/dashboard/venues/create"}>
+          <Button component={Link} to={"/dashboard/venues/create"}>
             Click here to create one
           </Button>
         </div>

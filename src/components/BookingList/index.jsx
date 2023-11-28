@@ -97,7 +97,7 @@ const BookingList = ({ bookings }) => {
           }}
         >
           <Typography variant="h2">You have no upcoming bookings.</Typography>
-          <Button as={Link} to={"/venues"}>
+          <Button component={Link} to={"/venues"}>
             Click here to browse our venues and book your Holidaze now
           </Button>
           <Typography>Treat yourself!</Typography>
