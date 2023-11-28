@@ -1,8 +1,8 @@
-import { useBookingStore } from "../../stores";
+import { useBookingStore, useDialogStore } from "../../stores";
 import { Link } from "react-router-dom";
 import dayjs from "dayjs";
 import { DataGrid } from "@mui/x-data-grid";
-import { Avatar, IconButton } from "@mui/material";
+import { Avatar, Container, IconButton, Typography } from "@mui/material";
 import { Link as MuiLink } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -14,10 +14,25 @@ const BookingGrid = ({ venueBookings }) => {
   console.log(venueBookings);
 
   const deleteBooking = useBookingStore((state) => state.deleteBooking);
+  const { openDialog } = useDialogStore();
 
-  const handleDelete = async (id, name) => {
+  const handleDelete = async (booking) => {
     // Call the deleteBooking action from your store
-    await deleteBooking(id, name);
+    openDialog(
+      `Cancel Booking at ${booking?.venue.name}`,
+      "Are you sure you want to cancel this booking? This action cannot be undone.",
+      `Dates: ${dayjs(booking?.dateFrom).format("DD/MM/YY")} - ${dayjs(
+        booking?.dateTo
+      ).format("DD/MM/YY")}. Guests: ${booking?.guests}`,
+      async () => {
+        await deleteBooking(booking.id, booking.venue.name);
+        /*     
+        // I dont have access to setBookings here, so I can't update the bookings list
+        setBookings((prevBookings) =>
+          prevBookings.filter((booking) => booking.id !== bookingId)
+        ); */
+      }
+    );
     // You might want to refresh your data here to reflect the deletion
   };
 
@@ -98,9 +113,7 @@ const BookingGrid = ({ venueBookings }) => {
             >
               <EditIcon />
             </IconButton>
-            <IconButton
-              onClick={() => handleDelete(params.row.id, params.row.venue.name)}
-            >
+            <IconButton onClick={() => handleDelete(params.row)}>
               <DeleteIcon />
             </IconButton>
             <IconButton
@@ -131,26 +144,41 @@ const BookingGrid = ({ venueBookings }) => {
   }));
   /*  const greenRowStyle = { backgroundColor: "lightgreen" }; */
   return (
-    <div style={{ height: 370, width: "100%" }}>
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        initialState={{
-          sorting: {
-            sortModel: [{ field: "dateFrom", sort: "asc" }],
-          },
-        }}
-        hideFooterSelectedRowCount
+    <>
+      {venueBookings.length === 0 ? (
+        <Container>
+          <Typography variant="h3">
+            Your venues have no bookings yet.
+          </Typography>
+        </Container>
+      ) : (
+        <>
+          <Typography variant="h2" sx={{ marginBottom: 2, marginTop: 1 }}>
+            Upcoming Stays at My Venues
+          </Typography>
+          <div style={{ height: 370, width: "100%" }}>
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              initialState={{
+                sorting: {
+                  sortModel: [{ field: "dateFrom", sort: "asc" }],
+                },
+              }}
+              hideFooterSelectedRowCount
 
-        /*  getRowClassName={(params) =>
+              /*  getRowClassName={(params) =>
           isBookingNow(params.row) ? "greenRow" : ""
         }
     
         sx={{
           "& .greenRow": greenRowStyle,
         }} */
-      />
-    </div>
+            />
+          </div>
+        </>
+      )}
+    </>
   );
 };
 

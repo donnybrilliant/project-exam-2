@@ -45,16 +45,18 @@ const VenueManager = () => {
     <>
       <Container sx={{ textAlign: "center" }}>
         <Typography variant="h1">Venue Manager</Typography>
-        <Button
-          variant="contained"
-          component={Link}
-          to={"/dashboard/venues/create"}
-          sx={{ marginBlock: 2 }}
-        >
-          Register New Venue
-        </Button>
+        {userVenues.length > 0 && (
+          <Button
+            variant="contained"
+            component={Link}
+            to={"/dashboard/venues/create"}
+            sx={{ marginBlock: 5 }}
+          >
+            Register New Venue
+          </Button>
+        )}
 
-        <BookingGrid venueBookings={venueBookings} />
+        {userVenues.length > 0 && <BookingGrid venueBookings={venueBookings} />}
         <MyVenueList venues={userVenues} />
       </Container>
     </>

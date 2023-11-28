@@ -16,6 +16,7 @@ import {
   Tooltip,
   Button,
   Typography,
+  Container,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -87,25 +88,39 @@ const BookingList = ({ bookings }) => {
 
   return (
     <>
-      <h2>
-        You Have {bookingCount} {showPastBookings ? "Past" : "Upcoming"}{" "}
-        {bookingText}
-      </h2>
-
-      <Button onClick={togglePastBookings}>
-        {showPastBookings ? "Show Upcoming Bookings" : "Show Past Bookings"}
-      </Button>
-      {bookings.length === 0 && (
-        <>
-          <Typography>You have no upcoming bookings.</Typography>
-          <Link to={"/venues"}>
+      {bookings.length === 0 ? (
+        <Container
+          className="marginBlock"
+          sx={{
+            "&>*": {
+              marginBlock: 1,
+            },
+          }}
+        >
+          <Typography variant="h2">You have no upcoming bookings.</Typography>
+          <Button as={Link} to={"/venues"}>
             Click here to browse our venues and book your Holidaze now
-          </Link>
+          </Button>
           <Typography>Treat yourself!</Typography>
+        </Container>
+      ) : (
+        <>
+          <h2>
+            You Have {bookingCount} {showPastBookings ? "Past" : "Upcoming"}{" "}
+            {bookingText}
+          </h2>
+
+          {pastBookings.length > 0 && (
+            <Button onClick={togglePastBookings}>
+              {showPastBookings
+                ? "Show Upcoming Bookings"
+                : "Show Past Bookings"}
+            </Button>
+          )}
         </>
       )}
       <List>
-        {displayedBookings.length > 0 ? (
+        {displayedBookings.length > 0 &&
           displayedBookings.map((booking) => (
             <Fragment key={booking.id}>
               <ListItem
@@ -221,12 +236,7 @@ const BookingList = ({ bookings }) => {
                 )}
               </Menu>
             </Fragment>
-          ))
-        ) : (
-          <Typography>
-            {showPastBookings ? "No past bookings." : "No upcoming bookings."}
-          </Typography>
-        )}
+          ))}
       </List>
     </>
   );

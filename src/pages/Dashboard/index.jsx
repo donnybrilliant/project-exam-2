@@ -10,13 +10,21 @@ import UserInfo from "../../components/UserInfo";
 // Remember to filter upcoming and past bookings
 const Dashboard = () => {
   const [bookings, setBookings] = useState([]);
-  const isLoading = useFetchStore((state) => state.isLoading);
   const userInfo = useAuthStore((state) => state.userInfo);
   const userName = userInfo.name;
   const fetchProfileByName = useProfileStore(
     (state) => state.fetchProfileByName
   );
   const selectedProfile = useProfileStore((state) => state.selectedProfile);
+
+  const updateVenueManagerStatus = useProfileStore(
+    (state) => state.updateVenueManagerStatus
+  );
+
+  const handleBecomeVenueManager = async () => {
+    await updateVenueManagerStatus(true);
+    // Additional logic if needed, e.g., redirection or success notification
+  };
 
   useEffect(() => {
     fetchProfileByName(userName);
@@ -53,11 +61,12 @@ const Dashboard = () => {
             Go to Venue Manager
           </Button>
         ) : (
-          <>
-            <Typography>Want to list your venue?</Typography>
-
-            <Link>Click here to become a venue manager</Link>
-          </>
+          <Container className="marginBlock">
+            <Typography variant="h3">Want to list your venue?</Typography>
+            <Button as={Link} onClick={handleBecomeVenueManager}>
+              Click here to become a venue manager
+            </Button>
+          </Container>
         )}
 
         <BookingList bookings={bookings} />
