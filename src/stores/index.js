@@ -7,3 +7,4 @@ export { useVenueStore } from "./venue";
 export { useProfileStore } from "./profile";
 export { useSearchStore } from "./search";
 export { useBookingStore } from "./booking";
+export { useFavoritesStore } from "./favorites";
