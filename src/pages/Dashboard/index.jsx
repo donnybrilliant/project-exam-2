@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuthStore, useProfileStore } from "../../stores";
+import { useAuthStore, useProfileStore, useVenueStore } from "../../stores";
 import { Container, Typography, Button } from "@mui/material";
 import BookingList from "../../components/BookingList";
 import UserInfo from "../../components/UserInfo";
@@ -9,6 +9,7 @@ import UserInfo from "../../components/UserInfo";
 // Remember to filter upcoming and past bookings
 const Dashboard = () => {
   const [bookings, setBookings] = useState([]);
+  const [bookingList, setBookingList] = useState([]);
   const userInfo = useAuthStore((state) => state.userInfo);
   const userName = userInfo.name;
   const fetchProfileByName = useProfileStore(
@@ -18,6 +19,7 @@ const Dashboard = () => {
   const updateVenueManagerStatus = useProfileStore(
     (state) => state.updateVenueManagerStatus
   );
+  const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
 
   const handleBecomeVenueManager = async () => {
     await updateVenueManagerStatus(true);
@@ -35,15 +37,50 @@ const Dashboard = () => {
         (booking) =>
           !selectedProfile.venues.some((venue) => venue.id === booking.venue.id)
       );
-      setBookings(filteredBookings);
+      setBookingList(filteredBookings);
     }
   }, [selectedProfile]);
 
-  // if (isLoading) return <Typography>Loading...</Typography>;
+  // Fetch detailed booking information for each filtered booking
+  useEffect(() => {
+    const fetchVenuesAndEnrichBookings = async () => {
+      // Extract unique venue IDs from the bookingList
+      const venueIds = Array.from(
+        new Set(bookingList.map((booking) => booking.venue.id))
+      );
+
+      // Fetch venue details for each unique venue ID
+      const venuesPromises = venueIds.map((id) => fetchVenueById(id));
+      const venues = await Promise.all(venuesPromises);
+
+      // Create a map of venueId to venue for quick lookup
+      const venueMap = venues.reduce((acc, venue) => {
+        acc[venue.id] = venue;
+        return acc;
+      }, {});
+
+      // Enrich bookings with venue owner details
+      const enrichedBookings = bookingList.map((booking) => {
+        const venueWithOwner = venueMap[booking.venue.id];
+        return {
+          ...booking,
+          venue: {
+            ...booking.venue,
+            owner: venueWithOwner.owner, // Assuming owner details are in the fetched venue object
+          },
+        };
+      });
+
+      setBookings(enrichedBookings);
+    };
+
+    if (bookingList.length > 0) {
+      fetchVenuesAndEnrichBookings();
+    }
+  }, [bookingList, fetchVenueById]);
 
   document.title = "Dashboard";
 
-  console.log(selectedProfile);
   return (
     <>
       <Container sx={{ textAlign: "center" }}>

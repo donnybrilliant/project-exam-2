@@ -22,6 +22,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import ChatIcon from "@mui/icons-material/Chat";
 
 const BookingList = ({ bookings }) => {
   const deleteBooking = useBookingStore((state) => state.deleteBooking);
@@ -212,6 +213,16 @@ const BookingList = ({ bookings }) => {
                   </ListItemIcon>
                   View Venue
                 </MenuItem>
+                <MenuItem
+                  component={Link}
+                  to={`mailto:${booking.venue.owner.email}`}
+                >
+                  <ListItemIcon>
+                    <ChatIcon fontSize="small" />
+                  </ListItemIcon>
+                  Contact Owner
+                </MenuItem>
+                <Divider />
                 {!showPastBookings && (
                   <MenuItem>
                     <ListItemIcon>
