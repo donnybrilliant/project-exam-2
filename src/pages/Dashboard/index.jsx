@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuthStore, useFetchStore, useProfileStore } from "../../stores";
+import { useAuthStore, useProfileStore } from "../../stores";
 import { Container, Typography, Button } from "@mui/material";
 import BookingList from "../../components/BookingList";
-import MyVenueList from "../../components/MyVenueList";
 import UserInfo from "../../components/UserInfo";
 
 // Should show total number of bookings for each venue in list and total for user.
@@ -45,7 +44,7 @@ const Dashboard = () => {
 
   document.title = "Dashboard";
 
-  console.log(bookings);
+  console.log(selectedProfile);
   return (
     <>
       <Container sx={{ textAlign: "center" }}>

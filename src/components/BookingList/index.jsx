@@ -50,8 +50,6 @@ const BookingList = ({ bookings }) => {
   // Determine which bookings to display based on `showPastBookings`
   const displayedBookings = showPastBookings ? pastBookings : upcomingBookings;
 
-  console.log(displayedBookings);
-
   const handleDeleteClickBooking = async (bookingId) => {
     console.log(bookingId);
     const booking = bookings.find((booking) => booking.id === bookingId);

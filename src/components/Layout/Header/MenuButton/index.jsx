@@ -15,8 +15,8 @@ import Login from "@mui/icons-material/Login";
 import Logout from "@mui/icons-material/Logout";
 import EventNoteIcon from "@mui/icons-material/EventNote";
 import HolidayVillageIcon from "@mui/icons-material/HolidayVillage";
-import PersonIcon from "@mui/icons-material/Person";
 import MapIcon from "@mui/icons-material/Map";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 // This component is used to display a menu button
 const MenuButton = () => {
@@ -102,7 +102,7 @@ const MenuButton = () => {
           >
             <MenuItem component={NavLink} to={"/dashboard"}>
               <ListItemIcon>
-                <PersonIcon fontSize="small" />
+                <AccountCircleIcon fontSize="small" />
               </ListItemIcon>
               Dashboard
             </MenuItem>
