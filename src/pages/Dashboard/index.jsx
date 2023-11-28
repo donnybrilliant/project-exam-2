@@ -1,48 +1,110 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuthStore, useFetchStore, useProfileStore } from "../../stores";
+import { useAuthStore, useProfileStore, useVenueStore } from "../../stores";
 import { Container, Typography, Button } from "@mui/material";
 import BookingList from "../../components/BookingList";
-import MyVenueList from "../../components/MyVenueList";
 import UserInfo from "../../components/UserInfo";
 
 // Should show total number of bookings for each venue in list and total for user.
 // Remember to filter upcoming and past bookings
 const Dashboard = () => {
-  const isLoading = useFetchStore((state) => state.isLoading);
+  const [bookings, setBookings] = useState([]);
+  const [bookingList, setBookingList] = useState([]);
   const userInfo = useAuthStore((state) => state.userInfo);
   const userName = userInfo.name;
   const fetchProfileByName = useProfileStore(
     (state) => state.fetchProfileByName
   );
+  const selectedProfile = useProfileStore((state) => state.selectedProfile);
+  const updateVenueManagerStatus = useProfileStore(
+    (state) => state.updateVenueManagerStatus
+  );
+  const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
+
+  const handleBecomeVenueManager = async () => {
+    await updateVenueManagerStatus(true);
+    // Additional logic if needed, e.g., redirection or success notification
+  };
 
   useEffect(() => {
     fetchProfileByName(userName);
-  }, [userName]);
+  }, [userName, fetchProfileByName]);
 
-  // if (isLoading) return <Typography>Loading...</Typography>;
+  useEffect(() => {
+    if (selectedProfile && selectedProfile.bookings) {
+      // Filter out bookings that belong to the owner's venues
+      const filteredBookings = selectedProfile.bookings.filter(
+        (booking) =>
+          !selectedProfile.venues.some((venue) => venue.id === booking.venue.id)
+      );
+      setBookingList(filteredBookings);
+    }
+  }, [selectedProfile]);
+
+  // Fetch detailed booking information for each filtered booking
+  useEffect(() => {
+    const fetchVenuesAndEnrichBookings = async () => {
+      // Extract unique venue IDs from the bookingList
+      const venueIds = Array.from(
+        new Set(bookingList.map((booking) => booking.venue.id))
+      );
+
+      // Fetch venue details for each unique venue ID
+      const venuesPromises = venueIds.map((id) => fetchVenueById(id));
+      const venues = await Promise.all(venuesPromises);
+
+      // Create a map of venueId to venue for quick lookup
+      const venueMap = venues.reduce((acc, venue) => {
+        acc[venue.id] = venue;
+        return acc;
+      }, {});
+
+      // Enrich bookings with venue owner details
+      const enrichedBookings = bookingList.map((booking) => {
+        const venueWithOwner = venueMap[booking.venue.id];
+        return {
+          ...booking,
+          venue: {
+            ...booking.venue,
+            owner: venueWithOwner.owner, // Assuming owner details are in the fetched venue object
+          },
+        };
+      });
+
+      setBookings(enrichedBookings);
+    };
+
+    if (bookingList.length > 0) {
+      fetchVenuesAndEnrichBookings();
+    }
+  }, [bookingList, fetchVenueById]);
 
   document.title = "Dashboard";
 
-  //console.log(selectedProfile);
   return (
     <>
       <Container sx={{ textAlign: "center" }}>
-        <Typography>Dashboard</Typography>
-        <UserInfo />
-        <Button
-          variant="contained"
-          component={Link}
-          to={"/dashboard/venues/create"}
-          sx={{ marginBlock: 2 }}
-        >
-          Create Venue
-        </Button>
-        <h2>Your Bookings</h2>
+        <Typography variant="h1">Dashboard</Typography>
+        <UserInfo userInfo={userInfo} />
+        {selectedProfile?.venueManager ? (
+          <Button
+            variant="contained"
+            component={Link}
+            to={"/venuemanager"}
+            sx={{ marginBlock: 2 }}
+          >
+            Go to Venue Manager
+          </Button>
+        ) : (
+          <Container className="marginBlock">
+            <Typography variant="h3">Want to list your venue?</Typography>
+            <Button as={Link} onClick={handleBecomeVenueManager}>
+              Click here to become a venue manager
+            </Button>
+          </Container>
+        )}
 
-        <BookingList />
-        <h2>Your Venues</h2>
-        <MyVenueList />
+        <BookingList bookings={bookings} />
       </Container>
     </>
   );

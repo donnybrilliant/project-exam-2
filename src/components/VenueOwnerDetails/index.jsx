@@ -1,6 +1,7 @@
 import { useVenueStore, useProfileStore, useAuthStore } from "../../stores";
+import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
+
 import {
   Container,
   Typography,
@@ -10,12 +11,11 @@ import {
   Tooltip,
 } from "@mui/material";
 
-dayjs.extend(utc);
-
 const VenueOwnerDetails = ({ selectedVenue }) => {
   const token = useAuthStore((state) => state.token);
   const isOwner = useVenueStore((state) => state.isOwner());
   const selectedProfile = useProfileStore((state) => state.selectedProfile);
+  const navigate = useNavigate();
 
   return (
     <Container
@@ -72,13 +72,11 @@ const VenueOwnerDetails = ({ selectedVenue }) => {
       )}
       <Box>
         <Typography>
-          Created:{" "}
-          {dayjs.utc(selectedVenue?.created).endOf("day").format("DD/MM/YY")}
+          Created: {dayjs(selectedVenue?.created).format("DD/MM/YY")}
         </Typography>
         {selectedVenue?.created !== selectedVenue?.updated && (
           <Typography>
-            Updated:{" "}
-            {dayjs.utc(selectedVenue?.updated).endOf("day").format("DD/MM/YY")}
+            Updated: {dayjs(selectedVenue?.updated).format("DD/MM/YY")}
           </Typography>
         )}
       </Box>

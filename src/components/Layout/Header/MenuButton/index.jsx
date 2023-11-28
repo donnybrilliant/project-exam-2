@@ -13,9 +13,10 @@ import IconButton from "@mui/material/IconButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Login from "@mui/icons-material/Login";
 import Logout from "@mui/icons-material/Logout";
-import DashboardIcon from "@mui/icons-material/Dashboard";
 import EventNoteIcon from "@mui/icons-material/EventNote";
 import HolidayVillageIcon from "@mui/icons-material/HolidayVillage";
+import MapIcon from "@mui/icons-material/Map";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 // This component is used to display a menu button
 const MenuButton = () => {
@@ -101,21 +102,28 @@ const MenuButton = () => {
           >
             <MenuItem component={NavLink} to={"/dashboard"}>
               <ListItemIcon>
-                <DashboardIcon fontSize="small" />
+                <AccountCircleIcon fontSize="small" />
               </ListItemIcon>
               Dashboard
             </MenuItem>
-            <MenuItem>
-              <ListItemIcon>
-                <HolidayVillageIcon fontSize="small" />
-              </ListItemIcon>
-              My Venues
-            </MenuItem>
-            <MenuItem>
+            <MenuItem component={NavLink} to={"/venuemanager"}>
               <ListItemIcon>
                 <EventNoteIcon fontSize="small" />
               </ListItemIcon>
-              My Bookings
+              Venue Manager
+            </MenuItem>
+            <Divider />
+            <MenuItem component={NavLink} to={"/venues"}>
+              <ListItemIcon>
+                <HolidayVillageIcon fontSize="small" />
+              </ListItemIcon>
+              Browse Venues
+            </MenuItem>
+            <MenuItem>
+              <ListItemIcon>
+                <MapIcon fontSize="small" />
+              </ListItemIcon>
+              Venue Map
             </MenuItem>
             <Divider />
             <ThemeToggle />

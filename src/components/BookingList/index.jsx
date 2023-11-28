@@ -1,7 +1,6 @@
-import { useEffect, useState, Fragment } from "react";
+import { useState, Fragment } from "react";
 import { Link } from "react-router-dom";
-import { useProfileStore, useVenueStore } from "../../stores";
-import { useDialogStore } from "../../stores"; // Adjust path as necessary
+import { useBookingStore, useDialogStore } from "../../stores";
 import dayjs from "dayjs";
 import {
   Avatar,
@@ -15,33 +14,47 @@ import {
   MenuItem,
   ListItemIcon,
   Tooltip,
+  Button,
   Typography,
+  Container,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import Person from "@mui/icons-material/Person";
-import People from "@mui/icons-material/People";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import ChatIcon from "@mui/icons-material/Chat";
 
-const BookingList = () => {
-  const [bookings, setBookings] = useState([]);
-  const selectedProfile = useProfileStore((state) => state.selectedProfile);
-  const deleteBooking = useVenueStore((state) => state.deleteBooking);
+const BookingList = ({ bookings }) => {
+  const deleteBooking = useBookingStore((state) => state.deleteBooking);
   const { openDialog } = useDialogStore();
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-  const [venues, setVenues] = useState([]);
+  const [menuState, setMenuState] = useState({
+    anchorEl: null,
+    bookingId: null,
+  });
+  const open = Boolean(menuState.anchorEl);
 
-  // might not need this if i have to fetch the venue bookings.. hmm
-  const [ownVenueBookings, setOwnVenueBookings] = useState([]);
+  // Add state to toggle between upcoming and past bookings
+  const [showPastBookings, setShowPastBookings] = useState(false);
 
-  const isBookingAtOwnVenue = (booking) => {
-    return venues.some((venue) => venue.id === booking.venue.id);
+  const togglePastBookings = () => {
+    setShowPastBookings(!showPastBookings);
   };
 
+  const upcomingBookings = bookings
+    .filter((booking) => dayjs(booking.dateTo).isAfter(dayjs()))
+    .sort((a, b) => dayjs(a.dateFrom) - dayjs(b.dateFrom)); // Sort upcoming bookings by soonest first
+
+  const pastBookings = bookings
+    .filter((booking) => dayjs(booking.dateTo).isBefore(dayjs()))
+    .sort((a, b) => dayjs(b.dateTo) - dayjs(a.dateTo)); // Sort past bookings by most recent first
+
+  // Determine which bookings to display based on `showPastBookings`
+  const displayedBookings = showPastBookings ? pastBookings : upcomingBookings;
+
   const handleDeleteClickBooking = async (bookingId) => {
+    console.log(bookingId);
     const booking = bookings.find((booking) => booking.id === bookingId);
+    console.log(booking);
     openDialog(
       `Cancel Booking at ${booking?.venue.name}`,
       "Are you sure you want to cancel this booking? This action cannot be undone.",
@@ -49,152 +62,190 @@ const BookingList = () => {
         booking?.dateTo
       ).format("DD/MM/YY")}. Guests: ${booking?.guests}`,
       async () => {
-        await deleteBooking(bookingId, booking?.venue.name);
+        await deleteBooking(bookingId, booking.venue.name);
+        /*     
+        // I dont have access to setBookings here, so I can't update the bookings list
         setBookings((prevBookings) =>
           prevBookings.filter((booking) => booking.id !== bookingId)
-        );
+        ); */
       }
     );
   };
 
-  useEffect(() => {
-    if (selectedProfile) {
-      const otherBookings = selectedProfile.bookings.filter(
-        (booking) => !isBookingAtOwnVenue(booking)
-      );
-      const ownBookings = selectedProfile.bookings.filter(isBookingAtOwnVenue);
-      setBookings(otherBookings);
-      setOwnVenueBookings(ownBookings);
-      setVenues(selectedProfile.venues);
-    }
-  }, [selectedProfile]);
-
-  // This function is used to open the menu
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
+  // This function is used to open the menu for a specific booking
+  const handleClick = (event, bookingId) => {
+    setMenuState({ anchorEl: event.currentTarget, bookingId });
   };
 
-  // This function is used to close the menu
+  // This function is now used to close the menu
   const handleClose = () => {
-    setAnchorEl(null);
+    setMenuState({ anchorEl: null, bookingId: null });
   };
+
+  const bookingCount = displayedBookings.length;
+  const bookingText = bookingCount === 1 ? "Booking" : "Bookings";
+
   return (
     <>
-      {bookings.length === 0 && (
-        <>
-          <Typography>You have no upcoming bookings.</Typography>
-          <Link to={"/venues"}>
+      {bookings.length === 0 ? (
+        <Container
+          className="marginBlock"
+          sx={{
+            "&>*": {
+              marginBlock: 1,
+            },
+          }}
+        >
+          <Typography variant="h2">You have no upcoming bookings.</Typography>
+          <Button as={Link} to={"/venues"}>
             Click here to browse our venues and book your Holidaze now
-          </Link>
+          </Button>
           <Typography>Treat yourself!</Typography>
+        </Container>
+      ) : (
+        <>
+          <h2>
+            You Have {bookingCount} {showPastBookings ? "Past" : "Upcoming"}{" "}
+            {bookingText}
+          </h2>
+
+          {pastBookings.length > 0 && (
+            <Button onClick={togglePastBookings}>
+              {showPastBookings
+                ? "Show Upcoming Bookings"
+                : "Show Past Bookings"}
+            </Button>
+          )}
         </>
       )}
       <List>
-        {bookings.map((booking) => (
-          <Fragment key={booking.id}>
-            <ListItem
-              secondaryAction={
-                <Tooltip title="Open Menu" arrow>
-                  <IconButton
-                    onClick={handleClick}
-                    edge="end"
-                    aria-label="booking-menu"
-                    aria-controls={open ? "booking-menu" : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={open ? "true" : undefined}
-                  >
-                    <MoreVertIcon />
-                  </IconButton>
-                </Tooltip>
-              }
-            >
-              <ListItemAvatar>
-                <Avatar
-                  alt={booking?.venue.name}
-                  src={booking?.venue.media[0]}
-                />
-              </ListItemAvatar>
-              <ListItemText
-                sx={{
-                  textTransform: "capitalize",
-                }}
-                primary={booking?.venue.name}
-                secondary={
-                  // add number of nights?
-                  dayjs
-                    .utc(booking?.dateFrom)
-                    .startOf("day")
-                    .format("DD/MM/YY") +
-                  " - " +
-                  dayjs
-                    .utc(booking?.dateTo)
-
-                    .endOf("day")
-                    .format("DD/MM/YY")
+        {displayedBookings.length > 0 &&
+          displayedBookings.map((booking) => (
+            <Fragment key={booking.id}>
+              <ListItem
+                secondaryAction={
+                  <Tooltip title="Open Menu" arrow>
+                    <IconButton
+                      onClick={(event) => handleClick(event, booking.id)}
+                      edge="end"
+                      aria-label="booking-menu"
+                      aria-controls={open ? "booking-menu" : undefined}
+                      aria-haspopup="true"
+                      aria-expanded={open ? "true" : undefined}
+                    >
+                      <MoreVertIcon />
+                    </IconButton>
+                  </Tooltip>
                 }
-              />
+              >
+                <ListItemAvatar>
+                  <Avatar
+                    alt={booking?.venue.name}
+                    src={booking?.venue.media[0]}
+                  />
+                </ListItemAvatar>
+                <ListItemText
+                  sx={{
+                    textTransform: "capitalize",
+                  }}
+                  primary={booking?.venue.name}
+                  secondary={
+                    // add number of nights?
+                    dayjs
+                      .utc(booking?.dateFrom)
+                      .startOf("day")
+                      .format("DD/MM/YY") +
+                    " - " +
+                    dayjs
+                      .utc(booking?.dateTo)
 
-              {/*                 <ListItemSecondaryAction>
-          <Chip
-            sx={{ mr: 2 }}
-            icon={booking?.guests === 1 ? <Person /> : <People />}
-            label={booking?.guests}
-          />
-          <IconButton
-            onClick={() => handleDeleteClickBooking(booking.id)}
-          >
-            <DeleteIcon />
-          </IconButton>
-          <IconButton>
-            <EditIcon />
-          </IconButton>
-          <Button component={Link} to={`/venues/${booking.venue.id}`}>
-            View
-          </Button>
-        </ListItemSecondaryAction> */}
-            </ListItem>
-            <Divider />
-            <Menu
-              id="booking-menu"
-              anchorEl={anchorEl}
-              open={open}
-              onClose={handleClose}
-              onClick={handleClose}
-              anchorOrigin={{
-                vertical: "center",
-                horizontal: "left",
-              }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              sx={{
-                "& .MuiPaper-root": {
-                  minWidth: "200px",
-                },
-              }}
-            >
-              <MenuItem component={Link} to={`/venues/${booking.venue.id}`}>
-                <ListItemIcon>
-                  <VisibilityIcon fontSize="small" />
-                </ListItemIcon>
-                View Venue
-              </MenuItem>
-              <MenuItem>
-                <ListItemIcon>
-                  <EditIcon fontSize="small" />
-                </ListItemIcon>
-                Edit
-              </MenuItem>
-              <MenuItem onClick={() => handleDeleteClickBooking(booking.id)}>
-                <ListItemIcon>
-                  <DeleteIcon fontSize="small" />
-                </ListItemIcon>
-                Delete
-              </MenuItem>
-            </Menu>
-          </Fragment>
-        ))}
+                      .endOf("day")
+                      .format("DD/MM/YY")
+                  }
+                />
+
+                {/*                 <ListItemSecondaryAction>
+              <Chip
+                sx={{ mr: 2 }}
+                icon={booking?.guests === 1 ? <Person /> : <People />}
+                label={booking?.guests}
+              />
+              <IconButton
+                onClick={() => handleDeleteClickBooking(booking.id)}
+              >
+                <DeleteIcon />
+              </IconButton>
+              <IconButton>
+                <EditIcon />
+              </IconButton>
+              <Button component={Link} to={`/venues/${booking.venue.id}`}>
+                View
+              </Button>
+            </ListItemSecondaryAction> */}
+              </ListItem>
+              <Divider />
+              <Menu
+                id="booking-menu"
+                anchorEl={menuState.anchorEl}
+                open={
+                  Boolean(menuState.anchorEl) &&
+                  menuState.bookingId === booking.id
+                }
+                onClose={handleClose}
+                onClick={handleClose}
+                anchorOrigin={{
+                  vertical: "center",
+                  horizontal: "left",
+                }}
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                sx={{
+                  "& .MuiPaper-root": {
+                    minWidth: "200px",
+                  },
+                }}
+              >
+                <MenuItem component={Link} to={`/venues/${booking.venue.id}`}>
+                  <ListItemIcon>
+                    <VisibilityIcon fontSize="small" />
+                  </ListItemIcon>
+                  View Venue
+                </MenuItem>
+                <MenuItem
+                  component={Link}
+                  to={`mailto:${booking.venue.owner.email}`}
+                >
+                  <ListItemIcon>
+                    <ChatIcon fontSize="small" />
+                  </ListItemIcon>
+                  Contact Owner
+                </MenuItem>
+                <Divider />
+                {!showPastBookings && (
+                  <MenuItem>
+                    <ListItemIcon>
+                      <EditIcon fontSize="small" />
+                    </ListItemIcon>
+                    Edit
+                  </MenuItem>
+                )}
+                {!showPastBookings && (
+                  <MenuItem
+                    onClick={() =>
+                      handleDeleteClickBooking(menuState.bookingId)
+                    }
+                  >
+                    <ListItemIcon>
+                      <DeleteIcon fontSize="small" />
+                    </ListItemIcon>
+                    Delete
+                  </MenuItem>
+                )}
+              </Menu>
+            </Fragment>
+          ))}
       </List>
     </>
   );

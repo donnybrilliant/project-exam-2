@@ -76,6 +76,9 @@ export const ThemeProviderComponent = ({ children }) => {
           main: {
             minHeight: "100dvh",
           },
+          ".marginBlock": {
+            marginBlock: "2rem",
+          },
         }}
       />
       {children}

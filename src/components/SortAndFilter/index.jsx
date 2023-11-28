@@ -26,15 +26,15 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 
 // Sort and filter component
 const SortAndFilter = () => {
-  const currentSortType = useVenueStore.getState().sortType;
-  const updateSortType = useVenueStore((state) => state.updateSortType);
-  const filterVenues = useVenueStore((state) => state.filterVenues);
-  const reverseFilteredVenues = useVenueStore(
+  const currentSortType = useSearchStore.getState().sortType;
+  const updateSortType = useSearchStore((state) => state.updateSortType);
+  const filterVenues = useSearchStore((state) => state.filterVenues);
+  const reverseFilteredVenues = useSearchStore(
     (state) => state.reverseFilteredVenues
   );
-  const searchParams = useVenueStore.getState().searchParams;
-  const isReversed = useVenueStore((state) => state.isReversed);
-  const MAX_SLIDER_VALUE = useVenueStore((state) => state.maxSliderValue);
+  const searchParams = useSearchStore.getState().searchParams;
+  const isReversed = useSearchStore((state) => state.isReversed);
+  const MAX_SLIDER_VALUE = useSearchStore((state) => state.maxSliderValue);
   const [amenityFilters, setAmenityFilters] = useState({
     wifi: false,
     parking: false,
@@ -68,13 +68,11 @@ const SortAndFilter = () => {
     return isAmenityDefault && isPriceDefault && isRatingDefault;
   };
 
-
   // Check if the value is the max slider value, if so, return "Max"
 
   const valueLabelFormat = (value) => {
     return value === MAX_SLIDER_VALUE ? "Max" : value;
   };
-
 
   // Get the label text for the rating
   const getLabelText = (value) => {

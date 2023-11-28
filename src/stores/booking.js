@@ -3,6 +3,14 @@ import { useFetchStore } from "./fetch";
 import { useDialogStore } from "./dialog";
 
 export const useBookingStore = create((set) => ({
+  // Action for fetching a booking by id
+  getBooking: async (id) => {
+    const data = await useFetchStore
+      .getState()
+      .apiFetch(`bookings/${id}?_customer=true&_venue=true`);
+    return data;
+  },
+
   // Action for creating a booking
   bookVenue: async (bookingData) => {
     try {

@@ -13,12 +13,11 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import LoadingButton from "@mui/lab/LoadingButton";
 
-const UserInfo = () => {
+const UserInfo = ({ userInfo }) => {
+  const isLoading = useFetchStore((state) => state.isLoading);
+  const updateAvatar = useProfileStore((state) => state.updateAvatar);
   const [isAvatarFieldVisible, setIsAvatarFieldVisible] = useState(false);
   const [avatar, setAvatar] = useState("");
-  const selectedProfile = useProfileStore((state) => state.selectedProfile);
-  const updateAvatar = useProfileStore((state) => state.updateAvatar);
-  const isLoading = useFetchStore((state) => state.isLoading);
 
   const toggleAvatarField = () => {
     setIsAvatarFieldVisible((prev) => !prev);
@@ -29,10 +28,11 @@ const UserInfo = () => {
     setIsAvatarFieldVisible(false);
   };
   useEffect(() => {
-    if (selectedProfile) {
-      setAvatar(selectedProfile.avatar);
+    if (userInfo) {
+      setAvatar(userInfo.avatar);
     }
-  }, [selectedProfile]);
+  }, [userInfo]);
+
   return (
     <>
       <Badge
@@ -46,7 +46,7 @@ const UserInfo = () => {
         }
       >
         <Avatar
-          alt={selectedProfile?.name}
+          alt={userInfo.name}
           src={avatar}
           sx={{ width: "100px", height: "100px" }}
         />
@@ -76,21 +76,21 @@ const UserInfo = () => {
           {isLoading ? (
             <Skeleton width={160} sx={{ marginInline: "auto" }} />
           ) : (
-            `Username: ${selectedProfile?.name}`
+            `Username: ${userInfo.name}`
           )}
         </Typography>
         <Typography>
           {isLoading ? (
             <Skeleton width={160} sx={{ marginInline: "auto" }} />
           ) : (
-            `Email: ${selectedProfile?.email}`
+            `Email: ${userInfo.email}`
           )}
         </Typography>
         <Typography>
           {isLoading ? (
             <Skeleton width={160} sx={{ marginInline: "auto" }} />
           ) : (
-            `Venue Manager: ${selectedProfile?.venueManager ? "Yes" : "No"}`
+            `Venue Manager: ${userInfo.venueManager ? "Yes" : "No"}`
           )}
         </Typography>
       </Container>
