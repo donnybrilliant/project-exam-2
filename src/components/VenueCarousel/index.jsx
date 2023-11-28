@@ -12,6 +12,7 @@ const VenueCarousel = ({ venues }) => {
         display: "flex",
         overflowX: "auto",
         scrollbarWidth: "none", // For Firefox
+        // Double check if this is needed
         "&::-webkit-scrollbar": {
           // For Chrome, Safari, and Edge
           display: "none",

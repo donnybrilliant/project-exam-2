@@ -8,14 +8,30 @@ import {
   Box,
   Tooltip,
   Link,
+  Button,
 } from "@mui/material";
 import WifiIcon from "@mui/icons-material/Wifi";
 import LocalParkingIcon from "@mui/icons-material/LocalParking";
 import FreeBreakfastIcon from "@mui/icons-material/FreeBreakfast";
 import PetsIcon from "@mui/icons-material/Pets";
 import PlaceIcon from "@mui/icons-material/Place";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import { useFavoritesStore, useAuthStore } from "../../stores";
 
 const VenueDetails = ({ venue }) => {
+  const { addFavorite, removeFavorite, isFavorite } = useFavoritesStore();
+  const favorite = isFavorite(venue.id);
+  const token = useAuthStore((state) => state.token);
+
+  const handleToggleFavorite = () => {
+    if (favorite) {
+      removeFavorite(venue.id);
+    } else {
+      addFavorite(venue.id);
+    }
+  };
+
   return (
     <>
       {venue?.media.length > 0 ? (
@@ -60,23 +76,42 @@ const VenueDetails = ({ venue }) => {
             style={{ marginLeft: -2 }}
           />
         </Container>
-        <Link
-          href="#map"
-          color="text.secondary"
-          sx={{
-            textTransform: "capitalize",
-            display: "flex",
-            alignItems: "center",
-            marginLeft: -0.5,
-            marginBlock: 2,
-          }}
+        <Container
+          disableGutters
+          sx={{ display: "flex", justifyContent: "space-between" }}
         >
-          <PlaceIcon fontSize="small" />
-          {venue?.location.city === "" ? "Unknown" : venue?.location.city}
-          {venue?.location.country === "" ? "" : ", " + venue?.location.country}
-        </Link>
+          <Link
+            href="#map"
+            color="text.secondary"
+            sx={{
+              textTransform: "capitalize",
+              display: "flex",
+              alignItems: "center",
+              marginLeft: -0.5,
+              marginBlock: 2,
+            }}
+          >
+            <PlaceIcon fontSize="small" />
+            {venue?.location.city === ""
+              ? "Unknown Location"
+              : venue?.location.city}
+            {venue?.location.country === ""
+              ? ""
+              : ", " + venue?.location.country}
+          </Link>
+          {token && (
+            <Button
+              startIcon={favorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+              onClick={handleToggleFavorite}
+            >
+              {favorite ? "In Favorites" : "Add to Favorites"}
+            </Button>
+          )}
+        </Container>
         <Typography variant="h2">Description:</Typography>
-        <Typography sx={{ marginBlock: 1 }}>{venue?.description}</Typography>
+        <Typography sx={{ marginBlock: 1 }}>
+          {venue?.description || "No description available"}
+        </Typography>
 
         <Typography color="text.secondary" align="right" sx={{ py: 2 }}>
           Max Guests: {venue?.maxGuests}

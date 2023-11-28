@@ -4,6 +4,7 @@ import { useAuthStore, useProfileStore, useVenueStore } from "../../stores";
 import { Container, Typography, Button } from "@mui/material";
 import BookingList from "../../components/BookingList";
 import UserInfo from "../../components/UserInfo";
+import FavoritesList from "../../components/FavoritesList";
 
 // Should show total number of bookings for each venue in list and total for user.
 // Remember to filter upcoming and past bookings
@@ -98,13 +99,14 @@ const Dashboard = () => {
         ) : (
           <Container className="marginBlock">
             <Typography variant="h3">Want to list your venue?</Typography>
-            <Button as={Link} onClick={handleBecomeVenueManager}>
+            <Button component={Link} onClick={handleBecomeVenueManager}>
               Click here to become a venue manager
             </Button>
           </Container>
         )}
 
         <BookingList bookings={bookings} />
+        <FavoritesList />
       </Container>
     </>
   );
