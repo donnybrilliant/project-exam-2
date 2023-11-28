@@ -20,15 +20,46 @@ import LocalParkingIcon from "@mui/icons-material/LocalParking";
 import FreeBreakfastIcon from "@mui/icons-material/FreeBreakfast";
 import PetsIcon from "@mui/icons-material/Pets";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import { useAuthStore } from "../../stores";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import { useAuthStore, useFavoritesStore } from "../../stores";
 
 // This component is used to display a venue card
 const VenueCard = ({ venue }) => {
   const token = useAuthStore((state) => state.token);
+  const { addFavorite, removeFavorite, isFavorite } = useFavoritesStore();
+  const favorite = isFavorite(venue.id);
+
+  const handleToggleFavorite = () => {
+    if (favorite) {
+      removeFavorite(venue.id);
+    } else {
+      addFavorite(venue.id);
+    }
+  };
 
   if (venue) {
     return (
-      <Card>
+      <Card sx={{ position: "relative" }}>
+        {token && (
+          <IconButton
+            size="small"
+            aria-label="Favorite"
+            sx={{
+              position: "absolute",
+              top: 3,
+              right: 3,
+              zIndex: 2,
+              backgroundColor: "rgba(255, 255, 255, 0.2)",
+            }}
+            onClick={handleToggleFavorite}
+          >
+            {favorite ? (
+              <FavoriteIcon color="primary" />
+            ) : (
+              <FavoriteBorderIcon />
+            )}
+          </IconButton>
+        )}
         <CardActionArea component={Link} to={`/venues/${venue.id}`}>
           {venue.media.length > 0 ? (
             <CardMedia
@@ -51,20 +82,6 @@ const VenueCard = ({ venue }) => {
           )}
 
           <CardContent>
-            {token && (
-              <IconButton
-                size="small"
-                aria-label="Favorite"
-                sx={{
-                  position: "absolute",
-                  top: 0,
-                  right: 0,
-                  zIndex: 2,
-                }}
-              >
-                <FavoriteBorderIcon />
-              </IconButton>
-            )}
             <Container
               disableGutters
               sx={{
