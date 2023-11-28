@@ -2,7 +2,13 @@ import { useBookingStore, useDialogStore } from "../../stores";
 import { Link } from "react-router-dom";
 import dayjs from "dayjs";
 import { DataGrid } from "@mui/x-data-grid";
-import { Avatar, Container, IconButton, Typography } from "@mui/material";
+import {
+  Avatar,
+  Container,
+  IconButton,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { Link as MuiLink } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -106,25 +112,31 @@ const BookingGrid = ({ venueBookings }) => {
       renderCell: (params) => {
         return (
           <>
-            <IconButton
-              onClick={() => {
-                /* handleEdit(params.row.id) */
-              }}
-            >
-              <EditIcon />
-            </IconButton>
-            <IconButton onClick={() => handleDelete(params.row)}>
-              <DeleteIcon />
-            </IconButton>
-            <IconButton
-              component={MuiLink}
-              href={`mailto:${params.row.customer.email}`}
-              onClick={(event) => {
-                event.stopPropagation();
-              }}
-            >
-              <ChatIcon />
-            </IconButton>
+            <Tooltip title="Edit Booking">
+              <IconButton
+                onClick={() => {
+                  /* handleEdit(params.row.id) */
+                }}
+              >
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Cancel Booking">
+              <IconButton onClick={() => handleDelete(params.row)}>
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Contact Customer">
+              <IconButton
+                component={MuiLink}
+                href={`mailto:${params.row.customer.email}`}
+                onClick={(event) => {
+                  event.stopPropagation();
+                }}
+              >
+                <ChatIcon />
+              </IconButton>
+            </Tooltip>
           </>
         );
       },
