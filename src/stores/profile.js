@@ -73,4 +73,27 @@ export const useProfileStore = create((set) => ({
       avatar: updatedProfile.avatar,
     });
   },
+
+  updateVenueManagerStatus: async (newStatus) => {
+    // Get the name from the userInfo in the auth store
+    const name = useAuthStore.getState().userInfo.name;
+
+    // Send the update request to the backend
+    const updatedProfile = await useFetchStore
+      .getState()
+      .apiFetch(`profiles/${name}`, "PUT", { venueManager: newStatus });
+
+    // Update the selectedProfile state
+    set((state) => ({
+      selectedProfile: {
+        ...state.selectedProfile,
+        venueManager: updatedProfile.venueManager,
+      },
+    }));
+
+    // Update userInfo in the auth store
+    useAuthStore.getState().updateUserInfo({
+      venueManager: updatedProfile.venueManager,
+    });
+  },
 }));
