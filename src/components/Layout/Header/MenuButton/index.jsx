@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuthStore } from "../../../../stores/index";
+import { useAuthStore, useFavoritesStore } from "../../../../stores/index";
 import { useNavigate, NavLink } from "react-router-dom";
 import ThemeToggle from "../../../ThemeToggle";
 import Tooltip from "@mui/material/Tooltip";
@@ -25,11 +25,13 @@ const MenuButton = () => {
   const token = useAuthStore((state) => state.token);
   const userInfo = useAuthStore((state) => state.userInfo);
   const clearAuthInfo = useAuthStore((state) => state.clearAuthInfo);
+  const clearFavorites = useFavoritesStore.getState().clearFavorites;
   const navigate = useNavigate();
 
   // This function is used to clear the auth info and navigate to the home page
   const handleLogout = (event) => {
     event.preventDefault();
+    clearFavorites();
     clearAuthInfo();
     navigate("/");
   };
