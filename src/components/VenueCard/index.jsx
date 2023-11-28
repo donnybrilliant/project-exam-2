@@ -96,6 +96,8 @@ const VenueCard = ({ venue }) => {
                 variant="h3"
                 sx={{
                   textTransform: "capitalize",
+                  width: "210px",
+                  textAlign: "left",
                 }}
               >
                 {venue.name.trim() === "" ? "No Name" : venue.name}

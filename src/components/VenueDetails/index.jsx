@@ -92,7 +92,9 @@ const VenueDetails = ({ venue }) => {
             }}
           >
             <PlaceIcon fontSize="small" />
-            {venue?.location.city === "" ? "Unknown" : venue?.location.city}
+            {venue?.location.city === ""
+              ? "Unknown Location"
+              : venue?.location.city}
             {venue?.location.country === ""
               ? ""
               : ", " + venue?.location.country}
@@ -107,7 +109,9 @@ const VenueDetails = ({ venue }) => {
           )}
         </Container>
         <Typography variant="h2">Description:</Typography>
-        <Typography sx={{ marginBlock: 1 }}>{venue?.description}</Typography>
+        <Typography sx={{ marginBlock: 1 }}>
+          {venue?.description || "No description available"}
+        </Typography>
 
         <Typography color="text.secondary" align="right" sx={{ py: 2 }}>
           Max Guests: {venue?.maxGuests}
