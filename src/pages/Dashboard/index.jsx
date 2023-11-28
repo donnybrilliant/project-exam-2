@@ -15,7 +15,6 @@ const Dashboard = () => {
     (state) => state.fetchProfileByName
   );
   const selectedProfile = useProfileStore((state) => state.selectedProfile);
-
   const updateVenueManagerStatus = useProfileStore(
     (state) => state.updateVenueManagerStatus
   );
@@ -49,7 +48,7 @@ const Dashboard = () => {
     <>
       <Container sx={{ textAlign: "center" }}>
         <Typography variant="h1">Dashboard</Typography>
-        <UserInfo />
+        <UserInfo userInfo={userInfo} />
         {selectedProfile?.venueManager ? (
           <Button
             variant="contained"
