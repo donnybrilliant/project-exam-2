@@ -55,7 +55,7 @@ const Logo = () => {
     }
   `;
   return (
-    <RotatingIconButton>
+    <RotatingIconButton aria-label="Go Home">
       <LogoIcon fontSize="large" color="white" />
     </RotatingIconButton>
   );

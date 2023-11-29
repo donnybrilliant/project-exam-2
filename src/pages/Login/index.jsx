@@ -43,8 +43,9 @@ const Login = () => {
           required
           fullWidth
           id="email"
-          label="Email Address"
           name="email"
+          type="email"
+          label="Email Address"
           autoComplete="email"
           autoFocus
           value={email}
@@ -74,7 +75,7 @@ const Login = () => {
         </LoadingButton>
       </Box>
       <Link component={RouterLink} to={"/register"}>
-        Don't have an account? Register
+        Don't have an account? Register here
       </Link>
     </Container>
   );

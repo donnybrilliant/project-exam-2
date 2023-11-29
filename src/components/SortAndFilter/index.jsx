@@ -176,8 +176,8 @@ const SortAndFilter = () => {
           <Select
             labelId="sort-label"
             id="sort"
+            name="sort"
             value={currentSortType || ""}
-            label="Sort by"
             onChange={handleSortChange}
             variant="standard"
             sx={{ fontSize: 14 }}
@@ -190,8 +190,12 @@ const SortAndFilter = () => {
           </Select>
         </FormControl>
       </Tooltip>
-      <Tooltip title="Order Venues" arrow>
-        <IconButton onClick={handleToggleSortOrder} size="small">
+      <Tooltip title="Toggle Sort Order" arrow>
+        <IconButton
+          onClick={handleToggleSortOrder}
+          size="small"
+          aria-label="Toggle Sort Order"
+        >
           {isReversed ? (
             <ArrowUpwardIcon fontSize="small" />
           ) : (
@@ -199,7 +203,7 @@ const SortAndFilter = () => {
           )}
         </IconButton>
       </Tooltip>
-      <Tooltip title="Filter Venues" arrow>
+      <Tooltip title="Filter Menu" arrow>
         <IconButton
           id="filter-button"
           aria-controls={open ? "filter-menu" : undefined}
@@ -207,6 +211,7 @@ const SortAndFilter = () => {
           aria-expanded={open ? "true" : undefined}
           onClick={handleClick}
           size="small"
+          aria-label="Filter Venues"
         >
           <FilterListIcon fontSize="small" />
         </IconButton>
@@ -273,8 +278,8 @@ const SortAndFilter = () => {
             )}
           </Box>
           <Divider />
+          <Typography>Ameneties:</Typography>
           <Box>
-            <Typography>Ameneties:</Typography>
             <Stack direction="row">
               <Checkbox
                 icon={<WifiIcon />}
@@ -319,12 +324,12 @@ const SortAndFilter = () => {
             </Stack>
           </Box>
           <Divider />
+          <Typography id="price-range-label">
+            Price Range: {priceRange[0]} - {valueLabelFormat(priceRange[1])}
+          </Typography>
           <Box>
-            <Typography>
-              Price Range: {priceRange[0]} - {valueLabelFormat(priceRange[1])}
-            </Typography>
             <Slider
-              getAriaLabel={() => "Price range"}
+              aria-labelledby="price-range-label"
               value={priceRange}
               onChange={(event, newValue) => {
                 setPriceRange(newValue);
@@ -336,15 +341,18 @@ const SortAndFilter = () => {
             />
           </Box>
           <Divider />
-          Rating: {minRating} {minRating === 1 ? "Star" : "Stars"}
+          <Typography id="rating-label">
+            Rating: {minRating} {minRating === 1 ? "Star" : "Stars"}
+          </Typography>
           <Box sx={{ textAlign: "center" }}>
             <Rating
+              id="rating"
               name="min-rating"
+              aria-labelledby="rating-label"
               size="large"
               value={minRating}
               onChange={handleRatingChange}
-              // Check consistency with create venue
-              precision={0.5}
+              precision={0.2}
               getLabelText={getLabelText}
             />
           </Box>

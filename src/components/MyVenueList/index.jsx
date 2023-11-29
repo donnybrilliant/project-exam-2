@@ -108,7 +108,12 @@ const MyVenueList = ({ venues }) => {
                     }}
                     primary={venue?.name || "No venue name - please update"}
                     secondary={
-                      "Rating: " + venue?.rating + " Price: " + venue?.price
+                      "Bookings: " +
+                      venue?.bookings.length +
+                      " Rating: " +
+                      venue?.rating +
+                      " Price: $" +
+                      venue?.price
                     }
                   />
                 </ListItem>
