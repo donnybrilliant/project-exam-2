@@ -27,10 +27,19 @@ const Register = () => {
   const login = useAuthStore((state) => state.login);
   const [isAvatarFieldVisible, setIsAvatarFieldVisible] = useState(false);
   const register = useAuthStore((state) => state.register);
+  const [emailError, setEmailError] = useState("");
 
   // This function is used to register the user and then login
   const handleRegister = async (event) => {
     event.preventDefault();
+    // Check if the email ends with '@stud.noroff.no'
+    if (!email.endsWith("@stud.noroff.no")) {
+      setEmailError("Email must be a Noroff student email");
+      return;
+    } else {
+      setEmailError(""); // Clear error message if the format is correct
+    }
+
     const registered = await register(name, email, password, avatar);
     if (registered) {
       navigate("/dashboard", { replace: true });
@@ -83,17 +92,29 @@ const Register = () => {
           autoFocus
           value={name}
           onChange={(e) => setName(e.target.value)}
+          inputProps={{ minLength: 3 }}
         />
         <TextField
+          error={emailError.length > 0}
+          helperText={emailError}
           margin="normal"
           required
           fullWidth
           id="email"
-          label="Email Address"
           name="email"
+          type="email"
+          label="Email Address"
           autoComplete="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (
+              e.target.value.endsWith("@stud.noroff.no") ||
+              e.target.value === ""
+            ) {
+              setEmailError("");
+            }
+          }}
         />
         <TextField
           margin="normal"
@@ -106,6 +127,7 @@ const Register = () => {
           autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          inputProps={{ minLength: 8 }}
         />
 
         <LoadingButton

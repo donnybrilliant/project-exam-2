@@ -146,7 +146,7 @@ const VenueDetails = ({ venue }) => {
             </Tooltip>
             <Tooltip
               title={
-                venue?.meta.breakfast ? "Breakfast included" : "No Breakfast"
+                venue?.meta.breakfast ? "Breakfast Included" : "No Breakfast"
               }
               arrow
             >
@@ -156,7 +156,7 @@ const VenueDetails = ({ venue }) => {
               />
             </Tooltip>
             <Tooltip
-              title={venue?.meta.pets ? "Pets allowed" : "No Pets"}
+              title={venue?.meta.pets ? "Pets Allowed" : "No Pets"}
               arrow
             >
               <PetsIcon

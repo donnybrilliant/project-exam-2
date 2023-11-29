@@ -8,7 +8,7 @@ const CreateVenue = () => {
 
   const handleCreateVenue = async (venueData) => {
     const response = await createVenue(venueData);
-    navigate(`/venues/${response.id}`);
+    if (response) navigate(`/venues/${response.id}`);
   };
 
   document.title = "Create Venue - Holidaze";
