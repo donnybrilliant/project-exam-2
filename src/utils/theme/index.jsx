@@ -58,6 +58,27 @@ const useMyTheme = () => {
             },
           },
         },
+
+        MuiInput: {
+          styleOverrides: {
+            root: {
+              "&.Mui-focused:after": {
+                borderColor: "#0588D1",
+              },
+
+              "&.MuiInput-underline:after": { borderColor: "#0588D1" },
+            },
+          },
+        },
+        MuiOutlinedInput: {
+          styleOverrides: {
+            root: {
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: "#0588D1",
+              },
+            },
+          },
+        },
       },
     });
   }, [mode]);
