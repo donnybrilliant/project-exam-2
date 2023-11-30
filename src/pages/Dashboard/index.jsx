@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuthStore, useProfileStore, useVenueStore } from "../../stores";
-import { Container, Typography, Button } from "@mui/material";
+import {
+  useAuthStore,
+  useFetchStore,
+  useProfileStore,
+  useVenueStore,
+} from "../../stores";
+import { Container, Typography, Button, Skeleton } from "@mui/material";
 import BookingList from "../../components/BookingList";
 import UserInfo from "../../components/UserInfo";
 import FavoritesList from "../../components/FavoritesList";
@@ -9,6 +14,7 @@ import FavoritesList from "../../components/FavoritesList";
 // Should show total number of bookings for each venue in list and total for user.
 // Remember to filter upcoming and past bookings
 const Dashboard = () => {
+  const isLoading = useFetchStore((state) => state.isLoading);
   const [bookings, setBookings] = useState([]);
   const [bookingList, setBookingList] = useState([]);
   const userInfo = useAuthStore((state) => state.userInfo);
@@ -87,24 +93,35 @@ const Dashboard = () => {
       <Container sx={{ textAlign: "center" }}>
         <Typography variant="h1">Dashboard</Typography>
         <UserInfo userInfo={userInfo} />
-        {selectedProfile?.venueManager ? (
-          <Button
-            variant="contained"
-            component={Link}
-            to={"/venuemanager"}
-            sx={{ marginBlock: 2 }}
-          >
-            Go to Venue Manager
-          </Button>
-        ) : (
-          <Container className="marginBlock">
-            <Typography variant="h3">Want to list your venue?</Typography>
-            <Button component={Link} onClick={handleBecomeVenueManager}>
-              Click here to become a venue manager
-            </Button>
-          </Container>
-        )}
 
+        {isLoading ? (
+          <Skeleton
+            variant="rectangular"
+            width="180px"
+            height="40px"
+            sx={{ mx: "auto", my: 4 }}
+          />
+        ) : (
+          <>
+            {selectedProfile?.venueManager ? (
+              <Button
+                variant="contained"
+                component={Link}
+                to={"/venuemanager"}
+                sx={{ marginBlock: 2 }}
+              >
+                Go to Venue Manager
+              </Button>
+            ) : (
+              <Container className="marginBlock">
+                <Typography variant="h3">Want to list your venue?</Typography>
+                <Button component={Link} onClick={handleBecomeVenueManager}>
+                  Click here to become a venue manager
+                </Button>
+              </Container>
+            )}
+          </>
+        )}
         <BookingList bookings={bookings} />
         <FavoritesList />
       </Container>

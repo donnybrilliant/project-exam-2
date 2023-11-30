@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import { useVenueStore } from "../../stores";
-import VenueForm from "../../components/VenueForm";
+import { useVenueStore } from "../../../stores";
+import VenueForm from "../../../components/VenueForm";
 
-const CreateVenue = () => {
+const RegisterVenue = () => {
   const createVenue = useVenueStore((state) => state.createVenue);
   const navigate = useNavigate();
 
@@ -11,9 +11,9 @@ const CreateVenue = () => {
     if (response) navigate(`/venues/${response.id}`);
   };
 
-  document.title = "Create Venue - Holidaze";
+  document.title = "Register Venue - Holidaze";
 
   return <VenueForm onSubmit={handleCreateVenue} />;
 };
 
-export default CreateVenue;
+export default RegisterVenue;

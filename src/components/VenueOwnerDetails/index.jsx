@@ -65,7 +65,7 @@ const VenueOwnerDetails = ({ selectedVenue }) => {
       {isOwner && (
         <Button
           variant="outlined"
-          onClick={() => navigate(`/venues/${selectedVenue?.id}/edit`)}
+          onClick={() => navigate(`/venuemanager/edit/${selectedVenue?.id}`)}
         >
           Edit Venue
         </Button>

@@ -10,12 +10,12 @@ import {
   OwnerRoute,
 } from "./components/AccessControl";
 import Dashboard from "./pages/Dashboard";
-import CreateVenue from "./pages/Create";
-import EditVenue from "./pages/EditVenue";
+import RegisterVenue from "./pages/VenueManager/Register";
+import EditVenue from "./pages/VenueManager/Edit";
 import Feedback from "./components/Feedback";
 import ConfirmationDialog from "./components/ConfirmationDialog";
 import VenuesPage from "./pages/Venues";
-import VenueManager from "./components/VenueManager";
+import VenueManager from "./pages/VenueManager";
 
 function App() {
   return (
@@ -26,14 +26,6 @@ function App() {
           <Route path="venues" element={<VenuesPage />} />
           <Route path="venues/:id" element={<VenuePage />} />
 
-          <Route
-            path="venues/:id/edit"
-            element={
-              <OwnerRoute>
-                <EditVenue />
-              </OwnerRoute>
-            }
-          />
           <Route
             path="login"
             element={
@@ -59,22 +51,10 @@ function App() {
               </PrivateRoute>
             }
           />
-          <Route
-            path="/dashboard/venues/create"
-            element={
-              <PrivateRoute>
-                <CreateVenue />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="venuemanager"
-            element={
-              <PrivateRoute>
-                <VenueManager />
-              </PrivateRoute>
-            }
-          />
+
+          <Route path="venuemanager" element={<VenueManager />} />
+          <Route path="venuemanager/register" element={<RegisterVenue />} />
+          <Route path="venuemanager/edit/:id" element={<EditVenue />} />
 
           <Route path="*" element={<h1>Not Found</h1>} />
         </Route>
