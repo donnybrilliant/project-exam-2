@@ -1,8 +1,8 @@
 import { useEffect, useState, Fragment } from "react";
 import { Link } from "react-router-dom";
-import { useProfileStore, useVenueStore } from "../../stores";
+import { useFetchStore, useProfileStore, useVenueStore } from "../../stores";
 import { useDialogStore } from "../../stores"; // Adjust path as necessary
-
+import { ListSkeleton } from "../Skeletons";
 import {
   Avatar,
   IconButton,
@@ -17,6 +17,8 @@ import {
   Tooltip,
   Typography,
   Button,
+  Container,
+  Skeleton,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -26,7 +28,7 @@ import EventBusyIcon from "@mui/icons-material/EventBusy";
 
 const MyVenueList = ({ venues }) => {
   // Should be taken from userInfo in authstore..
-
+  const isLoading = useFetchStore((state) => state.isLoading);
   const deleteVenue = useVenueStore((state) => state.deleteVenue);
 
   const { openDialog } = useDialogStore();
@@ -64,17 +66,31 @@ const MyVenueList = ({ venues }) => {
     setMenuState({ anchorEl: null, venueId: null });
   };
 
+  if (isLoading) {
+    return (
+      <Container>
+        <Skeleton width="280px" sx={{ mx: "auto", mb: 1, mt: 1 }} />
+
+        <List>
+          {Array.from(new Array(4)).map((item, index) => (
+            <ListSkeleton key={index} />
+          ))}
+        </List>
+      </Container>
+    );
+  }
+
   return (
     <>
       {venues.length === 0 ? (
-        <div className="marginBlock">
-          <Typography variant="h2" sx={{ marginBottom: 1 }}>
+        <Container>
+          <Typography variant="h2" sx={{ mb: 1, mt: 1 }}>
             You have no venues yet.
           </Typography>
-          <Button component={Link} to={"/dashboard/venues/create"}>
-            Click here to create one
+          <Button component={Link} to={"/venuemanager/register"}>
+            Click here to register one
           </Button>
-        </div>
+        </Container>
       ) : (
         <>
           <Typography variant="h3" sx={{ marginTop: 6 }}>
@@ -147,7 +163,10 @@ const MyVenueList = ({ venues }) => {
                     </ListItemIcon>
                     View
                   </MenuItem>
-                  <MenuItem component={Link} to={`/venues/${venue.id}/edit`}>
+                  <MenuItem
+                    component={Link}
+                    to={`/venuemanager/edit/${venue.id}`}
+                  >
                     <ListItemIcon>
                       <EditIcon fontSize="small" />
                     </ListItemIcon>

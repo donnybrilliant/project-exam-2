@@ -1,4 +1,4 @@
-import { useBookingStore, useDialogStore } from "../../stores";
+import { useBookingStore, useDialogStore, useFetchStore } from "../../stores";
 import { Link } from "react-router-dom";
 import dayjs from "dayjs";
 import { DataGrid } from "@mui/x-data-grid";
@@ -18,7 +18,7 @@ import ChatIcon from "@mui/icons-material/Chat";
 // Make another datagrid for owner with edit and delete?
 const BookingGrid = ({ venueBookings }) => {
   console.log(venueBookings);
-
+  const isLoading = useFetchStore((state) => state.isLoading);
   const deleteBooking = useBookingStore((state) => state.deleteBooking);
   const { openDialog } = useDialogStore();
 
@@ -158,38 +158,38 @@ const BookingGrid = ({ venueBookings }) => {
   return (
     <>
       {venueBookings.length === 0 ? (
-        <Container>
+        <Container sx={{ my: 1 }}>
           <Typography variant="h3">
             Your venues have no bookings yet.
           </Typography>
         </Container>
       ) : (
-        <>
-          <Typography variant="h2" sx={{ marginBottom: 2, marginTop: 1 }}>
-            Upcoming Stays at My Venues
-          </Typography>
-          <div style={{ height: 370, width: "100%" }}>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              initialState={{
-                sorting: {
-                  sortModel: [{ field: "dateFrom", sort: "asc" }],
-                },
-              }}
-              hideFooterSelectedRowCount
+        <Container sx={{ my: 1 }}>
+          <Typography variant="h2">Upcoming Stays at My Venues</Typography>
+        </Container>
+      )}
 
-              /*  getRowClassName={(params) =>
+      <div style={{ height: 370, width: "100%" }}>
+        <DataGrid
+          loading={isLoading}
+          rows={rows}
+          columns={columns}
+          initialState={{
+            sorting: {
+              sortModel: [{ field: "dateFrom", sort: "asc" }],
+            },
+          }}
+          hideFooterSelectedRowCount
+
+          /*  getRowClassName={(params) =>
           isBookingNow(params.row) ? "greenRow" : ""
         }
     
         sx={{
           "& .greenRow": greenRowStyle,
         }} */
-            />
-          </div>
-        </>
-      )}
+        />
+      </div>
     </>
   );
 };

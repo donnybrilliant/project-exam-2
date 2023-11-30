@@ -1,7 +1,8 @@
 import { useState, Fragment } from "react";
 import { Link } from "react-router-dom";
-import { useBookingStore, useDialogStore } from "../../stores";
+import { useBookingStore, useDialogStore, useFetchStore } from "../../stores";
 import dayjs from "dayjs";
+import { ListSkeleton } from "../Skeletons";
 import {
   Avatar,
   IconButton,
@@ -17,6 +18,7 @@ import {
   Button,
   Typography,
   Container,
+  Skeleton,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -26,6 +28,7 @@ import ChatIcon from "@mui/icons-material/Chat";
 
 const BookingList = ({ bookings }) => {
   const deleteBooking = useBookingStore((state) => state.deleteBooking);
+  const isLoading = useFetchStore((state) => state.isLoading);
   const { openDialog } = useDialogStore();
   const [menuState, setMenuState] = useState({
     anchorEl: null,
@@ -85,39 +88,46 @@ const BookingList = ({ bookings }) => {
   const bookingCount = displayedBookings.length;
   const bookingText = bookingCount === 1 ? "Booking" : "Bookings";
 
-  return (
-    <>
-      {bookings.length === 0 ? (
-        <Container
-          className="marginBlock"
-          sx={{
-            "&>*": {
-              marginBlock: 1,
-            },
-          }}
-        >
-          <Typography variant="h2">You have no upcoming bookings.</Typography>
-          <Button component={Link} to={"/venues"}>
-            Click here to browse our venues and book your Holidaze now
-          </Button>
-          <Typography>Treat yourself!</Typography>
-        </Container>
-      ) : (
-        <>
-          <h2>
-            You Have {bookingCount} {showPastBookings ? "Past" : "Upcoming"}{" "}
-            {bookingText}
-          </h2>
+  if (isLoading) {
+    return (
+      <Container className="marginBlock">
+        <Skeleton width="280px" sx={{ mx: "auto", mb: 1, mt: 5 }} />
+        <Skeleton width="200px" sx={{ mx: "auto", mb: 1 }} />
 
-          {pastBookings.length > 0 && (
-            <Button onClick={togglePastBookings}>
-              {showPastBookings
-                ? "Show Upcoming Bookings"
-                : "Show Past Bookings"}
-            </Button>
-          )}
-        </>
+        <List>
+          {Array.from(new Array(4)).map((item, index) => (
+            <ListSkeleton key={index} />
+          ))}
+        </List>
+      </Container>
+    );
+  }
+
+  if (bookings.length === 0) {
+    return (
+      <Container className="marginBlock">
+        <Typography variant="h2">You have no upcoming bookings.</Typography>
+        <Button component={Link} to={"/venues"}>
+          Click here to browse our venues and book your Holidaze now
+        </Button>
+        <Typography>Treat yourself!</Typography>
+      </Container>
+    );
+  }
+
+  return (
+    <Container className="marginBlock">
+      <Typography variant="h2">
+        You Have {bookingCount} {showPastBookings ? "Past" : "Upcoming"}{" "}
+        {bookingText}
+      </Typography>
+
+      {pastBookings.length > 0 && (
+        <Button onClick={togglePastBookings}>
+          {showPastBookings ? "Show Upcoming Bookings" : "Show Past Bookings"}
+        </Button>
       )}
+
       <List>
         {displayedBookings.length > 0 &&
           displayedBookings.map((booking) => (
@@ -247,7 +257,7 @@ const BookingList = ({ bookings }) => {
             </Fragment>
           ))}
       </List>
-    </>
+    </Container>
   );
 };
 
