@@ -24,16 +24,14 @@ const Login = () => {
   // This function is used to login the user
   const handleLogin = async (event) => {
     event.preventDefault();
-    const loggedIn = await login(email, password);
-    const { from } = location.state || { from: { pathname: "/" } };
-    if (loggedIn) navigate(from.pathname, { replace: true });
+    await login(email, password);
   };
 
   document.title = "Login - Holidaze";
 
   return (
     <Container sx={{ textAlign: "center" }} maxWidth={"sm"}>
-      <Typography>Login</Typography>
+      <Typography variant="h1">Login</Typography>
 
       <Avatar sx={{ width: "100px", height: "100px", my: 4, mx: "auto" }} />
 

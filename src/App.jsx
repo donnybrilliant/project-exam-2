@@ -16,6 +16,7 @@ import Feedback from "./components/Feedback";
 import ConfirmationDialog from "./components/ConfirmationDialog";
 import VenuesPage from "./pages/Venues";
 import VenueManager from "./pages/VenueManager";
+import MultiMarkerMap from "./components/MultiMarkerMap";
 
 function App() {
   return (
@@ -51,10 +52,32 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route path="map" element={<MultiMarkerMap />} />
 
-          <Route path="venuemanager" element={<VenueManager />} />
-          <Route path="venuemanager/register" element={<RegisterVenue />} />
-          <Route path="venuemanager/edit/:id" element={<EditVenue />} />
+          <Route
+            path="venuemanager"
+            element={
+              <PrivateRoute>
+                <VenueManager />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="venuemanager/register"
+            element={
+              <PrivateRoute>
+                <RegisterVenue />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="venuemanager/edit/:id"
+            element={
+              <OwnerRoute>
+                <EditVenue />
+              </OwnerRoute>
+            }
+          />
 
           <Route path="*" element={<h1>Not Found</h1>} />
         </Route>

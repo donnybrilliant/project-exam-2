@@ -42,7 +42,7 @@ const Register = () => {
 
     const registered = await register(name, email, password, avatar);
     if (registered) {
-      navigate("/dashboard", { replace: true });
+      await login(email, password);
     }
   };
 
@@ -54,7 +54,7 @@ const Register = () => {
 
   return (
     <Container sx={{ textAlign: "center" }} maxWidth={"sm"}>
-      <Typography>Register</Typography>
+      <Typography variant="h1">Register</Typography>
       <Badge
         overlap="circular"
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
