@@ -114,12 +114,14 @@ const MenuButton = () => {
               </ListItemIcon>
               Dashboard
             </MenuItem>
-            <MenuItem component={NavLink} to={"/venuemanager"}>
-              <ListItemIcon>
-                <EventNoteIcon fontSize="small" />
-              </ListItemIcon>
-              Venue Manager
-            </MenuItem>
+            {userInfo.venueManager && (
+              <MenuItem component={NavLink} to={"/venuemanager"}>
+                <ListItemIcon>
+                  <EventNoteIcon fontSize="small" />
+                </ListItemIcon>
+                Venue Manager
+              </MenuItem>
+            )}
             <Divider />
             <MenuItem component={NavLink} to={"/venues"}>
               <ListItemIcon>
