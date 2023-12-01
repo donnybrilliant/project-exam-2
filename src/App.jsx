@@ -17,6 +17,7 @@ import ConfirmationDialog from "./components/ConfirmationDialog";
 import VenuesPage from "./pages/Venues";
 import VenueManager from "./pages/VenueManager";
 import MultiMarkerMap from "./components/MultiMarkerMap";
+import NotFound from "./components/NotFound";
 
 function App() {
   return (
@@ -79,7 +80,7 @@ function App() {
             }
           />
 
-          <Route path="*" element={<h1>Not Found</h1>} />
+          <Route path="*" element={<NotFound text="Not Found" />} />
         </Route>
       </Routes>
       <Feedback />
