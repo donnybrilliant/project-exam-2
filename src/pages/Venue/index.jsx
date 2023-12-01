@@ -17,6 +17,7 @@ import { Container, Card, Typography, Button, TextField } from "@mui/material";
 import { VenuePageSkeleton } from "../../components/Skeletons";
 import VenueDetails from "../../components/VenueDetails";
 import VenueOwnerDetails from "../../components/VenueOwnerDetails";
+import NotFound from "../../components/NotFound";
 
 // Venue page component
 const VenuePage = () => {
@@ -59,7 +60,9 @@ const VenuePage = () => {
   // Update the document title and fetch profile by name when selectedVenue changes
   useEffect(() => {
     if (selectedVenue) {
-      document.title = `${selectedVenue.name} - Holidaze`;
+      const capitalizedName =
+        selectedVenue.name[0].toUpperCase() + selectedVenue.name.slice(1);
+      document.title = `${capitalizedName} - Holidaze`;
       if (token) {
         fetchProfileByName(selectedVenue.owner.name);
       }
@@ -96,8 +99,8 @@ const VenuePage = () => {
   // Open the confirmation dialog with booking details
   const handleBooking = () => {
     if (id && dateRange[0] && dateRange[1] && guests) {
-      const numberOfNights = dateRange[1].diff(dateRange[0], "day");
       const pricePerNight = selectedVenue.price;
+      const numberOfNights = dateRange[1].diff(dateRange[0], "day");
       const totalPrice = numberOfNights * pricePerNight;
 
       // Create the booking data object
@@ -144,7 +147,7 @@ const VenuePage = () => {
   // Should maybe change the logic of the loading here as it will show the skeleton when it loads for booking confirmation, which is not wanted.
   if (isLoading) return <VenuePageSkeleton />;
   if (!selectedVenue) {
-    return <Typography>Venue Not Found</Typography>;
+    return <NotFound text="Venue Not Found" />;
   }
 
   return (
@@ -174,7 +177,21 @@ const VenuePage = () => {
             onChange={(e) => setGuests(e.target.value)}
             sx={{ width: "100px", marginRight: 1 }}
           />
+          <Container sx={{ marginRight: -1.5, mt: 3 }}>
+            {dateRange[0] && dateRange[1] && (
+              <>
+                <Typography variant="body2">
+                  Number of nights: {dateRange[1].diff(dateRange[0], "day")}
+                </Typography>
+                <Typography variant="body2">
+                  Total price: $
+                  {dateRange[1].diff(dateRange[0], "day") * selectedVenue.price}
+                </Typography>
+              </>
+            )}
+          </Container>
         </Container>
+
         <Button
           variant="contained"
           color="primary"

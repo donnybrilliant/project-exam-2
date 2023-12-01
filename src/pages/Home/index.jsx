@@ -40,47 +40,66 @@ const Home = () => {
     .slice(0, 10);
 
   return (
-    <Container>
-      <Search />
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          flexWrap: "wrap",
-          justifyContent: "center",
-          gap: 3,
-          my: 20,
-        }}
-      >
+    <>
+      <Container>
+        <Search />
         <Box
           sx={{
-            width: "400px",
+            display: "flex",
+            alignItems: "center",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            gap: 3,
+            my: 20,
           }}
         >
-          <Typography variant="h1" gutterBottom>
-            Welcome to Holidaze
-          </Typography>
-          <Typography variant="h2" sx={{ marginBlock: 2.5 }}>
-            Your Personalized Holiday Planner
-          </Typography>
-          <Typography gutterBottom>
-            Search for your next holiday destination in the search bar above, or
-            browse our top rated, most popular, and newest venues below.
-          </Typography>
+          <Box
+            sx={{
+              width: "400px",
+            }}
+          >
+            <Typography variant="h1" gutterBottom>
+              Welcome to Holidaze
+            </Typography>
+            <Typography variant="h2" sx={{ marginBlock: 2.5 }}>
+              Your Personalized Holiday Planner
+            </Typography>
+            <Typography gutterBottom>
+              Search for your next holiday destination in the search bar above,
+              or browse our top rated, most popular, and newest venues below.
+            </Typography>
+          </Box>
+
+          <LogoIcon
+            sx={{
+              width: 150,
+              height: 150,
+              backgroundColor: "primary.main",
+              borderRadius: "50%",
+            }}
+            color="white"
+          />
         </Box>
 
-        <LogoIcon
-          sx={{
-            width: 150,
-            height: 150,
-            backgroundColor: "primary.main",
-            borderRadius: "50%",
-          }}
-          color="white"
-        />
-      </Box>
+        <Typography variant="h4" component="h2" marginTop={5} gutterBottom>
+          Top Rated Venues
+        </Typography>
+        <VenueCarousel venues={topRatedVenues} />
+        <Typography variant="h4" component="h2" marginTop={5} gutterBottom>
+          Most Popular Venues
+        </Typography>
+        <VenueCarousel venues={mostPopularVenues} />
+        <Typography variant="h4" component="h2" marginTop={5} gutterBottom>
+          Newest Venues
+        </Typography>
+        <VenueCarousel venues={newVenues} />
+      </Container>
 
-      <Container disableGutters sx={{ my: 4, backgroundColor: "primary.main" }}>
+      <Container
+        disableGutters
+        maxWidth="false"
+        sx={{ my: 10, p: 10, backgroundColor: "primary.main" }}
+      >
         <Typography variant="h5" gutterBottom>
           Your Perfect Getaway is Just a Click Away!
         </Typography>
@@ -90,19 +109,16 @@ const Home = () => {
           bustling city escape, Holidaze is your go-to platform for a tailored
           holiday experience.
         </Typography>
-        <Button variant="contained" color="primary" size="large">
+        <Button variant="contained" color="primary" size="large" sx={{ mt: 3 }}>
           Discover Top Venues
         </Button>
       </Container>
-
       <Container
-        disableGutters
         sx={{
           display: "flex",
           gap: 4,
           justifyContent: "space-between",
           flexWrap: "wrap",
-          my: "150px",
         }}
       >
         <Paper
@@ -170,53 +186,7 @@ const Home = () => {
           </Button>
         </Paper>
       </Container>
-
-      <Container>
-        <Typography variant="h5" gutterBottom>
-          Discover, Book, and Manage Venues with Ease
-        </Typography>
-        <Typography>
-          Are you seeking the perfect getaway or planning an event? Holidaze is
-          here to make your experience hassle-free and delightful. Discover a
-          wide range of venues, from tranquil retreats in the countryside to
-          vibrant city escapes.
-        </Typography>
-        <Typography>
-          At Holidaze, we bring you closer to your dream holiday: Explore
-          Diverse Venues: Discover venues that cater to every taste and
-          occasion.
-        </Typography>
-        <Typography>
-          Personalized Experiences: Create an account and enjoy a tailored
-          holiday booking experience.
-        </Typography>
-        <Typography>
-          Manage Your Bookings Effortlessly: Keep track of your bookings and
-          manage them with ease through your personal dashboard.
-        </Typography>
-        <Typography>
-          Venue Management for Owners: Are you a venue owner? Join our platform
-          and connect with potential customers like never before. Join us and
-          step into a world of relaxed and rewarding holiday planning.
-          <Button variant="contained" color="primary">
-            Register Your Venue
-          </Button>
-        </Typography>
-      </Container>
-
-      <Typography variant="h4" component="h2" marginTop={5} gutterBottom>
-        Top Rated Venues
-      </Typography>
-      <VenueCarousel venues={topRatedVenues} />
-      <Typography variant="h4" component="h2" marginTop={5} gutterBottom>
-        Most Popular Venues
-      </Typography>
-      <VenueCarousel venues={mostPopularVenues} />
-      <Typography variant="h4" component="h2" marginTop={5} gutterBottom>
-        Newest Venues
-      </Typography>
-      <VenueCarousel venues={newVenues} />
-    </Container>
+    </>
   );
 };
 

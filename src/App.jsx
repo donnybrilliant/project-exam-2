@@ -10,12 +10,14 @@ import {
   OwnerRoute,
 } from "./components/AccessControl";
 import Dashboard from "./pages/Dashboard";
-import CreateVenue from "./pages/Create";
-import EditVenue from "./pages/EditVenue";
+import RegisterVenue from "./pages/VenueManager/Register";
+import EditVenue from "./pages/VenueManager/Edit";
 import Feedback from "./components/Feedback";
 import ConfirmationDialog from "./components/ConfirmationDialog";
 import VenuesPage from "./pages/Venues";
-import VenueManager from "./components/VenueManager";
+import VenueManager from "./pages/VenueManager";
+import MultiMarkerMap from "./components/MultiMarkerMap";
+import NotFound from "./components/NotFound";
 
 function App() {
   return (
@@ -26,14 +28,6 @@ function App() {
           <Route path="venues" element={<VenuesPage />} />
           <Route path="venues/:id" element={<VenuePage />} />
 
-          <Route
-            path="venues/:id/edit"
-            element={
-              <OwnerRoute>
-                <EditVenue />
-              </OwnerRoute>
-            }
-          />
           <Route
             path="login"
             element={
@@ -59,14 +53,8 @@ function App() {
               </PrivateRoute>
             }
           />
-          <Route
-            path="/dashboard/venues/create"
-            element={
-              <PrivateRoute>
-                <CreateVenue />
-              </PrivateRoute>
-            }
-          />
+          {/*      <Route path="map" element={<MultiMarkerMap />} /> */}
+
           <Route
             path="venuemanager"
             element={
@@ -75,8 +63,24 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route
+            path="venuemanager/register"
+            element={
+              <PrivateRoute>
+                <RegisterVenue />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="venuemanager/edit/:id"
+            element={
+              <OwnerRoute>
+                <EditVenue />
+              </OwnerRoute>
+            }
+          />
 
-          <Route path="*" element={<h1>Not Found</h1>} />
+          <Route path="*" element={<NotFound text="Not Found" />} />
         </Route>
       </Routes>
       <Feedback />

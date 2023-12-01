@@ -25,7 +25,9 @@ const VenueOwnerDetails = ({ selectedVenue }) => {
         alignItems: "center",
         justifyContent: "space-between",
         flexWrap: "wrap",
-        marginTop: 2,
+        marginBlock: 2,
+        px: 1,
+        gap: 2,
       }}
     >
       <Tooltip
@@ -49,7 +51,7 @@ const VenueOwnerDetails = ({ selectedVenue }) => {
           sx={{
             display: "flex",
             alignItems: "center",
-            marginBlock: 2,
+
             cursor: "default",
           }}
         >
@@ -65,17 +67,17 @@ const VenueOwnerDetails = ({ selectedVenue }) => {
       {isOwner && (
         <Button
           variant="outlined"
-          onClick={() => navigate(`/venues/${selectedVenue?.id}/edit`)}
+          onClick={() => navigate(`/venuemanager/edit/${selectedVenue?.id}`)}
         >
           Edit Venue
         </Button>
       )}
-      <Box>
-        <Typography>
+      <Box sx={{ textAlign: "right" }}>
+        <Typography variant="body2">
           Created: {dayjs(selectedVenue?.created).format("DD/MM/YY")}
         </Typography>
         {selectedVenue?.created !== selectedVenue?.updated && (
-          <Typography>
+          <Typography variant="body2">
             Updated: {dayjs(selectedVenue?.updated).format("DD/MM/YY")}
           </Typography>
         )}

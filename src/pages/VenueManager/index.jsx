@@ -1,11 +1,17 @@
 import { Button, Container, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
-import { useProfileStore, useAuthStore, useBookingStore } from "../../stores";
+import {
+  useProfileStore,
+  useAuthStore,
+  useBookingStore,
+  useFetchStore,
+} from "../../stores";
 import { useEffect, useState } from "react";
-import MyVenueList from "../MyVenueList";
-import BookingGrid from "../BookingGrid";
+import MyVenueList from "../../components/MyVenueList";
+import BookingGrid from "../../components/BookingGrid";
 
 const VenueManager = () => {
+  const isLoading = useFetchStore((state) => state.isLoading);
   const userInfo = useAuthStore((state) => state.userInfo);
   const userName = userInfo.name;
   const fetchUserVenues = useProfileStore((state) => state.fetchUserVenues);
@@ -45,16 +51,15 @@ const VenueManager = () => {
     <>
       <Container sx={{ textAlign: "center" }}>
         <Typography variant="h1">Venue Manager</Typography>
-        {userVenues.length > 0 && (
-          <Button
-            variant="contained"
-            component={Link}
-            to={"/dashboard/venues/create"}
-            sx={{ marginBlock: 5 }}
-          >
-            Register New Venue
-          </Button>
-        )}
+
+        <Button
+          variant="contained"
+          component={Link}
+          to={"/venuemanager/register"}
+          sx={{ marginBlock: 5 }}
+        >
+          Register New Venue
+        </Button>
 
         {userVenues.length > 0 && <BookingGrid venueBookings={venueBookings} />}
         <MyVenueList venues={userVenues} />

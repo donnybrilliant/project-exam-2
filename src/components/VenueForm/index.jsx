@@ -28,15 +28,17 @@ import LoadingButton from "@mui/lab/LoadingButton";
 const VenueForm = ({ onSubmit, initialData = {} }) => {
   const isLoading = useFetchStore((state) => state.isLoading);
   const setErrorMsg = useFetchStore((state) => state.setErrorMsg);
-  const [name, setName] = useState(initialData.name || "");
-  const [description, setDescription] = useState(initialData.description || "");
-  const [media, setMedia] = useState(initialData.media || []);
+  const [name, setName] = useState(initialData?.name || "");
+  const [description, setDescription] = useState(
+    initialData?.description || ""
+  );
+  const [media, setMedia] = useState(initialData?.media || []);
   const [mediaInput, setMediaInput] = useState("");
-  const [price, setPrice] = useState(initialData.price || 1);
-  const [maxGuests, setMaxGuests] = useState(initialData.maxGuests || 1);
-  const [rating, setRating] = useState(initialData.rating || 0);
+  const [price, setPrice] = useState(initialData?.price || 1);
+  const [maxGuests, setMaxGuests] = useState(initialData?.maxGuests || 1);
+  const [rating, setRating] = useState(initialData?.rating || 0);
   const [meta, setMeta] = useState(
-    initialData.meta || {
+    initialData?.meta || {
       wifi: false,
       parking: false,
       breakfast: false,
@@ -47,7 +49,7 @@ const VenueForm = ({ onSubmit, initialData = {} }) => {
   const [searchAddress, setSearchAddress] = useState("");
 
   const [location, setLocation] = useState(
-    initialData.location || {
+    initialData?.location || {
       address: "",
       city: "",
       zip: "",
@@ -453,7 +455,7 @@ const VenueForm = ({ onSubmit, initialData = {} }) => {
           type="submit"
           loading={isLoading}
         >
-          {initialData.id ? "Update Venue" : "Register Venue"}
+          {initialData?.id ? "Update Venue" : "Register Venue"}
         </LoadingButton>
       </Card>
       {media.length > 1 && <ImageGallery media={media} />}

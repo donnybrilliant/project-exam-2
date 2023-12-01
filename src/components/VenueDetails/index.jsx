@@ -68,6 +68,7 @@ const VenueDetails = ({ venue }) => {
           <Typography variant="h1" component="div">
             {venue?.name}
           </Typography>
+
           <Rating
             name="venue-rating"
             value={venue?.rating ?? 0}
@@ -78,7 +79,13 @@ const VenueDetails = ({ venue }) => {
         </Container>
         <Container
           disableGutters
-          sx={{ display: "flex", justifyContent: "space-between" }}
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            mb: 2,
+          }}
         >
           <Link
             href="#map"
@@ -103,6 +110,7 @@ const VenueDetails = ({ venue }) => {
             <Button
               startIcon={favorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
               onClick={handleToggleFavorite}
+              sx={{ marginLeft: -0.5 }}
             >
               {favorite ? "In Favorites" : "Add to Favorites"}
             </Button>
