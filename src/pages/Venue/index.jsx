@@ -60,7 +60,9 @@ const VenuePage = () => {
   // Update the document title and fetch profile by name when selectedVenue changes
   useEffect(() => {
     if (selectedVenue) {
-      document.title = `${selectedVenue.name} - Holidaze`;
+      const capitalizedName =
+        selectedVenue.name[0].toUpperCase() + selectedVenue.name.slice(1);
+      document.title = `${capitalizedName} - Holidaze`;
       if (token) {
         fetchProfileByName(selectedVenue.owner.name);
       }
