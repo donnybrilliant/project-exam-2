@@ -232,7 +232,7 @@ const BookingList = ({ bookings }) => {
                   </ListItemIcon>
                   Contact Owner
                 </MenuItem>
-                <Divider />
+                {!showPastBookings && <Divider />}
                 {!showPastBookings && (
                   <MenuItem>
                     <ListItemIcon>

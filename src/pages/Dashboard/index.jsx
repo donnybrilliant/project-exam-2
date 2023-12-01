@@ -97,9 +97,9 @@ const Dashboard = () => {
         {isLoading ? (
           <Skeleton
             variant="rectangular"
-            width="180px"
-            height="40px"
-            sx={{ mx: "auto", my: 4 }}
+            width="200px"
+            height="36px"
+            sx={{ mx: "auto", my: 4, borderRadius: 1 }}
           />
         ) : (
           <>
