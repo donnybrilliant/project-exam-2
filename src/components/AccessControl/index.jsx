@@ -1,4 +1,9 @@
-import { Navigate, useNavigate, useLocation } from "react-router-dom";
+import {
+  Navigate,
+  useNavigate,
+  useLocation,
+  useParams,
+} from "react-router-dom";
 import { useAuthStore, useVenueStore } from "../../stores";
 
 // This component is used to display a public only route, rerouting to the home page if the user is logged in
@@ -34,13 +39,7 @@ export const PrivateRoute = ({ children }) => {
 // This component is used to display a owner only route, rerouting to the home page if the user is not an owner
 export const OwnerRoute = ({ children }) => {
   const isOwner = useVenueStore((state) => state.isOwner());
-  const location = useLocation();
-  const venueId = location.pathname.split("/")[2]; // Extracts the id from the path assuming the path is "/venues/:id/edit"
-  const redirectTo = `/venues/${venueId}`; // Constructs the redirect path
+  let { id } = useParams();
 
-  return !isOwner ? (
-    <Navigate to={redirectTo} state={{ from: location }} replace />
-  ) : (
-    children
-  );
+  return isOwner ? children : <Navigate to={`/venues/${id}`} replace />;
 };
