@@ -53,7 +53,7 @@ function App() {
               </PrivateRoute>
             }
           />
-          <Route path="map" element={<MultiMarkerMap />} />
+          {/*      <Route path="map" element={<MultiMarkerMap />} /> */}
 
           <Route
             path="venuemanager"
