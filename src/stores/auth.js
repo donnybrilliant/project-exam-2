@@ -2,8 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { useFetchStore } from "./fetch";
 
-// Auth store for storing token and userInfo persistently
-
+// Auth store for storing token and userInfo persistently, and for handling login and registration
 export const useAuthStore = create(
   persist(
     (set) => ({

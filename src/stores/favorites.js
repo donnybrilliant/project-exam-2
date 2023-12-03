@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+// Persistent store for storing favorite venues
 export const useFavoritesStore = create(
   persist(
     (set, get) => ({

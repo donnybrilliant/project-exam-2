@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { useFetchStore } from "./fetch";
 import { useDialogStore } from "./dialog";
+import { useProfileStore } from "./profile";
 
 export const useBookingStore = create((set) => ({
   guests: 1,
@@ -8,7 +9,9 @@ export const useBookingStore = create((set) => ({
   setGuests: (guests) => set({ guests }),
   setDateRange: (dateRange) => set({ dateRange }),
 
+  // Action for resetting the booking store
   reset: () => set({ guests: 1, dateRange: [null, null] }),
+
   // Action for fetching a booking by id
   getBooking: async (id) => {
     const data = await useFetchStore
@@ -37,6 +40,7 @@ export const useBookingStore = create((set) => ({
       await useFetchStore
         .getState()
         .apiFetch(`bookings/${id}`, "PUT", bookingData);
+      useProfileStore.getState().updateVenueBookings();
       useFetchStore.getState().setSuccessMsg(`Successfully updated ${name}`);
     } catch (error) {
       useFetchStore.getState().setErrorMsg(error.message);
@@ -49,8 +53,7 @@ export const useBookingStore = create((set) => ({
   deleteBooking: async (id, name) => {
     try {
       await useFetchStore.getState().apiFetch(`bookings/${id}`, "DELETE");
-      // After deletion, remove the venue from the local state to reflect the change??
-      //name should be capitalized
+      useProfileStore.getState().removeBookingFromVenues(id);
       useFetchStore
         .getState()
         .setSuccessMsg(`Successfully deleted booking at ${name}`);

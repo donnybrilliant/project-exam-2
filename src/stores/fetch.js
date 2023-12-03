@@ -2,8 +2,7 @@ import { create } from "zustand";
 import { BASE_URL } from "../constants";
 import { useAuthStore } from "./auth";
 
-// Fetch store for handling API requests
-
+// Fetch store for handling API requests, loading state, errors and messages
 export const useFetchStore = create((set) => ({
   isLoading: false,
   isError: false,

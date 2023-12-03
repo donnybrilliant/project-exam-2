@@ -1,7 +1,6 @@
 import { create } from "zustand";
 
 // Gallery store for storing the index of the open image
-
 export const useGalleryStore = create((set) => ({
   openImageIndex: null,
   setOpenImageIndex: (index) => set({ openImageIndex: index }),
