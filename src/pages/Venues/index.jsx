@@ -1,15 +1,14 @@
 import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useVenueStore, useFetchStore, useSearchStore } from "../../stores";
+import { useVenueStore, useSearchStore } from "../../stores";
 import Search from "../../components/Search";
 import VenueList from "../../components/VenueList";
 import Container from "@mui/material/Container";
 import dayjs from "dayjs";
 
-// In your VenuesPage component
+// Component for the venues page, listing all venues
 const VenuesPage = () => {
-  const isLoading = useFetchStore((state) => state.isLoading);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const { fetchAllVenues } = useVenueStore();
   const { filterVenues, filteredVenues, updateStoreSearchParams } =
     useSearchStore();

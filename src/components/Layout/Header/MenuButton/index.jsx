@@ -2,15 +2,17 @@ import { useState } from "react";
 import { useAuthStore, useFavoritesStore } from "../../../../stores/index";
 import { useNavigate, NavLink, useLocation } from "react-router-dom";
 import ThemeToggle from "../../../ThemeToggle";
-import Tooltip from "@mui/material/Tooltip";
-import Box from "@mui/material/Box";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import Avatar from "@mui/material/Avatar";
-import Divider from "@mui/material/Divider";
-import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
+import {
+  Tooltip,
+  Box,
+  Menu,
+  MenuItem,
+  Avatar,
+  Divider,
+  Button,
+  IconButton,
+  ListItemIcon,
+} from "@mui/material";
 import Login from "@mui/icons-material/Login";
 import Logout from "@mui/icons-material/Logout";
 import EventNoteIcon from "@mui/icons-material/EventNote";

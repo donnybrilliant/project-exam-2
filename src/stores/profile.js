@@ -1,25 +1,56 @@
 import { create } from "zustand";
 import { useFetchStore } from "./fetch";
 import { useAuthStore } from "./auth";
+import { useBookingStore } from "./booking";
 
 // Profiles store for fetching profiles and selected profile
-
-export const useProfileStore = create((set) => ({
+export const useProfileStore = create((set, get) => ({
   profiles: [],
   selectedProfile: null,
   userVenues: [],
   userBookings: [],
-  clearSelectedProfile: () => set({ selectedProfile: null }),
+  venueBookings: [],
+
+  // Method to remove a booking from venueBookings
+  removeBookingFromVenues: (bookingId) => {
+    const updatedVenueBookings = get().venueBookings.filter(
+      (booking) => booking.id !== bookingId
+    );
+    set({ venueBookings: updatedVenueBookings });
+  },
+  // Function to update venue bookings
+  updateVenueBookings: async () => {
+    const userVenues = get().userVenues;
+    const getBooking = useBookingStore.getState().getBooking;
+
+    const bookingsPromises = userVenues.flatMap((venue) =>
+      venue.bookings
+        .filter((booking) => booking.id)
+        .map((booking) => getBooking(booking.id))
+    );
+
+    const bookingsDetails = (await Promise.all(bookingsPromises)).filter(
+      Boolean
+    ); // Filter out null values
+    set({ venueBookings: bookingsDetails });
+  },
 
   // Action for fetching all profiles
-  /*   fetchProfiles: async () => {
-    const data = await useFetchStore
-      .getState()
-      .apiFetch("profiles?_venues=true&_bookings=true");
-    if (data) {
-      set({ venues: data });
-    }
-  }, */
+  clearSelectedProfile: () => set({ selectedProfile: null }),
+
+  // Action for removing a venue from userVenues
+  removeUserVenue: (id) => {
+    set((state) => ({
+      userVenues: state.userVenues.filter((venue) => venue.id !== id),
+    }));
+  },
+
+  // Action for removing a booking from userBookings
+  removeUserBooking: (id) => {
+    set((state) => ({
+      userBookings: state.userBookings.filter((booking) => booking.id !== id),
+    }));
+  },
 
   // Action for fetching a single profile
   fetchProfileByName: async (name) => {
@@ -51,7 +82,7 @@ export const useProfileStore = create((set) => ({
     }
   },
 
-  // maybe not neccessary with name here..
+  // Action for updating a avatar
   updateAvatar: async (newAvatarUrl) => {
     // Utilize apiFetch from useFetchStore for the PUT request
     const name = useAuthStore.getState().userInfo.name;
@@ -59,21 +90,13 @@ export const useProfileStore = create((set) => ({
       .getState()
       .apiFetch(`profiles/${name}/media`, "PUT", { avatar: newAvatarUrl });
 
-    // Is this neccessary?
-    // If successful, update selectedProfile and userInfo with the new avatar URL
-    /*     set((state) => ({
-      selectedProfile: {
-        ...state.selectedProfile,
-        avatar: updatedProfile.avatar,
-      },
-    }));
-*/
     // Update avatar URL in useAuthStore
     useAuthStore.getState().updateUserInfo({
       avatar: updatedProfile.avatar,
     });
   },
 
+  // Action for becoming a venue manager
   updateVenueManagerStatus: async (newStatus) => {
     // Get the name from the userInfo in the auth store
     const name = useAuthStore.getState().userInfo.name;

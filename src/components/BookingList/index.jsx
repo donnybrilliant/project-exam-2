@@ -1,7 +1,14 @@
 import { useState, Fragment } from "react";
 import { Link } from "react-router-dom";
-import { useBookingStore, useDialogStore, useFetchStore } from "../../stores";
+import {
+  useBookingStore,
+  useDialogStore,
+  useFetchStore,
+  useProfileStore,
+  useVenueStore,
+} from "../../stores";
 import dayjs from "dayjs";
+import BookingForm from "../BookingForm";
 import { ListSkeleton } from "../Skeletons";
 import {
   Avatar,
@@ -26,9 +33,13 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import ChatIcon from "@mui/icons-material/Chat";
 
+// Booking list of a user's personal bookings
 const BookingList = ({ bookings }) => {
   const deleteBooking = useBookingStore((state) => state.deleteBooking);
+  const updateBooking = useBookingStore((state) => state.updateBooking);
   const isLoading = useFetchStore((state) => state.isLoading);
+  const removeUserBooking = useProfileStore((state) => state.removeUserBooking);
+  const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
   const { openDialog } = useDialogStore();
   const [menuState, setMenuState] = useState({
     anchorEl: null,
@@ -54,10 +65,10 @@ const BookingList = ({ bookings }) => {
   // Determine which bookings to display based on `showPastBookings`
   const displayedBookings = showPastBookings ? pastBookings : upcomingBookings;
 
+  // This function is used to open the delete menu for a specific booking
   const handleDeleteClickBooking = async (bookingId) => {
-    console.log(bookingId);
     const booking = bookings.find((booking) => booking.id === bookingId);
-    console.log(booking);
+
     openDialog(
       `Cancel Booking at ${booking?.venue.name}`,
       "Are you sure you want to cancel this booking? This action cannot be undone.",
@@ -66,11 +77,31 @@ const BookingList = ({ bookings }) => {
       ).format("DD/MM/YY")}. Guests: ${booking?.guests}`,
       async () => {
         await deleteBooking(bookingId, booking.venue.name);
-        /*     
-        // I dont have access to setBookings here, so I can't update the bookings list
-        setBookings((prevBookings) =>
-          prevBookings.filter((booking) => booking.id !== bookingId)
-        ); */
+        removeUserBooking(bookingId);
+      }
+    );
+  };
+
+  // This function is used to open the edit menu for a specific booking
+  const handleEditClickBooking = async (bookingId) => {
+    const booking = bookings.find((b) => b.id === bookingId);
+    const venueData = await fetchVenueById(booking.venue.id);
+
+    openDialog(
+      `Edit Booking at ${booking.venue.name}`,
+      "Update your booking details.",
+      <BookingForm booking={booking} venueData={venueData} />,
+      async () => {
+        const updatedGuests = useBookingStore.getState().guests;
+        const updatedDateRange = useBookingStore.getState().dateRange;
+
+        const updatedBookingData = {
+          guests: updatedGuests,
+          dateFrom: updatedDateRange[0],
+          dateTo: updatedDateRange[1],
+        };
+        await updateBooking(bookingId, booking.venue.name, updatedBookingData);
+        useBookingStore.getState().reset();
       }
     );
   };
@@ -161,16 +192,9 @@ const BookingList = ({ bookings }) => {
                   primary={booking?.venue.name}
                   secondary={
                     // add number of nights?
-                    dayjs
-                      .utc(booking?.dateFrom)
-                      .startOf("day")
-                      .format("DD/MM/YY") +
+                    dayjs(booking?.dateFrom).startOf("day").format("DD/MM/YY") +
                     " - " +
-                    dayjs
-                      .utc(booking?.dateTo)
-
-                      .endOf("day")
-                      .format("DD/MM/YY")
+                    dayjs(booking?.dateTo).endOf("day").format("DD/MM/YY")
                   }
                 />
 
@@ -234,7 +258,9 @@ const BookingList = ({ bookings }) => {
                 </MenuItem>
                 {!showPastBookings && <Divider />}
                 {!showPastBookings && (
-                  <MenuItem>
+                  <MenuItem
+                    onClick={() => handleEditClickBooking(menuState.bookingId)}
+                  >
                     <ListItemIcon>
                       <EditIcon fontSize="small" />
                     </ListItemIcon>

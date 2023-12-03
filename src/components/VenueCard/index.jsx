@@ -1,3 +1,4 @@
+import { useAuthStore, useFavoritesStore } from "../../stores";
 import { Link } from "react-router-dom";
 import {
   Button,
@@ -21,7 +22,6 @@ import FreeBreakfastIcon from "@mui/icons-material/FreeBreakfast";
 import PetsIcon from "@mui/icons-material/Pets";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import { useAuthStore, useFavoritesStore } from "../../stores";
 
 // This component is used to display a venue card
 const VenueCard = ({ venue }) => {
@@ -29,6 +29,7 @@ const VenueCard = ({ venue }) => {
   const { addFavorite, removeFavorite, isFavorite } = useFavoritesStore();
   const favorite = isFavorite(venue.id);
 
+  // This function is used to toggle the favorite status of a venue
   const handleToggleFavorite = () => {
     if (favorite) {
       removeFavorite(venue.id);
@@ -96,10 +97,8 @@ const VenueCard = ({ venue }) => {
                 variant="h3"
                 sx={{
                   textTransform: "capitalize",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  maxWidth: "160px",
+                  width: "210px",
+                  textAlign: "left",
                 }}
               >
                 {venue.name.trim() === "" ? "No Name" : venue.name}

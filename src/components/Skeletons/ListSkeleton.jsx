@@ -6,6 +6,7 @@ import {
   Divider,
 } from "@mui/material";
 
+// This component is used to display a skeleton for a list item
 const ListSkeleton = () => (
   <>
     <ListItem>

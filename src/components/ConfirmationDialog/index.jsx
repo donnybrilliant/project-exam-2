@@ -1,12 +1,14 @@
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogActions from "@mui/material/DialogActions";
-import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
 import { useDialogStore, useFetchStore } from "../../stores"; // Adjust path as necessary
 import LoadingButton from "@mui/lab/LoadingButton";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
+  Box,
+} from "@mui/material";
 
 // Confirmation dialog component
 const ConfirmationDialog = () => {

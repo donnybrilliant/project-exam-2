@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useFetchStore } from "../../stores";
 import ImageGallery from "../../components/ImageGallery";
+import Map from "../../components/Map";
+import LoadingButton from "@mui/lab/LoadingButton";
 import {
   Container,
   Card,
@@ -23,9 +25,8 @@ import FreeBreakfastIcon from "@mui/icons-material/FreeBreakfast";
 import PetsIcon from "@mui/icons-material/Pets";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
-import Map from "../../components/Map";
-import LoadingButton from "@mui/lab/LoadingButton";
 
+// This component is used to display a venue form for registering or editing a venue
 const VenueForm = ({ onSubmit, initialData = {} }) => {
   const isLoading = useFetchStore((state) => state.isLoading);
   const setErrorMsg = useFetchStore((state) => state.setErrorMsg);
@@ -46,11 +47,8 @@ const VenueForm = ({ onSubmit, initialData = {} }) => {
       pets: false,
     }
   );
-
   const [gptLoading, setGptLoading] = useState(false);
-
   const [searchAddress, setSearchAddress] = useState("");
-
   const [location, setLocation] = useState(
     initialData?.location || {
       address: "",
@@ -61,10 +59,11 @@ const VenueForm = ({ onSubmit, initialData = {} }) => {
       lng: 0,
     }
   );
-
   const [nameError, setNameError] = useState("");
   const [descriptionError, setDescriptionError] = useState("");
+  let google;
 
+  // This function is used to geocode the search address
   const handleGeocode = async () => {
     const geocoder = new google.maps.Geocoder();
 
@@ -81,7 +80,6 @@ const VenueForm = ({ onSubmit, initialData = {} }) => {
     geocoder.geocode({ address: addressString }, (results, status) => {
       if (status === "OK") {
         const result = results[0];
-        console.log(result);
         const { address_components } = result;
         const newLocation = {
           lat: result.geometry.location.lat(),
@@ -129,6 +127,7 @@ const VenueForm = ({ onSubmit, initialData = {} }) => {
     });
   };
 
+  // This function is called when the meta checkboxes are changed
   const handleMetaChange = (event) => {
     setMeta({
       ...meta,
@@ -136,12 +135,14 @@ const VenueForm = ({ onSubmit, initialData = {} }) => {
     });
   };
 
+  // This function is called when the media text fields are changed
   const handleMediaChange = (event, index) => {
     const newMedia = media.slice(); // Create a copy of the media array
     newMedia[index] = event.target.value; // Update the value at the specified index
     setMedia(newMedia); // Update the media state with the new array
   };
 
+  // This function is called when the "Add Media URL" button is clicked
   const handleMediaSubmit = () => {
     if (mediaInput) {
       setMedia([...media, mediaInput]);
@@ -149,14 +150,17 @@ const VenueForm = ({ onSubmit, initialData = {} }) => {
     }
   };
 
+  // This function is called when the "Delete Media URL" button is clicked
   const handleMediaDelete = (index) => {
     setMedia(media.filter((_, i) => i !== index));
   };
 
+  // This function is called when the form is submitted
   const handleSubmit = async (event) => {
     event.preventDefault();
     let hasError = false;
 
+    // Validate the form data
     if (name.length < 3) {
       setNameError("Name must be at least 3 characters long");
       hasError = true;
@@ -186,6 +190,7 @@ const VenueForm = ({ onSubmit, initialData = {} }) => {
     }
   };
 
+  // This function is called when the "Generate Venue Data" button is clicked
   const fetchVenueData = async () => {
     try {
       setGptLoading(true);
@@ -239,8 +244,6 @@ const VenueForm = ({ onSubmit, initialData = {} }) => {
       setGptLoading(false);
     }
   };
-
-  console.log(initialData);
 
   return (
     <Container maxWidth="md" sx={{ textAlign: "center" }}>

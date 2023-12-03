@@ -1,3 +1,4 @@
+import { DateCalendar } from "@mui/x-date-pickers";
 import {
   Container,
   Card,
@@ -8,14 +9,14 @@ import {
   Button,
   Stack,
   Box,
+  Skeleton,
 } from "@mui/material";
 import WifiIcon from "@mui/icons-material/Wifi";
 import LocalParkingIcon from "@mui/icons-material/LocalParking";
 import FreeBreakfastIcon from "@mui/icons-material/FreeBreakfast";
 import PetsIcon from "@mui/icons-material/Pets";
-import { DateCalendar } from "@mui/x-date-pickers";
-import { Skeleton } from "@mui/material";
 
+// This component is used to display a skeleton for a venue page
 const VenuePageSkeleton = () => {
   return (
     <Container maxWidth="md">

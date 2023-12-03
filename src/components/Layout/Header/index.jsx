@@ -3,9 +3,7 @@ import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Logo from "./Logo";
 import MenuButton from "./MenuButton";
-import Tooltip from "@mui/material/Tooltip";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
+import { Box, Typography, Tooltip } from "@mui/material";
 
 // This component is used to display a header with a logo and menu button
 const Header = () => {

@@ -6,54 +6,40 @@ import {
   useProfileStore,
   useVenueStore,
 } from "../../stores";
-import { Container, Typography, Button, Skeleton } from "@mui/material";
 import BookingList from "../../components/BookingList";
 import UserInfo from "../../components/UserInfo";
 import FavoritesList from "../../components/FavoritesList";
+import { Container, Typography, Button, Skeleton } from "@mui/material";
 
-// Should show total number of bookings for each venue in list and total for user.
-// Remember to filter upcoming and past bookings
+// This component is used to display the dashboard page
 const Dashboard = () => {
   const isLoading = useFetchStore((state) => state.isLoading);
   const [bookings, setBookings] = useState([]);
-  const [bookingList, setBookingList] = useState([]);
   const userInfo = useAuthStore((state) => state.userInfo);
   const userName = userInfo.name;
-  const fetchProfileByName = useProfileStore(
-    (state) => state.fetchProfileByName
-  );
-  const selectedProfile = useProfileStore((state) => state.selectedProfile);
+  const userBookings = useProfileStore((state) => state.userBookings);
+  const fetchUserBookings = useProfileStore((state) => state.fetchUserBookings);
+  const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
   const updateVenueManagerStatus = useProfileStore(
     (state) => state.updateVenueManagerStatus
   );
-  const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
 
+  // Handler for becoming a venue manager
   const handleBecomeVenueManager = async () => {
     await updateVenueManagerStatus(true);
-    // Additional logic if needed, e.g., redirection or success notification
   };
 
+  // Fetch user bookings when userName changes
   useEffect(() => {
-    fetchProfileByName(userName);
-  }, [userName, fetchProfileByName]);
+    fetchUserBookings(userName);
+  }, [userName, fetchUserBookings]);
 
-  useEffect(() => {
-    if (selectedProfile && selectedProfile.bookings) {
-      // Filter out bookings that belong to the owner's venues
-      const filteredBookings = selectedProfile.bookings.filter(
-        (booking) =>
-          !selectedProfile.venues.some((venue) => venue.id === booking.venue.id)
-      );
-      setBookingList(filteredBookings);
-    }
-  }, [selectedProfile]);
-
-  // Fetch detailed booking information for each filtered booking
+  // Enrich bookings with venue details when userBookings changes
   useEffect(() => {
     const fetchVenuesAndEnrichBookings = async () => {
-      // Extract unique venue IDs from the bookingList
+      // Extract unique venue IDs from the userBookings
       const venueIds = Array.from(
-        new Set(bookingList.map((booking) => booking.venue.id))
+        new Set(userBookings.map((booking) => booking.venue.id))
       );
 
       // Fetch venue details for each unique venue ID
@@ -66,25 +52,26 @@ const Dashboard = () => {
         return acc;
       }, {});
 
-      // Enrich bookings with venue owner details
-      const enrichedBookings = bookingList.map((booking) => {
-        const venueWithOwner = venueMap[booking.venue.id];
+      // Filter out bookings for venues where the user is the owner
+      const filteredBookings = userBookings.filter(
+        (booking) => venueMap[booking.venue.id].owner.name !== userName
+      );
+
+      // Enrich bookings with venue details
+      const enrichedBookings = filteredBookings.map((booking) => {
         return {
           ...booking,
-          venue: {
-            ...booking.venue,
-            owner: venueWithOwner.owner, // Assuming owner details are in the fetched venue object
-          },
+          venue: venueMap[booking.venue.id],
         };
       });
 
       setBookings(enrichedBookings);
     };
 
-    if (bookingList.length > 0) {
+    if (userBookings.length > 0) {
       fetchVenuesAndEnrichBookings();
     }
-  }, [bookingList, fetchVenueById]);
+  }, [userBookings, fetchVenueById, userName]);
 
   document.title = "Dashboard";
 
@@ -103,7 +90,7 @@ const Dashboard = () => {
           />
         ) : (
           <>
-            {selectedProfile?.venueManager ? (
+            {userInfo?.venueManager ? (
               <Button
                 variant="contained"
                 component={Link}
@@ -122,6 +109,7 @@ const Dashboard = () => {
             )}
           </>
         )}
+
         <BookingList bookings={bookings} />
         <FavoritesList />
       </Container>

@@ -4,19 +4,18 @@ import Home from "./pages/Home";
 import VenuePage from "./pages/Venue";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
+import RegisterVenue from "./pages/VenueManager/Register";
+import EditVenue from "./pages/VenueManager/Edit";
+import VenuesPage from "./pages/Venues";
+import VenueManager from "./pages/VenueManager";
 import {
   PublicOnlyRoute,
   PrivateRoute,
   OwnerRoute,
 } from "./components/AccessControl";
-import Dashboard from "./pages/Dashboard";
-import RegisterVenue from "./pages/VenueManager/Register";
-import EditVenue from "./pages/VenueManager/Edit";
-import Feedback from "./components/Feedback";
 import ConfirmationDialog from "./components/ConfirmationDialog";
-import VenuesPage from "./pages/Venues";
-import VenueManager from "./pages/VenueManager";
-import MultiMarkerMap from "./components/MultiMarkerMap";
+import Feedback from "./components/Feedback";
 import NotFound from "./components/NotFound";
 
 function App() {
@@ -53,7 +52,6 @@ function App() {
               </PrivateRoute>
             }
           />
-          {/*      <Route path="map" element={<MultiMarkerMap />} /> */}
 
           <Route
             path="venuemanager"

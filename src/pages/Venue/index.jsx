@@ -13,11 +13,11 @@ import dayjs from "dayjs";
 import Calendar from "../../components/Calendar";
 import Map from "../../components/Map";
 import ImageGallery from "../../components/ImageGallery";
-import { Container, Card, Typography, Button, TextField } from "@mui/material";
 import { VenuePageSkeleton } from "../../components/Skeletons";
 import VenueDetails from "../../components/VenueDetails";
 import VenueOwnerDetails from "../../components/VenueOwnerDetails";
 import NotFound from "../../components/NotFound";
+import { Container, Card, Typography, Button, TextField } from "@mui/material";
 
 // Venue page component
 const VenuePage = () => {
@@ -55,7 +55,7 @@ const VenuePage = () => {
   // Fetch venue when id changes
   useEffect(() => {
     fetchVenueById(id);
-  }, [id]);
+  }, [id, fetchVenueById]);
 
   // Update the document title and fetch profile by name when selectedVenue changes
   useEffect(() => {
@@ -77,7 +77,7 @@ const VenuePage = () => {
       document.title = "Holidaze";
       // Optionally clear profile data here if necessary
     };
-  }, [selectedVenue]);
+  }, [selectedVenue, token, fetchProfileByName]);
 
   // This shouldnt be needed.. But if not it scrolls to the bottom on load sometimes
   useEffect(() => {
@@ -90,9 +90,8 @@ const VenuePage = () => {
   };
 
   // Handle booking confirmation
-  const handleBookingConfirm = async (bookingData) => {
-    console.log(bookingData);
-    await bookVenue(bookingData);
+  const handleBookingConfirm = async (name, bookingData) => {
+    await bookVenue(name, bookingData);
     setDateRange([null, null]);
     setGuests(1);
     navigate("/dashboard");
@@ -107,7 +106,6 @@ const VenuePage = () => {
 
       // Create the booking data object
       const bookingData = {
-        name: selectedVenue?.name,
         venueId: id,
         dateFrom: dateRange[0],
         dateTo: dateRange[1],
@@ -141,7 +139,7 @@ const VenuePage = () => {
         `Confirm Booking at ${selectedVenue?.name}`,
         "Please check your booking details, confirm and enjoy your Holidaze!",
         bookingDetails,
-        () => handleBookingConfirm(bookingData)
+        () => handleBookingConfirm(selectedVenue?.name, bookingData)
       );
     }
   };

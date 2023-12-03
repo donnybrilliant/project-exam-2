@@ -1,7 +1,13 @@
-import { useEffect, useState, Fragment } from "react";
+import { useState, Fragment } from "react";
 import { Link } from "react-router-dom";
-import { useFetchStore, useProfileStore, useVenueStore } from "../../stores";
-import { useDialogStore } from "../../stores"; // Adjust path as necessary
+import {
+  useFetchStore,
+  useProfileStore,
+  useVenueStore,
+  useDialogStore,
+  useBookingStore,
+} from "../../stores";
+import BookingForm from "../BookingForm";
 import { ListSkeleton } from "../Skeletons";
 import {
   Avatar,
@@ -26,11 +32,12 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EventBusyIcon from "@mui/icons-material/EventBusy";
 
+// Booking list of a Venue Manager's venues
 const MyVenueList = ({ venues }) => {
-  // Should be taken from userInfo in authstore..
   const isLoading = useFetchStore((state) => state.isLoading);
   const deleteVenue = useVenueStore((state) => state.deleteVenue);
-
+  const removeUserVenue = useProfileStore((state) => state.removeUserVenue);
+  const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
   const { openDialog } = useDialogStore();
   const [menuState, setMenuState] = useState({
     anchorEl: null,
@@ -38,6 +45,7 @@ const MyVenueList = ({ venues }) => {
   });
   const open = Boolean(menuState.anchorEl);
 
+  // This function is used to open the dialog for deleting a venue
   const handleDeleteClickVenue = (venueId) => {
     const venue = venues.find((venue) => venue.id === venueId);
 
@@ -49,9 +57,7 @@ const MyVenueList = ({ venues }) => {
       } upcoming bookings for this venue.`,
       async () => {
         await deleteVenue(venueId, venue.name);
-        /*   setVenues((prevVenues) =>
-          prevVenues.filter((venue) => venue.id !== venueId)
-        ); */
+        removeUserVenue(venueId);
       }
     );
   };
@@ -64,6 +70,34 @@ const MyVenueList = ({ venues }) => {
   // This function is now used to close the menu
   const handleClose = () => {
     setMenuState({ anchorEl: null, venueId: null });
+  };
+
+  // This function is used to open the dialog for occupying dates
+  const handleOccupyDatesClick = async (venueId) => {
+    const venueData = await fetchVenueById(venueId);
+    const venueName = venueData.name;
+
+    openDialog(
+      `Occupy Dates for ${venueName}`,
+      "Select the dates you want to occupy and the number of guests.",
+      <BookingForm venueData={venueData} />,
+      async () => {
+        const updatedGuests = useBookingStore.getState().guests;
+        const updatedDateRange = useBookingStore.getState().dateRange;
+
+        // Prepare the booking data for a new booking
+        const bookingData = {
+          venueId,
+          guests: updatedGuests,
+          dateFrom: updatedDateRange[0],
+          dateTo: updatedDateRange[1],
+        };
+
+        await useBookingStore.getState().bookVenue(venueName, bookingData);
+        /*  useProfileStore.getState().addUserVenueBooking(venueId, bookingData); */
+        useBookingStore.getState().reset();
+      }
+    );
   };
 
   if (isLoading) {
@@ -179,7 +213,7 @@ const MyVenueList = ({ venues }) => {
                     Delete
                   </MenuItem>
                   <Divider />
-                  <MenuItem>
+                  <MenuItem onClick={() => handleOccupyDatesClick(venue.id)}>
                     <ListItemIcon>
                       <EventBusyIcon fontSize="small" />
                     </ListItemIcon>

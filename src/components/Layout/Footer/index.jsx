@@ -29,7 +29,7 @@ const Footer = () => {
             You can check in at 00.01 and check out 23.59 - if you want.
           </Typography>
           <Typography variant="body2">
-            We can't be contacted - contact the venue owner directly after
+            We can&apos;t be contacted - contact the venue owner directly after
             booking.
           </Typography>
           <Typography variant="body2">No privacy, no policy.</Typography>

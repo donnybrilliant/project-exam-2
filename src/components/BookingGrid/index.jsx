@@ -1,6 +1,12 @@
-import { useBookingStore, useDialogStore, useFetchStore } from "../../stores";
-import { Link } from "react-router-dom";
+import {
+  useBookingStore,
+  useDialogStore,
+  useFetchStore,
+  useVenueStore,
+  useAuthStore,
+} from "../../stores";
 import dayjs from "dayjs";
+import BookingForm from "../BookingForm";
 import { DataGrid } from "@mui/x-data-grid";
 import {
   Avatar,
@@ -8,19 +14,21 @@ import {
   IconButton,
   Tooltip,
   Typography,
+  Link,
 } from "@mui/material";
-import { Link as MuiLink } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ChatIcon from "@mui/icons-material/Chat";
 
-// Remove edit and delete from datagrid if not owner?
-// Make another datagrid for owner with edit and delete?
+// This component is used to display the bookings grid with all the bookings for the venues of the current user
 const BookingGrid = ({ venueBookings }) => {
-  console.log(venueBookings);
   const isLoading = useFetchStore((state) => state.isLoading);
   const deleteBooking = useBookingStore((state) => state.deleteBooking);
+  const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
   const { openDialog } = useDialogStore();
+  const updateBooking = useBookingStore((state) => state.updateBooking);
+  const userInfo = useAuthStore((state) => state.userInfo);
+  const userName = userInfo.name;
 
   const handleDelete = async (booking) => {
     // Call the deleteBooking action from your store
@@ -32,24 +40,36 @@ const BookingGrid = ({ venueBookings }) => {
       ).format("DD/MM/YY")}. Guests: ${booking?.guests}`,
       async () => {
         await deleteBooking(booking.id, booking.venue.name);
-        /*     
-        // I dont have access to setBookings here, so I can't update the bookings list
-        setBookings((prevBookings) =>
-          prevBookings.filter((booking) => booking.id !== bookingId)
-        ); */
       }
     );
-    // You might want to refresh your data here to reflect the deletion
   };
 
-  // Check if the booking is happening now
-  /*   const isBookingNow = (booking) => {
-    const now = dayjs();
-    return (
-      now.isAfter(dayjs(booking.dateFrom)) &&
-      now.isBefore(dayjs(booking.dateTo))
+  // This function is called when the user clicks on the edit button
+  const handleEdit = async (bookingId) => {
+    const booking = venueBookings.find((b) => b.id === bookingId);
+    const venueData = await fetchVenueById(booking.venue.id);
+
+    // Call the openDialog action from your store
+    openDialog(
+      `Edit Booking at ${booking.venue.name}`,
+      "Update your booking details.",
+      <BookingForm booking={booking} venueData={venueData} />,
+      async () => {
+        const updatedGuests = useBookingStore.getState().guests;
+        const updatedDateRange = useBookingStore.getState().dateRange;
+
+        const updatedBookingData = {
+          guests: updatedGuests,
+          dateFrom: updatedDateRange[0],
+          dateTo: updatedDateRange[1],
+        };
+        await updateBooking(bookingId, booking.venue.name, updatedBookingData);
+        useBookingStore.getState().reset();
+      }
     );
-  }; */
+  };
+
+  // Define the columns for the DataGrid
   const columns = [
     {
       field: "dateFrom",
@@ -74,7 +94,10 @@ const BookingGrid = ({ venueBookings }) => {
       renderCell: (params) => (
         <>
           <Avatar alt={params.row.venue.name} src={params.row.venue.media[0]} />
-          <Link to={`/venues/${params.row.venue.id}`} style={{ marginLeft: 8 }}>
+          <Link
+            href={`/venues/${params.row.venue.id}`}
+            style={{ marginLeft: 8 }}
+          >
             {params.row.venue.name || "No venue name - please update"}
           </Link>
         </>
@@ -109,23 +132,29 @@ const BookingGrid = ({ venueBookings }) => {
       filterable: false,
       sortable: false,
       width: 130,
+      align: "right",
       renderCell: (params) => {
         return (
           <>
-            <Tooltip title="Edit Booking">
-              <IconButton
-                onClick={() => {
-                  /* handleEdit(params.row.id) */
-                }}
-              >
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Cancel Booking">
-              <IconButton onClick={() => handleDelete(params.row)}>
-                <DeleteIcon />
-              </IconButton>
-            </Tooltip>
+            {params.row.customer.name === userName && (
+              <>
+                <Tooltip title="Edit Booking">
+                  <IconButton
+                    onClick={() => {
+                      handleEdit(params.row.id);
+                    }}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Cancel Booking">
+                  <IconButton onClick={() => handleDelete(params.row)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </Tooltip>
+              </>
+            )}
+
             <Tooltip title="Contact Customer">
               <IconButton
                 component={Link}

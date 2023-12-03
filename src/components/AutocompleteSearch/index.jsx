@@ -1,10 +1,10 @@
 import { useVenueStore } from "../../stores";
-import TextField from "@mui/material/TextField";
-import Autocomplete from "@mui/material/Autocomplete";
+import { TextField, Autocomplete } from "@mui/material";
 
+// This is an autocomplete input component that allows users to search for venues by city, country, or venue name
 const AutocompleteSearch = ({ localSearchParams, updateLocalSearchParams }) => {
   const { venues } = useVenueStore();
-  // ## I should make this a separate function in a separate file and use it on everything, titles and success msg etc.
+
   // Helper function to capitalize each word in a string
   const capitalize = (str) => {
     str = str.trim(); // Remove leading/trailing whitespace
@@ -46,9 +46,12 @@ const AutocompleteSearch = ({ localSearchParams, updateLocalSearchParams }) => {
 
     // Function to add values to the appropriate arrays while checking for non-blank values
     const addToArrays = (category, value) => {
-      if (value && value.trim() !== "" && arrays.hasOwnProperty(category)) {
-        const formattedValue = capitalize(value.toLowerCase());
-        arrays[category].push(formattedValue);
+      if (value && value.trim() !== "") {
+        // Use call to access hasOwnProperty safely
+        if (Object.prototype.hasOwnProperty.call(arrays, category)) {
+          const formattedValue = capitalize(value.toLowerCase());
+          arrays[category].push(formattedValue);
+        }
       }
     };
 

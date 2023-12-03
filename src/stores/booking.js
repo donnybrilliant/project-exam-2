@@ -1,8 +1,17 @@
 import { create } from "zustand";
 import { useFetchStore } from "./fetch";
 import { useDialogStore } from "./dialog";
+import { useProfileStore } from "./profile";
 
 export const useBookingStore = create((set) => ({
+  guests: 1,
+  dateRange: [null, null],
+  setGuests: (guests) => set({ guests }),
+  setDateRange: (dateRange) => set({ dateRange }),
+
+  // Action for resetting the booking store
+  reset: () => set({ guests: 1, dateRange: [null, null] }),
+
   // Action for fetching a booking by id
   getBooking: async (id) => {
     const data = await useFetchStore
@@ -12,12 +21,27 @@ export const useBookingStore = create((set) => ({
   },
 
   // Action for creating a booking
-  bookVenue: async (bookingData) => {
+  bookVenue: async (name, bookingData) => {
     try {
       await useFetchStore.getState().apiFetch("bookings", "POST", bookingData);
       useFetchStore
         .getState()
-        .setSuccessMsg(`Booking at ${bookingData.name} was successful!`);
+        .setSuccessMsg(`Booking at ${name} was successful!`);
+    } catch (error) {
+      useFetchStore.getState().setErrorMsg(error.message);
+    } finally {
+      useDialogStore.getState().closeDialog();
+    }
+  },
+
+  // Action for creating a booking
+  updateBooking: async (id, name, bookingData) => {
+    try {
+      await useFetchStore
+        .getState()
+        .apiFetch(`bookings/${id}`, "PUT", bookingData);
+      useProfileStore.getState().updateVenueBookings();
+      useFetchStore.getState().setSuccessMsg(`Successfully updated ${name}`);
     } catch (error) {
       useFetchStore.getState().setErrorMsg(error.message);
     } finally {
@@ -29,8 +53,7 @@ export const useBookingStore = create((set) => ({
   deleteBooking: async (id, name) => {
     try {
       await useFetchStore.getState().apiFetch(`bookings/${id}`, "DELETE");
-      // After deletion, remove the venue from the local state to reflect the change??
-      //name should be capitalized
+      useProfileStore.getState().removeBookingFromVenues(id);
       useFetchStore
         .getState()
         .setSuccessMsg(`Successfully deleted booking at ${name}`);

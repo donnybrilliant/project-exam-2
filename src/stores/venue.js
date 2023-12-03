@@ -10,14 +10,12 @@ export const useVenueStore = create((set) => ({
   venues: [],
   selectedVenue: null,
 
-  // AUTH STORE??
-
-  // Action for checking if a user is the owner of a venue
-  isOwner: () => {
-    const selectedVenue = useVenueStore.getState().selectedVenue;
+  isOwner: (venue = null) => {
     const userInfo = useAuthStore.getState().userInfo;
-    return userInfo && selectedVenue && selectedVenue.owner
-      ? selectedVenue.owner.name === userInfo.name
+    const selectedVenue = useVenueStore.getState().selectedVenue;
+    const venueToCheck = venue || selectedVenue;
+    return userInfo && venueToCheck && venueToCheck.owner
+      ? venueToCheck.owner.name === userInfo.name
       : false;
   },
 
@@ -47,14 +45,6 @@ export const useVenueStore = create((set) => ({
     useSearchStore.getState().setVenuesAndMaxPrice(allVenues);
   },
 
-  // Action for fetching venues
-  fetchVenues: async () => {
-    const data = await useFetchStore.getState().apiFetch("venues");
-    if (data) {
-      set({ venues: data });
-    }
-  },
-
   // Action for fetching a single venue
   fetchVenueById: async (id) => {
     const data = await useFetchStore
@@ -77,7 +67,6 @@ export const useVenueStore = create((set) => ({
       set((state) => ({
         venues: [...state.venues, response],
       }));
-      // add other places?
       useFetchStore
         .getState()
         .setSuccessMsg(`Successfully created ${response.name}`);
@@ -112,9 +101,11 @@ export const useVenueStore = create((set) => ({
     try {
       await useFetchStore.getState().apiFetch(`venues/${id}`, "DELETE");
       // After deletion, remove the venue from the local state to reflect the change
-      set((state) => ({
+      /*       set((state) => ({
         venues: state.venues.filter((venue) => venue.id !== id),
-      }));
+      })); */
+      // Also update userVenues in useProfileStore
+      //useProfileStore.getState().removeVenue(id);
       useFetchStore.getState().setSuccessMsg(`Successfully deleted ${name}`);
     } catch (error) {
       useFetchStore.getState().setErrorMsg(error.message);

@@ -1,7 +1,6 @@
 import { useVenueStore, useProfileStore, useAuthStore } from "../../stores";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
-
 import {
   Container,
   Typography,
@@ -11,6 +10,7 @@ import {
   Tooltip,
 } from "@mui/material";
 
+// This component is used to display the owner details of a venue
 const VenueOwnerDetails = ({ selectedVenue }) => {
   const token = useAuthStore((state) => state.token);
   const isOwner = useVenueStore((state) => state.isOwner());

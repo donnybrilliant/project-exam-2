@@ -1,7 +1,7 @@
 import { useFetchStore } from "../../stores";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
+import { Snackbar, Alert } from "@mui/material";
 
+// Feedback component that shows a success or error message
 const Feedback = () => {
   const { errorMsg, successMsg, clearMessages } = useFetchStore();
 
