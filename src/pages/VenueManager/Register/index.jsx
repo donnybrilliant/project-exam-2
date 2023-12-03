@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router-dom";
 import { useVenueStore } from "../../../stores";
 import VenueForm from "../../../components/VenueForm";
@@ -13,9 +14,15 @@ const RegisterVenue = () => {
     if (response) navigate(`/venues/${response.id}`);
   };
 
-  document.title = "Register Venue - Holidaze";
-
-  return <VenueForm onSubmit={handleCreateVenue} />;
+  return (
+    <>
+      <Helmet>
+        <title>Register Venue - Holidaze</title>
+        <meta name="description" content="Register your Holidaze venue" />
+      </Helmet>
+      <VenueForm onSubmit={handleCreateVenue} />;
+    </>
+  );
 };
 
 export default RegisterVenue;

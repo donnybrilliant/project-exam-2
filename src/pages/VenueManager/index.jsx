@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
 import { useProfileStore, useAuthStore } from "../../stores";
 import MyVenueList from "../../components/MyVenueList";
@@ -15,8 +16,6 @@ const VenueManager = () => {
   const venueBookings = useProfileStore((state) => state.venueBookings);
   const userName = useAuthStore((state) => state.userInfo.name);
 
-  document.title = "Venue Manager";
-
   // Fetch user venues when userName changes
   useEffect(() => {
     fetchUserVenues(userName);
@@ -32,6 +31,13 @@ const VenueManager = () => {
   return (
     <>
       <Container sx={{ textAlign: "center" }}>
+        <Helmet>
+          <title>Venue Manager - Holidaze</title>
+          <meta
+            name="description"
+            content="Manage your Holidaze venues with ease!"
+          />
+        </Helmet>
         <Typography variant="h1">Venue Manager</Typography>
 
         <Button

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Helmet } from "react-helmet";
 import { useSearchParams } from "react-router-dom";
 import { useVenueStore, useSearchStore } from "../../stores";
 import Search from "../../components/Search";
@@ -50,12 +51,12 @@ const VenuesPage = () => {
     fetchDataAndFilter();
   }, [fetchAllVenues, filterVenues, searchParams, updateStoreSearchParams]);
 
-  //if (isLoading) return <p>Loading...</p>;
-
-  document.title = "Venues - Holidaze";
-
   return (
     <Container>
+      <Helmet>
+        <title>Venues - Holidaze</title>
+        <meta name="description" content="Browse all Holidaze venues" />
+      </Helmet>
       <Search />
       {Array.isArray(filteredVenues) && <VenueList venues={filteredVenues} />}
     </Container>

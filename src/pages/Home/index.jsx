@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Helmet } from "react-helmet";
 import { useVenueStore } from "../../stores";
 import Search from "../../components/Search";
 import VenueCarousel from "../../components/VenueCarousel";
