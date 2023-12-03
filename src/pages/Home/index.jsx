@@ -17,10 +17,6 @@ const Home = () => {
     fetchAllVenues();
   }, [fetchAllVenues]);
 
-  /*   const aDate = venues[0]?.bookings[0].dateFrom;
-  const finalDate = dayjs(aDate);
-  console.log(finalDate); */
-
   // Top Rated Venues: Sort by rating in descending order
   const topRatedVenues = [...venues]
     .sort((a, b) => b.rating - a.rating)

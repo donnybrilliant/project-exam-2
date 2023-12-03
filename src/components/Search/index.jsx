@@ -21,7 +21,6 @@ const Search = () => {
   // Update localSearchParams whenever searchParams changes
   useEffect(() => {
     setLocalSearchParams(searchParams);
-    // console.log(localSearchParams);
   }, [searchParams]);
 
   // Handle the search, update the store's searchParams and navigate to the venues page

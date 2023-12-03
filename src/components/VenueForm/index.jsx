@@ -61,6 +61,7 @@ const VenueForm = ({ onSubmit, initialData = {} }) => {
   );
   const [nameError, setNameError] = useState("");
   const [descriptionError, setDescriptionError] = useState("");
+  let google;
 
   // This function is used to geocode the search address
   const handleGeocode = async () => {
@@ -79,7 +80,6 @@ const VenueForm = ({ onSubmit, initialData = {} }) => {
     geocoder.geocode({ address: addressString }, (results, status) => {
       if (status === "OK") {
         const result = results[0];
-        console.log(result);
         const { address_components } = result;
         const newLocation = {
           lat: result.geometry.location.lat(),

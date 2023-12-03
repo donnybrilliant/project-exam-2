@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useVenueStore, useFetchStore } from "../../../stores";
+import { useVenueStore } from "../../../stores";
 import VenueForm from "../../../components/VenueForm";
 
 // This component is used to display a form for editing a venue
@@ -9,7 +9,6 @@ const EditVenue = () => {
   const navigate = useNavigate();
   const updateVenue = useVenueStore((state) => state.updateVenue);
   const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
-  const isLoading = useFetchStore((state) => state.isLoading);
   const [dataLoaded, setDataLoaded] = useState(false);
 
   const [initialData, setInitialData] = useState({});

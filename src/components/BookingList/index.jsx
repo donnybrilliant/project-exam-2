@@ -67,9 +67,8 @@ const BookingList = ({ bookings }) => {
 
   // This function is used to open the delete menu for a specific booking
   const handleDeleteClickBooking = async (bookingId) => {
-    console.log(bookingId);
     const booking = bookings.find((booking) => booking.id === bookingId);
-    console.log(booking);
+
     openDialog(
       `Cancel Booking at ${booking?.venue.name}`,
       "Are you sure you want to cancel this booking? This action cannot be undone.",

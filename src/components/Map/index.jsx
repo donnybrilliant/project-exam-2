@@ -1,3 +1,4 @@
+/* global google */
 import { useEffect, useState } from "react";
 import { GoogleMap, Marker } from "@react-google-maps/api";
 import { apiKey } from "../../utils/config";
@@ -6,11 +7,10 @@ import { apiKey } from "../../utils/config";
 const Map = ({ location }) => {
   const [mapLocation, setMapLocation] = useState(null);
 
-  // If the API key is not set, return null
-  if (!apiKey) return null;
-
   // When the location changes, geocode the location string
   useEffect(() => {
+    // If the API key is not set, return null
+    if (!apiKey) return null;
     const geocoder = new google.maps.Geocoder();
 
     // Get the location string from the location object
