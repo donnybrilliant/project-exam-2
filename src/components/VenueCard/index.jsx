@@ -97,10 +97,8 @@ const VenueCard = ({ venue }) => {
                 variant="h3"
                 sx={{
                   textTransform: "capitalize",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  maxWidth: "160px",
+                  width: "210px",
+                  textAlign: "left",
                 }}
               >
                 {venue.name.trim() === "" ? "No Name" : venue.name}
