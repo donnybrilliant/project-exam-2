@@ -5,9 +5,11 @@ import {
   useDialogStore,
   useFetchStore,
   useProfileStore,
+  useVenueStore,
 } from "../../stores";
 import dayjs from "dayjs";
 import { ListSkeleton } from "../Skeletons";
+import Calendar from "../Calendar";
 import {
   Avatar,
   IconButton,
@@ -24,23 +26,34 @@ import {
   Typography,
   Container,
   Skeleton,
+  TextField,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import ChatIcon from "@mui/icons-material/Chat";
+import EditBookingForm from "../EditBookingForm";
 
 const BookingList = ({ bookings }) => {
   const deleteBooking = useBookingStore((state) => state.deleteBooking);
+  const updateBooking = useBookingStore((state) => state.updateBooking);
   const isLoading = useFetchStore((state) => state.isLoading);
   const removeUserBooking = useProfileStore((state) => state.removeUserBooking);
+  const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
+  const guests = useBookingStore((state) => state.guests);
+  const dateRange = useBookingStore((state) => state.dateRange);
   const { openDialog } = useDialogStore();
   const [menuState, setMenuState] = useState({
     anchorEl: null,
     bookingId: null,
   });
   const open = Boolean(menuState.anchorEl);
+
+  const handleUpdate = (updatedBookingData) => {
+    // This will be called with the data from EditBookingForm
+    updateBooking(menuState.bookingId, updatedBookingData);
+  };
 
   // Add state to toggle between upcoming and past bookings
   const [showPastBookings, setShowPastBookings] = useState(false);
@@ -76,6 +89,37 @@ const BookingList = ({ bookings }) => {
       }
     );
   };
+
+  // In BookingList component
+  // BookingList component...
+
+  const handleEditClickBooking = async (bookingId) => {
+    const booking = bookings.find((b) => b.id === bookingId);
+    const venueData = await fetchVenueById(booking.venue.id);
+
+    // Set initial values in the store
+
+    openDialog(
+      `Edit Booking at ${booking.venue.name}`,
+      "Update your booking details.",
+      <EditBookingForm booking={booking} venueData={venueData} />,
+      async () => {
+        const updatedGuests = useBookingStore.getState().guests;
+        const updatedDateRange = useBookingStore.getState().dateRange;
+
+        // Prepare the updated booking data
+        const updatedBookingData = {
+          guests: updatedGuests,
+          dateFrom: updatedDateRange[0],
+          dateTo: updatedDateRange[1],
+        };
+        console.log(bookingId, updatedBookingData);
+        await updateBooking(bookingId, booking.venue.name, updatedBookingData);
+      }
+    );
+  };
+
+  // ... rest of the BookingList component
 
   // This function is used to open the menu for a specific booking
   const handleClick = (event, bookingId) => {
@@ -163,16 +207,9 @@ const BookingList = ({ bookings }) => {
                   primary={booking?.venue.name}
                   secondary={
                     // add number of nights?
-                    dayjs
-                      .utc(booking?.dateFrom)
-                      .startOf("day")
-                      .format("DD/MM/YY") +
+                    dayjs(booking?.dateFrom).startOf("day").format("DD/MM/YY") +
                     " - " +
-                    dayjs
-                      .utc(booking?.dateTo)
-
-                      .endOf("day")
-                      .format("DD/MM/YY")
+                    dayjs(booking?.dateTo).endOf("day").format("DD/MM/YY")
                   }
                 />
 
@@ -236,7 +273,9 @@ const BookingList = ({ bookings }) => {
                 </MenuItem>
                 {!showPastBookings && <Divider />}
                 {!showPastBookings && (
-                  <MenuItem>
+                  <MenuItem
+                    onClick={() => handleEditClickBooking(menuState.bookingId)}
+                  >
                     <ListItemIcon>
                       <EditIcon fontSize="small" />
                     </ListItemIcon>

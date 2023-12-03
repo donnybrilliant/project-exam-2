@@ -4,12 +4,20 @@ import { PickersDay } from "@mui/x-date-pickers/PickersDay";
 import dayjs from "dayjs";
 
 // Calendar component with disabled dates and date range selection
-const Calendar = ({ selectedVenue, dateRange, setDateRange }) => {
+const Calendar = ({
+  selectedVenue,
+  dateRange,
+  setDateRange,
+  currentBooking,
+}) => {
   // Check if the selected venue has any bookings that overlap with the selected date range
   const checkDisabledDatesInRange = (startDate, endDate) => {
     const start = dayjs(startDate).startOf("day");
     const end = dayjs(endDate).endOf("day");
     return selectedVenue?.bookings.some((booking) => {
+      if (booking.id === currentBooking?.id) {
+        return false;
+      }
       const bookingStart = dayjs(booking.dateFrom).startOf("day");
       const bookingEnd = dayjs(booking.dateTo);
       return start.isBefore(bookingEnd) && end.isAfter(bookingStart);
