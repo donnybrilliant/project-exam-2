@@ -9,7 +9,7 @@ const Footer = () => {
           sx={{
             textAlign: "center",
             fontSize: "20vw",
-            opacity: 0.1,
+            opacity: 0.03,
           }}
         >
           Holidaze
