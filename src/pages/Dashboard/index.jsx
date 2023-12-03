@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
 import {
   useAuthStore,
@@ -73,11 +74,16 @@ const Dashboard = () => {
     }
   }, [userBookings, fetchVenueById, userName]);
 
-  document.title = "Dashboard";
-
   return (
     <>
       <Container sx={{ textAlign: "center" }}>
+        <Helmet>
+          <title>Dashboard - Holidaze</title>
+          <meta
+            name="description"
+            content="This is where you see ypur user info and personal bookings"
+          />
+        </Helmet>
         <Typography variant="h1">Dashboard</Typography>
         <UserInfo userInfo={userInfo} />
 

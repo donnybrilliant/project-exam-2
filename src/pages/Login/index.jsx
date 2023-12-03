@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Helmet } from "react-helmet";
 import { Link as RouterLink } from "react-router-dom";
 import { useFetchStore, useAuthStore } from "../../stores";
 import {
@@ -24,10 +25,12 @@ const Login = () => {
     await login(email, password);
   };
 
-  document.title = "Login - Holidaze";
-
   return (
     <Container sx={{ textAlign: "center" }} maxWidth={"sm"}>
+      <Helmet>
+        <title>Login - Holidaze</title>
+        <meta name="description" content="Login to your Holidaze account" />
+      </Helmet>
       <Typography variant="h1">Login</Typography>
 
       <Avatar sx={{ width: "100px", height: "100px", my: 4, mx: "auto" }} />

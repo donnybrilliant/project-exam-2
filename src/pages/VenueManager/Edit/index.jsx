@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet";
 import { useParams, useNavigate } from "react-router-dom";
 import { useVenueStore } from "../../../stores";
 import VenueForm from "../../../components/VenueForm";
@@ -10,7 +11,6 @@ const EditVenue = () => {
   const updateVenue = useVenueStore((state) => state.updateVenue);
   const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
   const [dataLoaded, setDataLoaded] = useState(false);
-
   const [initialData, setInitialData] = useState({});
 
   // Fetch venue when id changes
@@ -29,14 +29,18 @@ const EditVenue = () => {
     navigate(`/venues/${id}`);
   };
 
-  document.title = `Edit ${initialData.name}`;
-
   return (
-    <VenueForm
-      key={dataLoaded}
-      initialData={initialData}
-      onSubmit={handleUpdateVenue}
-    />
+    <>
+      <Helmet>
+        <title>Edit Venue - Holidaze</title>
+        <meta name="description" content="Edit your Holidaze venue" />
+      </Helmet>
+      <VenueForm
+        key={dataLoaded}
+        initialData={initialData}
+        onSubmit={handleUpdateVenue}
+      />
+    </>
   );
 };
 

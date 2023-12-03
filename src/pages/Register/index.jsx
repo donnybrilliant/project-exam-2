@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Helmet } from "react-helmet";
 import { Link as RouterLink } from "react-router-dom";
 import { useFetchStore, useAuthStore } from "../../stores";
 import LoadingButton from "@mui/lab/LoadingButton";
@@ -50,10 +51,12 @@ const Register = () => {
     setIsAvatarFieldVisible((prev) => !prev);
   };
 
-  document.title = "Register - Holidaze";
-
   return (
     <Container sx={{ textAlign: "center" }} maxWidth={"sm"}>
+      <Helmet>
+        <title>Register - Holidaze</title>
+        <meta name="description" content="Register your new Holidaze account" />
+      </Helmet>
       <Typography variant="h1">Register</Typography>
       <Badge
         overlap="circular"
