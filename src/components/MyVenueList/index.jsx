@@ -38,7 +38,6 @@ const MyVenueList = ({ venues }) => {
   const deleteVenue = useVenueStore((state) => state.deleteVenue);
   const removeUserVenue = useProfileStore((state) => state.removeUserVenue);
   const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
-
   const { openDialog } = useDialogStore();
   const [menuState, setMenuState] = useState({
     anchorEl: null,
@@ -95,6 +94,7 @@ const MyVenueList = ({ venues }) => {
         };
 
         await useBookingStore.getState().bookVenue(venueName, bookingData);
+        /*  useProfileStore.getState().addUserVenueBooking(venueId, bookingData); */
         useBookingStore.getState().reset();
       }
     );

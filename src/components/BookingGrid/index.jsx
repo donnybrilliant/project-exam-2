@@ -5,8 +5,8 @@ import {
   useVenueStore,
   useAuthStore,
 } from "../../stores";
-import { Link } from "react-router-dom";
 import dayjs from "dayjs";
+import BookingForm from "../BookingForm";
 import { DataGrid } from "@mui/x-data-grid";
 import {
   Avatar,
@@ -14,16 +14,14 @@ import {
   IconButton,
   Tooltip,
   Typography,
+  Link,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ChatIcon from "@mui/icons-material/Chat";
-import BookingForm from "../BookingForm";
 
-// Remove edit and delete from datagrid if not owner?
-// Make another datagrid for owner with edit and delete?
+// This component is used to display the bookings grid with all the bookings for the venues of the current user
 const BookingGrid = ({ venueBookings }) => {
-  console.log(venueBookings);
   const isLoading = useFetchStore((state) => state.isLoading);
   const deleteBooking = useBookingStore((state) => state.deleteBooking);
   const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
@@ -42,20 +40,16 @@ const BookingGrid = ({ venueBookings }) => {
       ).format("DD/MM/YY")}. Guests: ${booking?.guests}`,
       async () => {
         await deleteBooking(booking.id, booking.venue.name);
-        /*     
-        // I dont have access to setBookings here, so I can't update the bookings list
-        setBookings((prevBookings) =>
-          prevBookings.filter((booking) => booking.id !== bookingId)
-        ); */
       }
     );
-    // You might want to refresh your data here to reflect the deletion
   };
 
+  // This function is called when the user clicks on the edit button
   const handleEdit = async (bookingId) => {
     const booking = venueBookings.find((b) => b.id === bookingId);
     const venueData = await fetchVenueById(booking.venue.id);
 
+    // Call the openDialog action from your store
     openDialog(
       `Edit Booking at ${booking.venue.name}`,
       "Update your booking details.",
@@ -75,6 +69,7 @@ const BookingGrid = ({ venueBookings }) => {
     );
   };
 
+  // Define the columns for the DataGrid
   const columns = [
     {
       field: "dateFrom",
@@ -99,7 +94,10 @@ const BookingGrid = ({ venueBookings }) => {
       renderCell: (params) => (
         <>
           <Avatar alt={params.row.venue.name} src={params.row.venue.media[0]} />
-          <Link to={`/venues/${params.row.venue.id}`} style={{ marginLeft: 8 }}>
+          <Link
+            href={`/venues/${params.row.venue.id}`}
+            style={{ marginLeft: 8 }}
+          >
             {params.row.venue.name || "No venue name - please update"}
           </Link>
         </>
