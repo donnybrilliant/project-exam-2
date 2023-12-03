@@ -56,7 +56,7 @@ const VenueOwnerDetails = ({ selectedVenue }) => {
           }}
         >
           <Avatar
-            alt={selectedVenue?.owner?.name}
+            alt={`Profile photo for ${selectedVenue?.owner?.name}`}
             src={selectedVenue?.owner?.avatar}
             sx={{ marginRight: 1 }}
           />

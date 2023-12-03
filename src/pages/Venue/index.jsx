@@ -60,14 +60,16 @@ const VenuePage = () => {
   // Update the document title and fetch profile by name when selectedVenue changes
   useEffect(() => {
     if (selectedVenue) {
-      const capitalizedName =
-        selectedVenue.name[0].toUpperCase() + selectedVenue.name.slice(1);
-      document.title = `${capitalizedName} - Holidaze`;
+      if (selectedVenue.name.trim() !== "") {
+        const capitalizedName =
+          selectedVenue?.name[0].toUpperCase() + selectedVenue?.name.slice(1);
+        document.title = `${capitalizedName} - Holidaze`;
+      } else {
+        document.title = "Venue - Holidaze";
+      }
       if (token) {
         fetchProfileByName(selectedVenue.owner.name);
       }
-    } else {
-      document.title = "Venue - Holidaze";
     }
 
     // Clean-up function to reset title or clear profile data if needed

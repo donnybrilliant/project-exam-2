@@ -39,7 +39,7 @@ const VenueDetails = ({ venue }) => {
           component="img"
           height="350"
           image={venue?.media[0]}
-          alt={venue?.name}
+          alt={`Image of ${venue?.name}`}
         />
       ) : (
         <Box

@@ -15,6 +15,7 @@ import {
   InputAdornment,
   Box,
   Tooltip,
+  Typography,
 } from "@mui/material";
 import WifiIcon from "@mui/icons-material/Wifi";
 import LocalParkingIcon from "@mui/icons-material/LocalParking";
@@ -46,6 +47,8 @@ const VenueForm = ({ onSubmit, initialData = {} }) => {
     }
   );
 
+  const [gptLoading, setGptLoading] = useState(false);
+
   const [searchAddress, setSearchAddress] = useState("");
 
   const [location, setLocation] = useState(
@@ -74,7 +77,6 @@ const VenueForm = ({ onSubmit, initialData = {} }) => {
       lng: 0,
     });
 
-    //const addressString = `${location.address}, ${location.city}, ${location.zip}, ${location.country}`;
     const addressString = searchAddress;
     geocoder.geocode({ address: addressString }, (results, status) => {
       if (status === "OK") {
@@ -184,8 +186,80 @@ const VenueForm = ({ onSubmit, initialData = {} }) => {
     }
   };
 
+  const fetchVenueData = async () => {
+    try {
+      setGptLoading(true);
+      const response = await fetch(
+        "https://server-ocmw.onrender.com/holidaze",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+
+      if (data.error) {
+        setErrorMsg(data.error);
+        setGptLoading(false);
+        return;
+      }
+
+      // Update the form state with the fetched data
+      setName(data.name);
+      setDescription(data.description);
+      setPrice(Number(data.price) || 99);
+      setMaxGuests(Number(data.maxGuests) || 69);
+      setRating(Number(data.rating) || 3);
+
+      // Convert meta object to the required format
+      setMeta({
+        wifi: Math.random() < 0.5,
+        parking: Math.random() < 0.5,
+        breakfast: Math.random() < 0.5,
+        pets: Math.random() < 0.5,
+      });
+
+      setMedia(data.media || []);
+
+      setLocation({
+        address: data.location.address || "",
+        city: data.location.city || "",
+        zip: data.location.zip || "",
+        country: data.location.country || "",
+        lat: data.location.latitude || 0,
+        lng: data.location.longitude || 0,
+      });
+      setSearchAddress("");
+
+      setGptLoading(false);
+    } catch (error) {
+      setErrorMsg(error);
+      setGptLoading(false);
+    }
+  };
+
+  console.log(initialData);
+
   return (
-    <Container maxWidth="md">
+    <Container maxWidth="md" sx={{ textAlign: "center" }}>
+      {!initialData.id ? (
+        <>
+          <Typography variant="h1">Register Venue</Typography>
+          <LoadingButton
+            onClick={fetchVenueData}
+            loading={gptLoading}
+            sx={{ marginBlock: 5 }}
+          >
+            Generate Venue Data
+          </LoadingButton>
+        </>
+      ) : (
+        <Typography variant="h1" sx={{ marginBottom: 5 }}>
+          Edit Venue
+        </Typography>
+      )}
       <Card
         component="form"
         onSubmit={handleSubmit}
@@ -345,7 +419,6 @@ const VenueForm = ({ onSubmit, initialData = {} }) => {
             value={mediaInput}
             onChange={(e) => setMediaInput(e.target.value)}
             fullWidth
-            //required
             InputProps={{
               endAdornment: (
                 <IconButton
@@ -454,6 +527,7 @@ const VenueForm = ({ onSubmit, initialData = {} }) => {
           fullWidth
           type="submit"
           loading={isLoading}
+          sx={{ mt: 2 }}
         >
           {initialData?.id ? "Update Venue" : "Register Venue"}
         </LoadingButton>
