@@ -49,6 +49,7 @@ const MenuButton = () => {
     setAnchorEl(null);
   };
 
+  // This function is used to navigate to the login page
   const navigateToLogin = () => {
     navigate("/login", { state: { from: location } });
   };
@@ -131,7 +132,7 @@ const MenuButton = () => {
               </ListItemIcon>
               Browse Venues
             </MenuItem>
-            <MenuItem>
+            <MenuItem disabled>
               <ListItemIcon>
                 <MapIcon fontSize="small" />
               </ListItemIcon>
