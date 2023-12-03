@@ -90,9 +90,8 @@ const VenuePage = () => {
   };
 
   // Handle booking confirmation
-  const handleBookingConfirm = async (bookingData) => {
-    console.log(bookingData);
-    await bookVenue(bookingData);
+  const handleBookingConfirm = async (name, bookingData) => {
+    await bookVenue(name, bookingData);
     setDateRange([null, null]);
     setGuests(1);
     navigate("/dashboard");
@@ -107,7 +106,6 @@ const VenuePage = () => {
 
       // Create the booking data object
       const bookingData = {
-        name: selectedVenue?.name,
         venueId: id,
         dateFrom: dateRange[0],
         dateTo: dateRange[1],
@@ -141,7 +139,7 @@ const VenuePage = () => {
         `Confirm Booking at ${selectedVenue?.name}`,
         "Please check your booking details, confirm and enjoy your Holidaze!",
         bookingDetails,
-        () => handleBookingConfirm(bookingData)
+        () => handleBookingConfirm(selectedVenue?.name, bookingData)
       );
     }
   };

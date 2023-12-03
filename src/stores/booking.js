@@ -18,12 +18,12 @@ export const useBookingStore = create((set) => ({
   },
 
   // Action for creating a booking
-  bookVenue: async (bookingData) => {
+  bookVenue: async (name, bookingData) => {
     try {
       await useFetchStore.getState().apiFetch("bookings", "POST", bookingData);
       useFetchStore
         .getState()
-        .setSuccessMsg(`Booking at ${bookingData.name} was successful!`);
+        .setSuccessMsg(`Booking at ${name} was successful!`);
     } catch (error) {
       useFetchStore.getState().setErrorMsg(error.message);
     } finally {

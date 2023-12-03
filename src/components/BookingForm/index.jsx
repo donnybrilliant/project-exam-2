@@ -1,16 +1,21 @@
-import React, { useState, useEffect } from "react";
-import { TextField } from "@mui/material";
-import Calendar from "../Calendar";
-import dayjs from "dayjs";
+import { useEffect, useState } from "react";
 import { useBookingStore } from "../../stores";
+import dayjs from "dayjs";
+import Calendar from "../Calendar";
+import { TextField } from "@mui/material";
 
-const EditBookingForm = ({ booking, venueData }) => {
+// Booking form component for dialog use
+const BookingForm = ({ booking, venueData }) => {
   const { setGuests, setDateRange } = useBookingStore();
-  const [localDateRange, setLocalDateRange] = useState([
-    dayjs(booking.dateFrom),
-    dayjs(booking.dateTo),
-  ]);
-  const [localGuests, setLocalGuests] = useState(booking.guests);
+
+  // Determine initial values based on whether we're editing an existing booking
+  const initialDateRange = booking
+    ? [dayjs(booking.dateFrom), dayjs(booking.dateTo)]
+    : [null, null];
+  const initialGuests = booking ? booking.guests : 1;
+
+  const [localDateRange, setLocalDateRange] = useState(initialDateRange);
+  const [localGuests, setLocalGuests] = useState(initialGuests);
 
   // Handle local state changes
   const handleDateRangeChange = (newDateRange) => {
@@ -21,6 +26,7 @@ const EditBookingForm = ({ booking, venueData }) => {
     setLocalGuests(Number(e.target.value));
   };
 
+  // Update global state when local state changes
   useEffect(() => {
     setDateRange(localDateRange);
     setGuests(localGuests);
@@ -45,4 +51,4 @@ const EditBookingForm = ({ booking, venueData }) => {
   );
 };
 
-export default EditBookingForm;
+export default BookingForm;
