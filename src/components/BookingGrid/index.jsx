@@ -158,7 +158,7 @@ const BookingGrid = ({ venueBookings }) => {
             <Tooltip title="Contact Customer">
               <IconButton
                 component={Link}
-                to={`mailto:${params.row.customer.email}`}
+                href={`mailto:${params.row.customer.email}`}
                 onClick={(event) => {
                   event.stopPropagation();
                 }}
