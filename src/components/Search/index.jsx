@@ -157,6 +157,7 @@ const Search = () => {
             variant="contained"
             loading={isLoading}
             sx={{ height: "54px" }}
+            aria-label="Search"
           >
             <SearchIcon />
           </LoadingButton>
