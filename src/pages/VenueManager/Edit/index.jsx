@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useVenueStore, useFetchStore } from "../../../stores";
 import VenueForm from "../../../components/VenueForm";
-import { Typography } from "@mui/material";
 
+// This component is used to display a form for editing a venue
 const EditVenue = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -14,6 +14,7 @@ const EditVenue = () => {
 
   const [initialData, setInitialData] = useState({});
 
+  // Fetch venue when id changes
   useEffect(() => {
     const fetchVenueData = async () => {
       const venueData = await fetchVenueById(id);
@@ -23,18 +24,13 @@ const EditVenue = () => {
     fetchVenueData();
   }, [id, fetchVenueById]);
 
+  // This function is used to update the venue
   const handleUpdateVenue = async (venueData) => {
     await updateVenue(id, venueData);
     navigate(`/venues/${id}`);
   };
 
-  /*   // or isLoading?
-  if (!initialData) {
-    return <Typography>Loading...</Typography>;
-  }
-  
-
-  document.title = `Edit ${initialData.name}`; */
+  document.title = `Edit ${initialData.name}`;
 
   return (
     <VenueForm

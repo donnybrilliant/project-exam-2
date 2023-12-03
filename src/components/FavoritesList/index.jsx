@@ -3,11 +3,13 @@ import { useVenueStore, useFavoritesStore } from "../../stores";
 import { Container, Typography } from "@mui/material";
 import VenueCarousel from "../../components/VenueCarousel";
 
+// FavoritesList is a component that displays a list of the user's favorite venues
 const FavoritesList = () => {
   const fetchVenueById = useVenueStore((state) => state.fetchVenueById);
   const favorites = useFavoritesStore((state) => state.favorites);
   const [favoriteVenues, setFavoriteVenues] = useState([]);
 
+  // Fetch venue details for each favorite venue
   useEffect(() => {
     const fetchFavoriteVenues = async () => {
       const venueDetails = await Promise.all(
@@ -20,7 +22,6 @@ const FavoritesList = () => {
   }, [favorites, fetchVenueById]);
 
   return (
-    // "View your favorites here" when empty?
     <Container disableGutters className="marginBlock">
       {favoriteVenues.length > 0 && (
         <>

@@ -1,6 +1,11 @@
 import { useState, Fragment } from "react";
 import { Link } from "react-router-dom";
-import { useBookingStore, useDialogStore, useFetchStore } from "../../stores";
+import {
+  useBookingStore,
+  useDialogStore,
+  useFetchStore,
+  useProfileStore,
+} from "../../stores";
 import dayjs from "dayjs";
 import { ListSkeleton } from "../Skeletons";
 import {
@@ -29,6 +34,7 @@ import ChatIcon from "@mui/icons-material/Chat";
 const BookingList = ({ bookings }) => {
   const deleteBooking = useBookingStore((state) => state.deleteBooking);
   const isLoading = useFetchStore((state) => state.isLoading);
+  const removeUserBooking = useProfileStore((state) => state.removeUserBooking);
   const { openDialog } = useDialogStore();
   const [menuState, setMenuState] = useState({
     anchorEl: null,
@@ -66,11 +72,7 @@ const BookingList = ({ bookings }) => {
       ).format("DD/MM/YY")}. Guests: ${booking?.guests}`,
       async () => {
         await deleteBooking(bookingId, booking.venue.name);
-        /*     
-        // I dont have access to setBookings here, so I can't update the bookings list
-        setBookings((prevBookings) =>
-          prevBookings.filter((booking) => booking.id !== bookingId)
-        ); */
+        removeUserBooking(bookingId);
       }
     );
   };

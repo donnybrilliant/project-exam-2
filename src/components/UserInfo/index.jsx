@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useProfileStore, useFetchStore } from "../../stores";
+import LoadingButton from "@mui/lab/LoadingButton";
 import {
   Avatar,
   Typography,
@@ -11,22 +12,26 @@ import {
   Skeleton,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
-import LoadingButton from "@mui/lab/LoadingButton";
 
+// This component is used to display the user info
 const UserInfo = ({ userInfo }) => {
   const isLoading = useFetchStore((state) => state.isLoading);
   const updateAvatar = useProfileStore((state) => state.updateAvatar);
   const [isAvatarFieldVisible, setIsAvatarFieldVisible] = useState(false);
   const [avatar, setAvatar] = useState("");
 
+  // This function is used to toggle the avatar field
   const toggleAvatarField = () => {
     setIsAvatarFieldVisible((prev) => !prev);
   };
 
+  // This function is used to update the avatar
   const handleAvatarUpdate = async () => {
     await updateAvatar(avatar);
     setIsAvatarFieldVisible(false);
   };
+
+  // Update the avatar state whenever userInfo changes
   useEffect(() => {
     if (userInfo) {
       setAvatar(userInfo.avatar);

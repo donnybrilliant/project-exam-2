@@ -1,7 +1,4 @@
 import { useState, useEffect } from "react";
-import { MenuItem, IconButton, Tooltip } from "@mui/material";
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import { useSearchStore } from "../../stores";
 import {
   Checkbox,
@@ -17,12 +14,17 @@ import {
   Typography,
   Chip,
   Divider,
+  MenuItem,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import WifiIcon from "@mui/icons-material/Wifi";
 import LocalParkingIcon from "@mui/icons-material/LocalParking";
 import FreeBreakfastIcon from "@mui/icons-material/FreeBreakfast";
 import PetsIcon from "@mui/icons-material/Pets";
 import FilterListIcon from "@mui/icons-material/FilterList";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 
 // Sort and filter component
 const SortAndFilter = () => {
@@ -138,7 +140,14 @@ const SortAndFilter = () => {
       priceRange,
       minRating
     );
-  }, [amenityFilters, currentSortType, priceRange, minRating]);
+  }, [
+    amenityFilters,
+    currentSortType,
+    priceRange,
+    minRating,
+    filterVenues,
+    searchParams,
+  ]);
 
   return (
     <Container

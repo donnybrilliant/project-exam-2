@@ -1,3 +1,4 @@
+import { useFavoritesStore, useAuthStore } from "../../stores";
 import {
   Container,
   CardMedia,
@@ -17,13 +18,14 @@ import PetsIcon from "@mui/icons-material/Pets";
 import PlaceIcon from "@mui/icons-material/Place";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import { useFavoritesStore, useAuthStore } from "../../stores";
 
+// This component is used to display a venue card
 const VenueDetails = ({ venue }) => {
   const { addFavorite, removeFavorite, isFavorite } = useFavoritesStore();
   const favorite = isFavorite(venue.id);
   const token = useAuthStore((state) => state.token);
 
+  // This function is used to toggle the favorite status of a venue
   const handleToggleFavorite = () => {
     if (favorite) {
       removeFavorite(venue.id);

@@ -1,4 +1,4 @@
-import { Button, Container, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   useProfileStore,
@@ -6,10 +6,11 @@ import {
   useBookingStore,
   useFetchStore,
 } from "../../stores";
-import { useEffect, useState } from "react";
 import MyVenueList from "../../components/MyVenueList";
 import BookingGrid from "../../components/BookingGrid";
+import { Button, Container, Typography } from "@mui/material";
 
+// This component is used to display the venue manager page
 const VenueManager = () => {
   const isLoading = useFetchStore((state) => state.isLoading);
   const userInfo = useAuthStore((state) => state.userInfo);
@@ -21,10 +22,12 @@ const VenueManager = () => {
 
   document.title = "Venue Manager";
 
+  // Fetch user venues when userName changes
   useEffect(() => {
     fetchUserVenues(userName);
   }, [fetchUserVenues, userName]);
 
+  // Fetch bookings for each venue when userVenues changes
   useEffect(() => {
     const fetchBookings = async () => {
       // This will be an array of all bookings' promises we need to fetch
@@ -43,9 +46,6 @@ const VenueManager = () => {
       fetchBookings();
     }
   }, [userVenues, getBooking]);
-
-  //console.log(userVenues);
-  //console.log(venueBookings);
 
   return (
     <>

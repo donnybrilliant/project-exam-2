@@ -9,6 +9,7 @@ import {
   Skeleton,
 } from "@mui/material";
 
+// This component is used to display a skeleton for a venue card
 const VenueCardSkeleton = () => {
   return (
     <Grid item xs={12} sm={6} md={4}>

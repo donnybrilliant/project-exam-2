@@ -4,13 +4,10 @@ import { useFetchStore, useSearchStore } from "../../stores";
 import dayjs from "dayjs";
 import AutocompleteSearch from "../AutocompleteSearch";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import Grid from "@mui/material/Grid";
-import Container from "@mui/material/Container";
-import TextField from "@mui/material/TextField";
-import InputAdornment from "@mui/material/InputAdornment";
+import LoadingButton from "@mui/lab/LoadingButton";
+import { Container, Grid, TextField, InputAdornment } from "@mui/material";
 import Person from "@mui/icons-material/Person";
 import SearchIcon from "@mui/icons-material/Search";
-import LoadingButton from "@mui/lab/LoadingButton";
 
 // Search bar component
 const Search = () => {

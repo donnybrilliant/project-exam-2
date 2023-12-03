@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 import { useFetchStore, useAuthStore } from "../../stores";
 import {
   Container,
   Typography,
   Box,
   TextField,
-  Button,
   Link,
   Avatar,
 } from "@mui/material";
@@ -18,8 +17,6 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const login = useAuthStore((state) => state.login);
   const isLoading = useFetchStore((state) => state.isLoading);
-  const navigate = useNavigate();
-  const location = useLocation();
 
   // This function is used to login the user
   const handleLogin = async (event) => {
@@ -73,7 +70,7 @@ const Login = () => {
         </LoadingButton>
       </Box>
       <Link component={RouterLink} to={"/register"}>
-        Don't have an account? Register here
+        Don&apos;t have an account? Register here
       </Link>
     </Container>
   );

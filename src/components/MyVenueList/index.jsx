@@ -1,4 +1,4 @@
-import { useEffect, useState, Fragment } from "react";
+import { useState, Fragment } from "react";
 import { Link } from "react-router-dom";
 import { useFetchStore, useProfileStore, useVenueStore } from "../../stores";
 import { useDialogStore } from "../../stores"; // Adjust path as necessary
@@ -30,6 +30,7 @@ const MyVenueList = ({ venues }) => {
   // Should be taken from userInfo in authstore..
   const isLoading = useFetchStore((state) => state.isLoading);
   const deleteVenue = useVenueStore((state) => state.deleteVenue);
+  const removeUserVenue = useProfileStore((state) => state.removeUserVenue);
 
   const { openDialog } = useDialogStore();
   const [menuState, setMenuState] = useState({
@@ -49,9 +50,7 @@ const MyVenueList = ({ venues }) => {
       } upcoming bookings for this venue.`,
       async () => {
         await deleteVenue(venueId, venue.name);
-        /*   setVenues((prevVenues) =>
-          prevVenues.filter((venue) => venue.id !== venueId)
-        ); */
+        removeUserVenue(venueId);
       }
     );
   };

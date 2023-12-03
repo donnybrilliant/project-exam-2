@@ -13,11 +13,11 @@ import dayjs from "dayjs";
 import Calendar from "../../components/Calendar";
 import Map from "../../components/Map";
 import ImageGallery from "../../components/ImageGallery";
-import { Container, Card, Typography, Button, TextField } from "@mui/material";
 import { VenuePageSkeleton } from "../../components/Skeletons";
 import VenueDetails from "../../components/VenueDetails";
 import VenueOwnerDetails from "../../components/VenueOwnerDetails";
 import NotFound from "../../components/NotFound";
+import { Container, Card, Typography, Button, TextField } from "@mui/material";
 
 // Venue page component
 const VenuePage = () => {
@@ -55,7 +55,7 @@ const VenuePage = () => {
   // Fetch venue when id changes
   useEffect(() => {
     fetchVenueById(id);
-  }, [id]);
+  }, [id, fetchVenueById]);
 
   // Update the document title and fetch profile by name when selectedVenue changes
   useEffect(() => {
@@ -77,7 +77,7 @@ const VenuePage = () => {
       document.title = "Holidaze";
       // Optionally clear profile data here if necessary
     };
-  }, [selectedVenue]);
+  }, [selectedVenue, token, fetchProfileByName]);
 
   // This shouldnt be needed.. But if not it scrolls to the bottom on load sometimes
   useEffect(() => {

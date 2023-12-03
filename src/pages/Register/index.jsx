@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 import { useFetchStore, useAuthStore } from "../../stores";
+import LoadingButton from "@mui/lab/LoadingButton";
 import {
   Container,
   Typography,
@@ -12,7 +13,6 @@ import {
   IconButton,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
-import LoadingButton from "@mui/lab/LoadingButton";
 
 // This component is used to display a register page
 const Register = () => {
@@ -20,8 +20,6 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [avatar, setAvatar] = useState("");
-  const navigate = useNavigate();
-  const apiFetch = useFetchStore((state) => state.apiFetch);
   const isLoading = useFetchStore((state) => state.isLoading);
   const errorMsg = useFetchStore((state) => state.errorMsg);
   const login = useAuthStore((state) => state.login);
@@ -40,12 +38,14 @@ const Register = () => {
       setEmailError(""); // Clear error message if the format is correct
     }
 
+    // Register the user and then login
     const registered = await register(name, email, password, avatar);
     if (registered) {
       await login(email, password);
     }
   };
 
+  // This function is used to toggle the avatar field
   const toggleAvatarField = () => {
     setIsAvatarFieldVisible((prev) => !prev);
   };

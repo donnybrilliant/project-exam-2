@@ -6,10 +6,10 @@ import {
   useProfileStore,
   useVenueStore,
 } from "../../stores";
-import { Container, Typography, Button, Skeleton } from "@mui/material";
 import BookingList from "../../components/BookingList";
 import UserInfo from "../../components/UserInfo";
 import FavoritesList from "../../components/FavoritesList";
+import { Container, Typography, Button, Skeleton } from "@mui/material";
 
 // Should show total number of bookings for each venue in list and total for user.
 // Remember to filter upcoming and past bookings

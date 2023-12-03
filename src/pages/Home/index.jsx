@@ -1,13 +1,10 @@
 import { useEffect } from "react";
 import { useVenueStore } from "../../stores";
-import Container from "@mui/material/Container";
-import { Button, Typography } from "@mui/material";
 import Search from "../../components/Search";
 import VenueCarousel from "../../components/VenueCarousel";
-import Box from "@mui/material/Box";
 import { LogoIcon } from "../../components/Layout/Header/Logo";
+import { Button, Typography, Container, Box, Paper } from "@mui/material";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import Paper from "@mui/material/Paper";
 
 // This component is used to display a home page with a list of venues
 const Home = () => {
@@ -137,7 +134,7 @@ const Home = () => {
         </Typography>
         <Typography paragraph>
           Dive into a plethora of venues that cater to every discerning
-          traveler. Whether you're eyeing a serene countryside retreat or a
+          traveler. Whether you&apos;re eyeing a serene countryside retreat or a
           bustling city escape, Holidaze is your go-to platform for a tailored
           holiday experience.
         </Typography>

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useFetchStore } from "../../stores";
 import ImageGallery from "../../components/ImageGallery";
+import Map from "../../components/Map";
+import LoadingButton from "@mui/lab/LoadingButton";
 import {
   Container,
   Card,
@@ -23,9 +25,8 @@ import FreeBreakfastIcon from "@mui/icons-material/FreeBreakfast";
 import PetsIcon from "@mui/icons-material/Pets";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
-import Map from "../../components/Map";
-import LoadingButton from "@mui/lab/LoadingButton";
 
+// This component is used to display a venue form for registering or editing a venue
 const VenueForm = ({ onSubmit, initialData = {} }) => {
   const isLoading = useFetchStore((state) => state.isLoading);
   const setErrorMsg = useFetchStore((state) => state.setErrorMsg);

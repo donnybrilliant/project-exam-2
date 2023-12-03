@@ -1,9 +1,9 @@
-import React from "react";
-import { Box } from "@mui/material";
-import VenueCard from "../VenueCard";
 import { useFetchStore } from "../../stores";
+import VenueCard from "../VenueCard";
 import { VenueCardSkeleton } from "../Skeletons";
+import { Box } from "@mui/material";
 
+// This component is used to display a carousel of VenenueCards
 const VenueCarousel = ({ venues }) => {
   const isLoading = useFetchStore((state) => state.isLoading);
   return (

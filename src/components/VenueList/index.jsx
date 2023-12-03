@@ -1,10 +1,8 @@
-import VenueCard from "../VenueCard";
-import Grid from "@mui/material/Grid";
-import Typography from "@mui/material/Typography";
-import SortAndFilter from "../SortAndFilter";
-import Container from "@mui/material/Container";
 import { useFetchStore } from "../../stores";
+import SortAndFilter from "../SortAndFilter";
+import VenueCard from "../VenueCard";
 import { VenueCardSkeleton } from "../Skeletons";
+import { Grid, Container, Typography } from "@mui/material";
 
 // This component is used to display a list of venues
 const VenueList = ({ venues }) => {

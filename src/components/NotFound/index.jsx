@@ -1,6 +1,6 @@
 import { Button, Container } from "@mui/material";
-import React from "react";
 
+// NotFound is a component that displays a 404 error message
 const NotFound = ({ text }) => {
   document.title = "404 - Holidaze";
   return (
