@@ -40,7 +40,7 @@ const VenueCard = ({ venue }) => {
 
   if (venue) {
     return (
-      <Card sx={{ position: "relative" }}>
+      <Card sx={{ position: "relative", maxWidth: "300px" }}>
         {token && (
           <IconButton
             size="small"
@@ -97,8 +97,10 @@ const VenueCard = ({ venue }) => {
                 variant="h3"
                 sx={{
                   textTransform: "capitalize",
-                  width: "210px",
-                  textAlign: "left",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  maxWidth: "160px",
                 }}
               >
                 {venue.name.trim() === "" ? "No Name" : venue.name}
